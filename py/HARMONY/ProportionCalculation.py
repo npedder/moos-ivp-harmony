@@ -2,6 +2,7 @@ from SurveyArea import SurveyArea
 from UxV import UxV
 from AreaAssignment import startAssignArea
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 # Pre-condition:
 #   Takes a dictionary that maps vehicle name to vehicle object, and a survey area
@@ -42,13 +43,16 @@ def calculateProportions(vehicles: dict, surveyArea: SurveyArea):
 def plotAssignments(vehicleAssignments: dict):
     plt.figure(figsize=(10, 5))
 
-    for vehicle_name, (x_start, x_end) in vehicleAssignments.items():
-        # Plot the range as a horizontal line
-        plt.plot([x_start, x_end], [vehicle_name, vehicle_name], label=vehicle_name, marker='o')
-    
+    for vehicle_name, survey in vehicleAssignments.items():
+        # Start and end of the range (as a line segment)
+        x_start = survey.position[0]
+        x_end = survey.position[0] + survey.width
+        
+        # Plot the range as a horizontal line for each vehicle
+        plt.plot([x_start, x_end], [0, 0], label=vehicle_name, marker='o')
+
     # Set labels and title
     plt.xlabel("Survey Area Range")
-    plt.ylabel("Vehicle Name")
     plt.title("Vehicle Assignment Ranges in Survey Area")
     plt.legend()
     plt.grid(True)
