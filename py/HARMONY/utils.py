@@ -1,10 +1,11 @@
 import re
+import numpy as np
 from UxV import UxV
 from SurveyArea import SurveyArea
 
 
 
-def parseNodeReportAndCreateVehilce(nodeReport):
+def parseNodeReportAndCreateVehicle(nodeReport):
     # Regular expression to extract NAME, LAT, and LON
     pattern = r"NAME=([^,]+),.*LAT=([-\d.]+),.*LON=([-\d.]+)"
 
@@ -20,7 +21,7 @@ def parseNodeReportAndCreateVehilce(nodeReport):
         # print(f"Latitude: {lat}")
         # print(f"Longitude: {lon}")
 
-        vehicle = UxV(name, (lat,lon), 10, 100, 100 );
+        vehicle = UxV(name, (lat,lon), 10, 20, 100 );
         return vehicle
     else:
         print("Pattern not found in the string.")
@@ -35,7 +36,7 @@ def parseSurveyAreaAndCreateObject(survey_msg):
     match = re.search(pattern, survey_msg)
 
     if match:
-        width = match.group(1)
+        width = float(match.group(1))
         height = float(match.group(2))
         x_pos = float(match.group(3))
         y_pos = float(match.group(4))
@@ -50,3 +51,25 @@ def parseSurveyAreaAndCreateObject(survey_msg):
     else:
         print("Pattern not found in the string.")
         return None
+
+def convertSurveyAreaIntoMatrix(survey_area):
+    start_x = survey_area.position[0]
+    start_y = survey_area.position[1]
+    max_x = start_x + survey_area.width
+    max_y= start_y + survey_area.height
+
+    # define the lower and upper limits for x and y
+    minX, maxX, minY, maxY = start_x, max_x, start_y, max_y
+
+    # create one-dimensional arrays for x and y
+    x = np.arange(minX, maxX, (maxX - minX) / 10. + 1)
+    y = np.arange(minY, maxY, (maxY - minY) / 10. + 1)
+    # create the mesh based on these arrays
+    x, y = np.meshgrid(x, y)
+
+    print(x)
+    print(y)
+
+    coords = zip(x, y)
+
+    print(tuple(coords))

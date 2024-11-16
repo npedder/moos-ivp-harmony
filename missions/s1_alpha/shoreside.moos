@@ -111,12 +111,14 @@ ProcessConfig = pShare
    output = src_name=RETURN , route=localhost:9201
    output = src_name=SLOWER , route=localhost:9201
    output = src_name=FASTER , route=localhost:9201
+   output = src_name=alpha_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9201
    
    output = src_name=DEPLOY , route=localhost:9202
    output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9202
    output = src_name=RETURN , route=localhost:9202
    output = src_name=SLOWER , route=localhost:9202
    output = src_name=FASTER , route=localhost:9202
+   output = src_name=bravo_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9202
  }
 
 
