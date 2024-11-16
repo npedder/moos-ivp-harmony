@@ -1,4 +1,4 @@
-##Setup
+## Setup
 
 The HARMONY system uses the python-moos wrapper for MOOSApps for its shore-side application. 
 To install python-moos:
