@@ -24,9 +24,7 @@ n=9000
 # Run through every set of vehicles by dividing the line count
 # by the number of variables required for each nsplug call
 for i in $(seq 1 $((line_count / 9))); do
-  echo "What is the name of this new vehicle file?"
-read name
-    nsplug vehicle.moos "$name.moos" \
+    nsplug vehicle.moos "${my_array[$((0 + next_vehicle))]}.moos" \
     PORT="$n" \
     VNAME="${my_array[$((0 + next_vehicle))]}" \
     LATORG="${my_array[$((1 + next_vehicle))]}" \
