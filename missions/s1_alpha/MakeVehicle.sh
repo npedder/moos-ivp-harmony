@@ -24,9 +24,9 @@ m=0
 # Run through every set of vehicles by dividing the line count
 # by the number of variables required for each nsplug call
 for i in $(seq 1 $((line_count / 8))); do
-    nsplug vehicle.moos "$vehicle_$m.moos" \
+    nsplug vehicle.moos vehicle_"$m.moos" \
     PORT="$n" \
-    VNAME="$vehicle_$m" \
+    VNAME=Vehicle_"$m" \
     LATORG="${my_array[$((0 + next_vehicle))]}" \
     LONGORG="${my_array[$((1 + next_vehicle))]}" \
     START_X="${my_array[$((2 + next_vehicle))]}" \
