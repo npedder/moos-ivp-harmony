@@ -1,5 +1,12 @@
 #!/bin/bash
 
+#remove vehicle files and rebuild so if changes are made
+#or a vehicle is removed singularly because config
+#changes, then you have a safe bet nothing will
+#be misalligned of broken in a file
+rm *vehicle_*
+echo "$If you see a "file doesn't exist error" ignore it. We're just checking for existing files!"
+
 # Define the file
 file="InitVehicleConfig.txt"
 
@@ -26,7 +33,7 @@ m=0
 for i in $(seq 1 $((line_count / 8))); do
     nsplug vehicle.moos vehicle_"$m.moos" \
     PORT="$n" \
-    VNAME=Vehicle_"$m" \
+    VNAME=vehicle_"$m" \
     LATORG="${my_array[$((0 + next_vehicle))]}" \
     LONGORG="${my_array[$((1 + next_vehicle))]}" \
     START_X="${my_array[$((2 + next_vehicle))]}" \
