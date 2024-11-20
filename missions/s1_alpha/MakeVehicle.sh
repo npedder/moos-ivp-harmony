@@ -4,8 +4,14 @@
 #or a vehicle is removed singularly because config
 #changes, then you have a safe bet nothing will
 #be misalligned of broken in a file
+#!/bin/bash
+
+word="vehicle_"
+
+# Check for file names containing the word
+if ls *"$word"* 1> /dev/null 2>&1; then
 rm *vehicle_*
-echo "$If you see a "file doesn't exist error" ignore it. We're just checking for existing files!"
+fi
 
 # Define the file
 file="InitVehicleConfig.txt"
