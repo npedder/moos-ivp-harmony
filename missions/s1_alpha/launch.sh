@@ -7,7 +7,7 @@
 #  Part 1: Set Exit actions and declare global var defaults
 #----------------------------------------------------------
 #source file to run your congfig and vehicle amounts before launch!
-source MakeVehicle.sh
+m=(grep'^m='MakeVehicle.sh|cut -d'='-f2|tr-d"")
 TIME_WARP=1
 COMMUNITY="vehicle_0"
 GUI="yes"
