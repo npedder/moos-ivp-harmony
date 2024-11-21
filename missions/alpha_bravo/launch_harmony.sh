@@ -8,6 +8,7 @@
 #----------------------------------------------------------
 TIME_WARP=1
 COMMUNITY="alpha"
+HARMONY_PATH="../../py/HARMONY/main.py"
 GUI="yes"
 
 #----------------------------------------------------------
@@ -32,11 +33,15 @@ done
 #----------------------------------------------------------
 #  Part 3: Launch the processes
 #----------------------------------------------------------
-echo "Launching $COMMUNITY MOOS Community with WARP:" $TIME_WARP
+
+echo "Launching HARMONY app from $HARMONY_PATH" 
+xterm -e "python3 $HARMONY_PATH" &
+
+echo "Launching $COMMUNITY MOOS Community with WARP:" $TIME_WARP 
 pAntler $COMMUNITY.moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
 pAntler bravo.moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
 pAntler shoreside.moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
 uMAC -t shoreside.moos &
 uMAC -t bravo.moos &
-uMAC -t $COMMUNITY.moos
+uMAC -t $COMMUNITY.moos 
 kill -- -$$
