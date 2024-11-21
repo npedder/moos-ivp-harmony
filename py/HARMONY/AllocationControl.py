@@ -18,15 +18,17 @@ def allocateArea(vehicles: dict, surveyArea: SurveyArea) :
 
     return vehicleAssignments
 
-# Defining some vehicles and a survey area for a test (can be removed)
-surveyArea = SurveyArea(15, 15, (0, 0))
 
-vehicle1 = UxV("Alpha", (0, 0), 1, 5, 100)
-vehicle2 = UxV("Beta", (10, 3), 5, 10, 100)
-vehicle3 = UxV("Charlie", (10, 10), 1, 7, 100)
-vehicle4 = UxV("Delta", (1, 5), 3, 4, 300)
+if __name__ == "__main__":
+    # Defining some vehicles and a survey area for a test (can be removed)
+    surveyArea = SurveyArea(15, 15, (0, 0))
 
-vehicles = {vehicle1.name: vehicle1, vehicle2.name: vehicle2, vehicle3.name: vehicle3, vehicle4.name: vehicle4}
+    vehicle1 = UxV("Alpha", (0, 0), 1, 5, 100)
+    vehicle2 = UxV("Beta", (10, 3), 5, 10, 100)
+    vehicle3 = UxV("Charlie", (10, 10), 1, 7, 100)
+    vehicle4 = UxV("Delta", (1, 5), 3, 4, 300)
 
-vehicleAssignments = allocateArea(vehicles, surveyArea)
-plotAssignments(vehicleAssignments)
+    vehicles = {vehicle1.name: vehicle1, vehicle2.name: vehicle2, vehicle3.name: vehicle3, vehicle4.name: vehicle4}
+
+    vehicleAssignments = allocateArea(vehicles, surveyArea)
+    plotAssignments(vehicleAssignments)
