@@ -179,3 +179,12 @@ ProcessConfig = pShare
    output = src_name=VIEW_SEGLIST , route=localhost:9200
    output = src_name=VIEW_POINT , route=localhost:9200
  }
+
+//--------------------------------
+//uTimerScript
+ ProcessConfig = uTimerScript
+ {
+   paused = false
+   event = var =HARMONYREPORT, val = "NAME=$(NAME),TYPE=UUV,X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
+
+ }
