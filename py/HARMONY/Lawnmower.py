@@ -1,4 +1,4 @@
-
+# Class to represent the Lawnmower waypoint function for MOOS IvP behavior scripting
 class Lawnmower:
     def __init__(self, width, height, lane_width, position : tuple):
         self.width = width
