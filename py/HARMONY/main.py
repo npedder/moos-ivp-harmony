@@ -7,7 +7,7 @@ from MOOSHandler import MOOSHandler
 # and add to a dictionary of available vehicles.
 # Generate waypoint information and send to 
 
-PORT = 9200
+PORT = 8999
 MOOS_HOST = 'localhost'
 CLIENT_NAME = "HARMONY"
 

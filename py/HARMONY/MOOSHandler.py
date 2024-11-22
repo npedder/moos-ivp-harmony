@@ -28,6 +28,7 @@ class MOOSHandler:
     def register_variables(self):
         self.comms.register("NODE_REPORT")
         self.comms.register("SURVEY_AREA")
+        self.comms.register("HARMONY_REPORT")
 
     def fetch_messages(self):
         # Will return a list of MOOS msg
