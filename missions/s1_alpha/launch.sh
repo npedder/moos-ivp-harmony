@@ -6,10 +6,12 @@
 #----------------------------------------------------------
 #  Part 1: Set Exit actions and declare global var defaults
 #----------------------------------------------------------
+#source file to run your congfig and vehicle amounts before launch!
+m=(grep'^m='MakeVehicle.sh|cut -d'='-f2|tr-d"")
 TIME_WARP=1
-COMMUNITY="alpha"
+COMMUNITY="vehicle_0"
 GUI="yes"
-
+n=0
 #----------------------------------------------------------
 #  Part 2: Check for and handle command-line arguments
 #----------------------------------------------------------
@@ -34,9 +36,15 @@ done
 #----------------------------------------------------------
 echo "Launching $COMMUNITY MOOS Community with WARP:" $TIME_WARP
 pAntler $COMMUNITY.moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
-pAntler bravo.moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
+for i in {seq 0 to "$m"}; do
+pAntler vehicle_"$n".moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
+((n++))
+done
 pAntler shoreside.moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
 uMAC -t shoreside.moos &
-uMAC -t bravo.moos &
+for i in {seq 0 to "$m"}; do
+uMAC -t vehicle_"$n".moos &
+((n++))
+done
 uMAC -t $COMMUNITY.moos
 kill -- -$$
