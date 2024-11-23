@@ -16,7 +16,6 @@ def main():
     # Handles MOOSDB connection, stores survey area and vehicle information, and sends waypoints based on algorithm
     moos_handler = MOOSHandler(MOOS_HOST, PORT, CLIENT_NAME)
 
-
     moos_handler.connect()
 
     # Forever loop
@@ -24,7 +23,7 @@ def main():
         time.sleep(1)
         messages = moos_handler.fetch_messages()
 
-        # When respective messages are received, moos_handler.survey_area and mood_handler.available_vehicles will be updated.
+        # When respective messages are received, moos_handler.survey_area and mood_handler.available_vehicles updates.
         moos_handler.parse_incoming_messages(messages)
 
 

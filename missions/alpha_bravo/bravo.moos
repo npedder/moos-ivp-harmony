@@ -1,5 +1,5 @@
 //-------------------------------------------------
-// NAME: M. Benjamin, MIT CSAIL
+// NAME: Nathan Pedder
 // FILE: bravo.moos
 //-------------------------------------------------
 
@@ -31,6 +31,7 @@ ProcessConfig = ANTLER
   Run = pNodeReporter	@ NewConsole = false
   Run = pRealm	      @ NewConsole = false
   Run = pShare	      @ NewConsole = false
+  Run = uTimerScript  @ NewConsole = false
 }
 
 //------------------------------------------
@@ -178,4 +179,20 @@ ProcessConfig = pShare
    output = src_name=NODE_REPORT_LOCAL, dest_name=NODE_REPORT, route=localhost:8999
    output = src_name=VIEW_SEGLIST , route=localhost:8999
    output = src_name=VIEW_POINT , route=localhost:8999
+   output = src_name=HARMONY_REPORT, route=localhost:8999
  }
+
+//--------------------------------
+//uTimerScript
+ProcessConfig = uTimerScript
+ {
+ 
+   AppTick    = 4
+   CommsTick  = 4
+   
+   paused = false
+   reset_time = 1
+   event = var=HARMONY_REPORT, val="NAME=bravo,TYPE=UUV,X=200,Y=-50,SPD=2.5,ENDURANCE=300,SENSOR_RANGE=100"
+
+ }
+
