@@ -4,7 +4,7 @@
 //-------------------------------------------------
 
 ServerHost   = localhost
-ServerPort   = 9200
+ServerPort   = 8999
 Community    = shoreside
 MOOSTimeWarp = 1
 
@@ -104,21 +104,21 @@ ProcessConfig = pShare
    AppTick    = 4
    CommsTick  = 4
 
-   input  = route = localhost:9200  
+   input  = route = localhost:8999  
    
-   output = src_name=DEPLOY , route=localhost:9201
-   output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9201
-   output = src_name=RETURN , route=localhost:9201
-   output = src_name=SLOWER , route=localhost:9201
-   output = src_name=FASTER , route=localhost:9201
-   output = src_name=alpha_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9201
+   output = src_name=DEPLOY , route=localhost:9000
+   output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9000
+   output = src_name=RETURN , route=localhost:9000
+   output = src_name=SLOWER , route=localhost:9000
+   output = src_name=FASTER , route=localhost:9000
+   output = src_name=vehicle_0_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9000
    
-   output = src_name=DEPLOY , route=localhost:9202
-   output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9202
-   output = src_name=RETURN , route=localhost:9202
-   output = src_name=SLOWER , route=localhost:9202
-   output = src_name=FASTER , route=localhost:9202
-   output = src_name=bravo_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9202
+   output = src_name=DEPLOY , route=localhost:9001
+   output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9001
+   output = src_name=RETURN , route=localhost:9001
+   output = src_name=SLOWER , route=localhost:9001
+   output = src_name=FASTER , route=localhost:9001
+   output = src_name=vehicle_1_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9001
  }
 
 

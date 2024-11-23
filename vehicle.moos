@@ -175,7 +175,16 @@ ProcessConfig = pShare
 
    input  = route = localhost:$(PORT)
 
-   output = src_name=NODE_REPORT_LOCAL, dest_name=NODE_REPORT, route=localhost:9200
-   output = src_name=VIEW_SEGLIST , route=localhost:9200
-   output = src_name=VIEW_POINT , route=localhost:9200
+   output = src_name=NODE_REPORT_LOCAL, dest_name=NODE_REPORT, route=localhost:8999
+   output = src_name=VIEW_SEGLIST , route=localhost:8999
+   output = src_name=VIEW_POINT , route=localhost:8999
+ }
+
+//--------------------------------
+//uTimerScript
+ ProcessConfig = uTimerScript
+ {
+   paused = false
+   event = var =HARMONY_REPORT, val = "NAME=$(NAME),TYPE=UUV,X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
+
  }
