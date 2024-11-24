@@ -21,6 +21,7 @@ def main():
     # Forever loop
     while True:
         time.sleep(1)
+
         messages = moos_handler.fetch_messages()
 
         # When respective messages are received, moos_handler.survey_area and mood_handler.available_vehicles updates.
