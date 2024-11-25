@@ -78,7 +78,7 @@ def convertSurveyAreaIntoMatrix(survey_area):
 
     print(tuple(coords))
 
-def plotAssignments(vehicleAssignments: dict, totalSurvey: 'SurveyArea'):
+def plotAssignments(vehicleAssignments: dict, vehicles: dict, totalSurvey: SurveyArea):
     # Create a figure and axis
     fig, ax = plt.subplots()
 
@@ -99,19 +99,20 @@ def plotAssignments(vehicleAssignments: dict, totalSurvey: 'SurveyArea'):
         
         # Add the rectangle to the plot
         ax.add_patch(rect)
+        ax.scatter(vehicles[name].position[0], vehicles[name].position[1], color=color)
+        ax.text(vehicles[name].position[0], vehicles[name].position[1], f"{name}", fontsize=8, color='black')
 
         # Create legend entry for this rectangle
         if color not in legend_colors:  # Avoid duplicate legend entries for the same color
             legend_labels.append(name)  # Vehicle name
             legend_colors.append(patches.Patch(color=color))  # Color patch for legend
 
-    # Set limits and show the plot
-
-    ax.set_xlim(0, 50)
-    ax.set_ylim(0, 50)
+    ax.autoscale()
     plt.gca().set_aspect('equal', adjustable='box')
 
     # Add the legend
-    ax.legend(legend_colors, legend_labels, title="Vehicles")
+    ax.legend(legend_colors, legend_labels, title="Vehicles", bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+    # plt.tight_layout()
+    ax.set_title("Vehicle Assignments")
 
     plt.show()

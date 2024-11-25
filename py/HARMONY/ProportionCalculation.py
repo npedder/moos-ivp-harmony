@@ -37,7 +37,7 @@ def calculateProportions(vehicles: dict, surveyArea: SurveyArea):
         weightedCapRatio = (min(totalSurveyArea * vehicleProportions[vehicle[1].name][1], 
                             vehicle[1].endurance * vehicle[1].sensorRange))/totalWeightedCapacity
         vehicleProportions[vehicle[1].name] = (vehicle[1], weightedCapRatio)
-        # print(vehicle[1].name + "'s propotion of the area is " + str(weightedCapRatio))
+        print(vehicle[1].name + " is assigned a proportion of: " + str(weightedCapRatio))
     return vehicleProportions
         
 # Below is a re-implementation of the startAreaAssign function which utilizes new
@@ -85,10 +85,13 @@ def calculateProportions2(vehicles: dict, surveyArea: SurveyArea):
         endTravelDistance = math.dist(vehicle.position, surveyCenter)  
         totalTravelDistance = startTravelDistance + endTravelDistance
         if(startTravelTime >= 1):
-            startTimeScalar = 1 - (startTravelTime - 1)/(T_max - 1)
+            if(startTravelTime <= T_max):
+                startTimeScalar = 1 - (startTravelTime)/(T_max)
+            else:
+                startTimeScalar = 0
         else:
             startTimeScalar = 1
-        totalWeightCapSum += min(totalSurveyArea * (timeEffRatio * startTimeScalar), totalAreaCapability - (totalTravelDistance * vehicle.sensorRange))
+        totalWeightCapSum += min(totalSurveyArea * (timeEffRatio * startTimeScalar), max(0, totalAreaCapability - (totalTravelDistance * vehicle.sensorRange)))
         
     for vehicle_name, vehicle in vehicles.items():
         coverageRate = vehicle.speed * vehicle.sensorRange
@@ -102,9 +105,14 @@ def calculateProportions2(vehicles: dict, surveyArea: SurveyArea):
         endTravelDistance = math.dist(vehicle.position, surveyCenter)  
         totalTravelDistance = startTravelDistance + endTravelDistance
         if(startTravelTime >= 1):
-            startTimeScalar = 1 - (startTravelTime - 1)/(T_max - 1)
+            if(startTravelTime <= T_max):
+                startTimeScalar = 1 - (startTravelTime)/(T_max)
+            else:
+                startTimeScalar = 0
         else:
             startTimeScalar = 1
-        vehicleProportions[vehicle_name] = (vehicle, min(totalSurveyArea * (timeEffRatio * startTimeScalar), totalAreaCapability - (totalTravelDistance * vehicle.sensorRange))/totalWeightCapSum)
+        vehicleProportions[vehicle_name] = (vehicle, min(totalSurveyArea * (timeEffRatio * startTimeScalar), max(0, totalAreaCapability - (totalTravelDistance * vehicle.sensorRange)))/totalWeightCapSum)
+        print(vehicle_name + " is assigned a proportion of: " + str(vehicleProportions[vehicle_name][1]))
+
     return vehicleProportions
 
