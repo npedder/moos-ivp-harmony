@@ -10,6 +10,6 @@ class Lawnmower:
         return f'"LAWNMOWER("points = format=lawnmower, x={self.position[0]}, y={self.position[1]}, height={self.height}, width={self.width}, lane_width={self.lane_width})""'
 
     def string(self):
-        return f'points = format=lawnmower, x={self.position[0]}, y={self.position[1]}, height={self.height}, width={self.width}, lane_width={self.lane_width}'
+        return f'points = format=lawnmower, x={self.position[0]}, y={self.position[1]}, height={self.height}, width={self.width}, lane_width={self.lane_width}, rows=north-south'
 
     

@@ -121,7 +121,7 @@ ProcessConfig = pHostInfo
     bridge = src=DEPLOY_$V, alias=DEPLOY
     bridge = src=RETURN_ALL, alias=RETURN
     bridge = src=RETURN_$V, alias=RETURN
-    bridge = src=$V_WPT_UPDATE, alias=WPT_UPDATE
+    bridge = src=$v_WPT_UPDATE, alias=WPT_UPDATE
     bridge = src=FASTER
     bridge = src=SLOWER
     qbridge = NODE_REPORT, STATION_KEEP
