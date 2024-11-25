@@ -32,6 +32,8 @@ ProcessConfig = ANTLER
   Run = pRealm	      @ NewConsole = false
   Run = pShare	      @ NewConsole = false
   Run = uTimerScript @ NewConsole = false
+  Run = uFldNodeBroker @ NewConsole = false
+  Run = pHostInfo     @ NewConsole = false
 }
 
 //------------------------------------------
@@ -57,6 +59,15 @@ ProcessConfig = pLogger
   WildCardOmitPattern = DB_VARSUMMARY
   WildCardOmitPattern = DB_RWSUMMARY
   WildCardExclusionLog = true
+}
+
+//pHostInfo configuration block
+ProcessConfig = pHostInfo
+{
+    AppTick = 4
+    CommsTick = 4
+
+    DEFAULT_HOSTIP = localhost
 }
 
 //------------------------------------------
@@ -149,23 +160,22 @@ ProcessConfig = pNodeReporter
          
 }
 
- //ProcessConfig = uFldNodeBroker                                  
-   //6  {                                                               
-   //7    AppTick   = 4                                                 
-  // 8    CommsTick = 4                                                 
-   //9         
-  //10    keyword        = lemon                                        
-  //11                                                            
-  //12    try_shore_host = pshare_route=localhost:9200                  
-  //13    try_shore_host = pshare_route=192.168.0.122:9301              
-  //14    try_shore_host = pshare_route=multicast_8           
-  //15                                                            
-  //16    bridge = src=VIEW_POLYGON                                     
-  //17    bridge = src=VIEW_POINT                                       
-  //18    bridge = src=VIEW_SEGLIST                                     
-  //19                                                              
-  //20    bridge = src=NODE_REPORT_LOCAL, alias=NODE_REPORT             
-  //21  }                           
+//--------------------------------
+//uFldNodeBroker
+//ProcessConfig = uFldNodeBroker
+//  {
+//    AppTick   = 4
+//    CommsTick = 4
+
+//    try_shore_host = pshare_route=localhost:8999        //Switched localhost to match shoreside address
+
+//    bridge = src=VIEW_POLYGON
+//    bridge = src=VIEW_POINT
+//    bridge = src=VIEW_SEGLIST
+
+//    bridge = src=NODE_REPORT_LOCAL, alias=NODE_REPORT
+//    bridge = src=HARMONY_REPORT
+//  }
 
 //--------------------------------
 //pShare

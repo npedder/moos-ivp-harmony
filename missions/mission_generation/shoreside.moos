@@ -25,6 +25,8 @@ ProcessConfig = ANTLER
   Run = MOOSDB        @ NewConsole = false
   Run = pMarineViewer	@ NewConsole = false
   Run = pShare	      @ NewConsole = false
+  Run = uFldShoreBroker @ NewConsole = false
+  Run = pHostInfo     @ NewConsole = false
 }
 
 
@@ -83,10 +85,11 @@ ProcessConfig = pMarineViewer
   scope  = VIEW_POLYGON
   scope  = MVIEWER_LCLICK
   scope  = MVIEWER_RCLICK
+  scope  = DEPLOY
 
-  button_one = DEPLOY # DEPLOY=true
-  button_one = MOOS_MANUAL_OVERRIDE=false # RETURN=false
-  button_two = RETURN # RETURN=true
+  button_one = DEPLOY # DEPLOY_ALL=true
+  button_one = MOOS_MANUAL_OVERRIDE_ALL=false # RETURN_ALL=false
+  button_two = RETURN # RETURN_ALL=true
   button_three = SLOWER # WPT_UPDATE=speed=1.5
   button_four = FASTER # WPT_UPDATE=speed=3.5
 
@@ -96,8 +99,38 @@ ProcessConfig = pMarineViewer
   action  = UPDATES_RETURN=speed=1.4
 }
 
+//pHostInfo configuration block
+ProcessConfig = pHostInfo
+{
+    AppTick = 4
+    CommsTick = 4
+}
 
-//-Share
+//uFldShoreBroker
+  ProcessConfig = uFldShoreBroker
+  {
+    AppTick   = 4
+    CommsTick = 4
+
+    warning_on_stale      = false
+    auto_bridge_realmcast = true
+    auto_bridge_appcast   = true
+    auto_bridge_mhash     = true
+
+    bridge =  src=DEPLOY_ALL, alias=DEPLOY
+    bridge = src=DEPLOY_$V, alias=DEPLOY
+    bridge = src=RETURN_ALL, alias=RETURN
+    bridge = src=RETURN_$V, alias=RETURN
+    bridge = src=$V_WPT_UPDATE, alias=WPT_UPDATE
+    bridge = src=FASTER
+    bridge = src=SLOWER
+    qbridge = NODE_REPORT, STATION_KEEP
+    qbridge = MOOS_MANUAL_OVERRIDE, APPCAST_REQ
+
+ }
+
+
+//pShare
 //-------------
 ProcessConfig = pShare
  {
@@ -106,33 +139,33 @@ ProcessConfig = pShare
 
    input  = route = localhost:8999  
    
-   output = src_name=DEPLOY , route=localhost:9000
-   output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9000
-   output = src_name=RETURN , route=localhost:9000
-   output = src_name=SLOWER , route=localhost:9000
-   output = src_name=FASTER , route=localhost:9000
-   output = src_name=vehicle_1_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9000
+   //output = src_name=DEPLOY , route=localhost:9000
+   //output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9000
+   //output = src_name=RETURN , route=localhost:9000
+   //output = src_name=SLOWER , route=localhost:9000
+   //output = src_name=FASTER , route=localhost:9000
+   //output = src_name=vehicle_1_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9000
    
-   output = src_name=DEPLOY , route=localhost:9001
-   output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9001
-   output = src_name=RETURN , route=localhost:9001
-   output = src_name=SLOWER , route=localhost:9001
-   output = src_name=FASTER , route=localhost:9001
-   output = src_name=vehicle_2_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9001
+   //output = src_name=DEPLOY , route=localhost:9001
+   //output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9001
+   //output = src_name=RETURN , route=localhost:9001
+   //output = src_name=SLOWER , route=localhost:9001
+   //output = src_name=FASTER , route=localhost:9001
+   //output = src_name=vehicle_2_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9001
    
-   output = src_name=DEPLOY , route=localhost:9002
-   output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9002
-   output = src_name=RETURN , route=localhost:9002
-   output = src_name=SLOWER , route=localhost:9002
-   output = src_name=FASTER , route=localhost:9002
-   output = src_name=vehicle_3_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9002
+   //output = src_name=DEPLOY , route=localhost:9002
+   //output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9002
+   //output = src_name=RETURN , route=localhost:9002
+   //output = src_name=SLOWER , route=localhost:9002
+   //output = src_name=FASTER , route=localhost:9002
+   //output = src_name=vehicle_3_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9002
    
-   output = src_name=DEPLOY , route=localhost:9003
-   output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9003
-   output = src_name=RETURN , route=localhost:9003
-   output = src_name=SLOWER , route=localhost:9003
-   output = src_name=FASTER , route=localhost:9003
-   output = src_name=vehicle_4_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9003
+   //output = src_name=DEPLOY , route=localhost:9003
+   //output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9003
+   //output = src_name=RETURN , route=localhost:9003
+   //output = src_name=SLOWER , route=localhost:9003
+   //output = src_name=FASTER , route=localhost:9003
+   //output = src_name=vehicle_4_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9003
  }
 
 
