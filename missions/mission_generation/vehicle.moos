@@ -1,6 +1,6 @@
 //-------------------------------------------------
-// NAME: M. Benjamin, MIT CSAIL
-// FILE: alpha.moos
+// NAME: HARMONY TEAM
+// FILE: vehicle.moos
 //-------------------------------------------------
 
 ServerHost   = localhost
@@ -31,6 +31,8 @@ ProcessConfig = ANTLER
   Run = pNodeReporter	@ NewConsole = false
   Run = pRealm	      @ NewConsole = false
   Run = pShare	      @ NewConsole = false
+  Run = pHostInfo     @ NewConsole = false
+  Run = uFldNodeBroker @ NewConsole = false
   Run = uTimerScript @ NewConsole = false
 }
 
@@ -57,6 +59,15 @@ ProcessConfig = pLogger
   WildCardOmitPattern = DB_VARSUMMARY
   WildCardOmitPattern = DB_RWSUMMARY
   WildCardExclusionLog = true
+}
+
+//pHostInfo configuration block
+ProcessConfig = pHostInfo
+{
+    AppTick = 4
+    CommsTick = 4
+
+    DEFAULT_HOSTIP = localhost
 }
 
 //------------------------------------------
@@ -149,23 +160,22 @@ ProcessConfig = pNodeReporter
          
 }
 
- //ProcessConfig = uFldNodeBroker                                  
-   //6  {                                                               
-   //7    AppTick   = 4                                                 
-  // 8    CommsTick = 4                                                 
-   //9         
-  //10    keyword        = lemon                                        
-  //11                                                            
-  //12    try_shore_host = pshare_route=localhost:9200                  
-  //13    try_shore_host = pshare_route=192.168.0.122:9301              
-  //14    try_shore_host = pshare_route=multicast_8           
-  //15                                                            
-  //16    bridge = src=VIEW_POLYGON                                     
-  //17    bridge = src=VIEW_POINT                                       
-  //18    bridge = src=VIEW_SEGLIST                                     
-  //19                                                              
-  //20    bridge = src=NODE_REPORT_LOCAL, alias=NODE_REPORT             
-  //21  }                           
+//---------------------------------
+ProcessConfig = uFldNodeBroker
+ {
+    AppTick   = 4
+    CommsTick = 4
+
+    try_shore_host = pshare_route=localhost:8999
+
+    bridge = src=VIEW_POLYGON
+    bridge = src=VIEW_POINT
+    bridge = src=VIEW_SEGLIST
+    bridge = src=APPCAST
+    bridge = src=HARMONY_REPORT
+    bridge = src=NODE_REPORT_LOCAL, alias=NODE_REPORT
+  }
+//------------
 
 //--------------------------------
 //pShare
@@ -176,10 +186,10 @@ ProcessConfig = pShare
 
    input  = route = localhost:$(PORT)
 
-   output = src_name=NODE_REPORT_LOCAL, dest_name=NODE_REPORT, route=localhost:8999
-   output = src_name=VIEW_SEGLIST , route=localhost:8999
-   output = src_name=VIEW_POINT , route=localhost:8999
-   output = src_name=HARMONY_REPORT, route=localhost:8999
+   //output = src_name=NODE_REPORT_LOCAL, dest_name=NODE_REPORT, route=localhost:8999
+   //output = src_name=VIEW_SEGLIST , route=localhost:8999
+   //output = src_name=VIEW_POINT , route=localhost:8999
+   //output = src_name=HARMONY_REPORT, route=localhost:8999
  }
 
 //--------------------------------
