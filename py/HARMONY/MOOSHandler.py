@@ -87,4 +87,5 @@ class MOOSHandler:
         for name, assignment in vehicle_assignments.items():
             wpt_var = f"{name}_WPT_UPDATE"
             print(f"SENDING {assignment.string()} to {wpt_var}")
+            self.notify("VIEW_SEGLIST", f'{assignment.string()},label={name}_wpt_survey') # Displays waypoints before deployment.
             self.notify(wpt_var, assignment.string())

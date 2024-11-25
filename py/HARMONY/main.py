@@ -29,6 +29,8 @@ def main():
 
 
         if moos_handler.survey_area is not None:
+            moos_handler.notify("VIEW_GRID", moos_handler.survey_area.areaToGrid());
+            print(moos_handler.survey_area.areaToGrid())
             moos_handler.assign_and_notify()
             moos_handler.survey_area = None  # Reset survey area for the next iteration
 
