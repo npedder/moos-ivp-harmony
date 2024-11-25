@@ -8,7 +8,6 @@
 #----------------------------------------------------------
 
 TIME_WARP=1
-COMMUNITY="vehicle_0"
 GUI="yes"
 m=0
 n=0
@@ -46,11 +45,14 @@ if [ $m -eq 0 ]; then
     exit 1
 fi
 
+<<<<<<< HEAD:missions/s1_alpha/launch.sh
 echo "Launching $COMMUNITY MOOS Community with WARP:" $TIME_WARP
 
 # Launch the main community process
 pAntler $COMMUNITY.moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
 
+=======
+>>>>>>> mission-gen-rework:missions/mission_generation/launch.sh
 # Launch all vehicle_*.moos files
 for vehicle in "${vehicle_files[@]}"; do
     pAntler $vehicle --MOOSTimeWarp=$TIME_WARP >& /dev/null &
@@ -60,6 +62,7 @@ done
 pAntler shoreside.moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
 
 # Launch uMAC for shoreside and all vehicles
+<<<<<<< HEAD:missions/s1_alpha/launch.sh
 uMAC -t shoreside.moos &
 for vehicle in "${vehicle_files[@]}"; do
     uMAC -t $vehicle &
@@ -70,3 +73,9 @@ uMAC -t $COMMUNITY.moos
 
 # Kill all processes after completion
 kill -- -$$
+=======
+uMAC -t shoreside.moos 
+
+# Kill all processes after completion
+kill -- -$$
+>>>>>>> mission-gen-rework:missions/mission_generation/launch.sh

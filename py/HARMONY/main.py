@@ -21,6 +21,7 @@ def main():
     # Forever loop
     while True:
         time.sleep(1)
+
         messages = moos_handler.fetch_messages()
 
         # When respective messages are received, moos_handler.survey_area and mood_handler.available_vehicles updates.
@@ -28,6 +29,8 @@ def main():
 
 
         if moos_handler.survey_area is not None:
+            moos_handler.notify("VIEW_GRID", moos_handler.survey_area.areaToGrid());
+            print(moos_handler.survey_area.areaToGrid())
             moos_handler.assign_and_notify()
             moos_handler.survey_area = None  # Reset survey area for the next iteration
 
