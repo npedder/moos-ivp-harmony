@@ -111,14 +111,28 @@ ProcessConfig = pShare
    output = src_name=RETURN , route=localhost:9000
    output = src_name=SLOWER , route=localhost:9000
    output = src_name=FASTER , route=localhost:9000
-   output = src_name=vehicle_0_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9000
+   output = src_name=vehicle_1_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9000
    
    output = src_name=DEPLOY , route=localhost:9001
    output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9001
    output = src_name=RETURN , route=localhost:9001
    output = src_name=SLOWER , route=localhost:9001
    output = src_name=FASTER , route=localhost:9001
-   output = src_name=vehicle_1_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9001
+   output = src_name=vehicle_2_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9001
+   
+   output = src_name=DEPLOY , route=localhost:9002
+   output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9002
+   output = src_name=RETURN , route=localhost:9002
+   output = src_name=SLOWER , route=localhost:9002
+   output = src_name=FASTER , route=localhost:9002
+   output = src_name=vehicle_3_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9002
+   
+   output = src_name=DEPLOY , route=localhost:9003
+   output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9003
+   output = src_name=RETURN , route=localhost:9003
+   output = src_name=SLOWER , route=localhost:9003
+   output = src_name=FASTER , route=localhost:9003
+   output = src_name=vehicle_4_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9003
  }
 
 

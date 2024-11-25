@@ -4,7 +4,7 @@ class Lawnmower:
         self.width = width
         self.height = height
         self.lane_width = lane_width
-        self.position = position  # (x, y)
+        self.position = position  # (x, y) bottom left corner
 
     def __repr__(self):
         return f'"LAWNMOWER("points = format=lawnmower, x={self.position[0]}, y={self.position[1]}, height={self.height}, width={self.width}, lane_width={self.lane_width})""'

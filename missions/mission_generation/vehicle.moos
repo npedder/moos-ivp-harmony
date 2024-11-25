@@ -9,8 +9,8 @@ Community    = $(VNAME)
 MOOSTimeWarp = 1
 
 // Forest Lake
-LatOrigin  = $(LATORG) 
-LongOrigin = $(LONGORG)
+LatOrigin  = -41.9237674
+LongOrigin = 60.298463
 
 // MIT Sailing Pavilion (use this one)
 // LatOrigin  = $(LATORG)
@@ -82,7 +82,7 @@ ProcessConfig = uSimMarineV22
   AppTick  	= 4
   CommsTick	= 4
 
-  start_pos     = $(START_X), $(START_Y), $(HEADING), $(SPEED)
+  start_pos     = $(START_X), $(START_Y), $(HEADING), 0
   prefix        = NAV
   turn_rate     = 95
   thrust_map    = 0:0, 20:1, 40:2, 60:3, 80:4, 100:5
@@ -97,7 +97,7 @@ ProcessConfig = pHelmIvP
   AppTick    = 4
   CommsTick  = 4
 
-  behaviors  = default.bhv
+  behaviors  = $(BHV)
   domain     = course:0:359:360
   domain     = speed:0:4:41
 }
@@ -186,7 +186,11 @@ ProcessConfig = pShare
 //uTimerScript
  ProcessConfig = uTimerScript
  {
+   AppTick    = 4
+   CommsTick  = 4
+   
    paused = false
+   reset_time = 1
    event = var =HARMONY_REPORT, val = "NAME=$(VNAME),TYPE=UUV,X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
 
  }
