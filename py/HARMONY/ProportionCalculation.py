@@ -64,12 +64,18 @@ def calculateProportions2(vehicles: dict, surveyArea: SurveyArea):
         assignedArea = totalSurveyArea * timeEffRatio
 
         startTravelDistance = math.dist(vehicle.position, surveyCenter)
-        startTravelTime = startTravelDistance / vehicle.speed
+        if vehicle.speed == 0:
+            startTravelTime = 0
+        else: 
+            startTravelTime = startTravelDistance / vehicle.speed
         # Subject to change once we have an endpoint attribute for the vehicle
         endTravelDistance = math.dist(vehicle.position, surveyCenter)  
         totalTravelDistance = startTravelDistance + endTravelDistance
 
-        T_max += (assignedArea / coverageRate) + startTravelTime
+        if coverageRate == 0:
+            T_max += 0 + startTravelTime # both should be 0 anyways
+        else:
+            T_max += (assignedArea / coverageRate) + startTravelTime
 
     # Now calc the weight 
     for vehicle_name, vehicle in vehicles.items():
@@ -80,7 +86,10 @@ def calculateProportions2(vehicles: dict, surveyArea: SurveyArea):
         totalAreaCapability = vehicle.endurance * vehicle.sensorRange
 
         startTravelDistance = math.dist(vehicle.position, surveyCenter)
-        startTravelTime = startTravelDistance / vehicle.speed
+        if vehicle.speed == 0:
+            startTravelTime = 0
+        else: 
+            startTravelTime = startTravelDistance / vehicle.speed
         # Subject to change once we have an endpoint attribute for the vehicle
         endTravelDistance = math.dist(vehicle.position, surveyCenter)  
         totalTravelDistance = startTravelDistance + endTravelDistance
@@ -100,7 +109,10 @@ def calculateProportions2(vehicles: dict, surveyArea: SurveyArea):
         totalAreaCapability = vehicle.endurance * vehicle.sensorRange
 
         startTravelDistance = math.dist(vehicle.position, surveyCenter)
-        startTravelTime = startTravelDistance / vehicle.speed
+        if vehicle.speed == 0:
+            startTravelTime = 0
+        else: 
+            startTravelTime = startTravelDistance / vehicle.speed
         # Subject to change once we have an endpoint attribute for the vehicle
         endTravelDistance = math.dist(vehicle.position, surveyCenter)  
         totalTravelDistance = startTravelDistance + endTravelDistance

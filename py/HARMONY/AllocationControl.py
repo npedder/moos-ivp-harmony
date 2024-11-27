@@ -22,10 +22,10 @@ def allocateArea(vehicles: dict, surveyArea: SurveyArea) :
 # Defining some vehicles and a survey area for a test (can be removed)
 surveyArea = SurveyArea(150, 150, (10, 10))
 
-vehicle1 = UxV("Alpha", (0, 0), 10, 0, 10000)
-vehicle2 = UxV("Beta", (0, 0), 10, 10, 10000)
-vehicle3 = UxV("Charlie", (0, 0), 30, 10, 10000)
-vehicle4 = UxV("Delta", (0, 0), 10, 40, 10000)
+vehicle1 = UxV("Alpha", (10, 0), 1, 1, 1000)
+vehicle2 = UxV("Beta", (3, 5), 20, 10, 1000)
+vehicle3 = UxV("Charlie", (5, 3), 10, 10, 1000)
+vehicle4 = UxV("Delta", (-10, 60), 10, 10, 1000)
 
 vehicles = {vehicle1.name: vehicle1, vehicle2.name: vehicle2, vehicle3.name: vehicle3, vehicle4.name: vehicle4}
 vehicleAssignments = allocateArea(vehicles, surveyArea)

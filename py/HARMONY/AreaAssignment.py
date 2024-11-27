@@ -22,8 +22,14 @@ def startAssignArea(vehicles: dict, surveyArea: SurveyArea):
     totalSurveyTime = 0
     for vehicle_name, vehicle_survey in newVehicleAreas.items():
         vehicle = vehicles[vehicle_name][0]
-        startTravelTime = math.dist(vehicle.position, vehicle_survey.position) / vehicle.speed
-        surveyTime = vehicle_survey.height * vehicle_survey.width / (vehicle.speed * vehicle.sensorRange)
+        if vehicle.speed == 0:
+            startTravelTime = 0
+        else: 
+            startTravelTime = math.dist(vehicle.position, vehicle_survey.position) / vehicle.speed
+        if vehicle.speed == 0 or vehicle.sensorRange == 0:
+            surveyTime = 0
+        else:
+            surveyTime = vehicle_survey.height * vehicle_survey.width / (vehicle.speed * vehicle.sensorRange)
         totalSurveyTime += startTravelTime + surveyTime
     print("Time to complete survey is approximately " + str(totalSurveyTime) + " seconds")
 
