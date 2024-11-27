@@ -39,12 +39,12 @@ sudo make install
 cd ../..
 ```
 
+This will produce a "pymoos*.so" file that needs to be added to your python interpreter in order to import the pymoos library into your python code. 
+
 ## Python packages
 - numpy
 - matplotlib
-
-This will produce a "pymoos*.so" file that needs to be added to your python interpreter in order to import the pymoos library into your python code. 
-
+  
 # Usage
 Once setup is complete, example HAMRONY missions can be generated in the missions/s1_alpha folder. This folder contains bash scripts that can quickly set up new mission configurations based on the InitVehicleConig.txt file. 
 
