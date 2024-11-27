@@ -39,6 +39,10 @@ sudo make install
 cd ../..
 ```
 
+## Python packages
+- numpy
+- matplotlib
+
 This will produce a "pymoos*.so" file that needs to be added to your python interpreter in order to import the pymoos library into your python code. 
 
 # Usage
