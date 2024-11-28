@@ -39,6 +39,7 @@ ProcessConfig = pMarineViewer
   CommsTick  = 4
 
   tiff_file            = forrest19.tif
+  tiff_viewable	       = true
 	//tiff_file            = MIT_SP.tif
 
   set_pan_x            = -90
@@ -47,7 +48,7 @@ ProcessConfig = pMarineViewer
   vehicle_shape_scale  = 1.5
   hash_delta           = 50
   hash_shade           = 0.22
-  hash_viewable        = true
+  hash_viewable        = false
 
   trails_point_size   = 1
 

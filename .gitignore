@@ -62,4 +62,7 @@ venv*/
 .idea*/
 
 
+# Buildable vehicle files 
+vehicle_*.*
+
 

@@ -75,17 +75,54 @@ class MOOSHandler:
 
 
     def assign_and_notify(self):
-        # Assign tasks to vehicles and send notifications to MOOSDB.
-
+        # Assign tasks to vehicles and send notifications to MOOSDB
         print(f"{len(self.available_vehicles)} vehicles found. Survey area: {self.survey_area}")
 
         # Assign areas to vehicles using allocation algorithm
         vehicle_assignments = AllocationControl.allocateArea(self.available_vehicles, self.survey_area)
         print("Vehicle Assignments:", vehicle_assignments)
 
-        # Notify MOOS with the waypoint updates
-        for name, assignment in vehicle_assignments.items():
+        # Notify MOOSDB with the waypoint updates
+        for count, (name, assignment) in enumerate(vehicle_assignments.items()):
+            color = colors[count % len(colors)]
             wpt_var = f"{name}_WPT_UPDATE"
             print(f"SENDING {assignment.string()} to {wpt_var}")
-            self.notify("VIEW_SEGLIST", f'{assignment.string()},label={name}_wpt_survey') # Displays waypoints before deployment.
+            self.notify("VIEW_SEGLIST", f'{assignment.string()},label={name}_wpt_survey, edge_color={color}')  # Displays waypoints before deployment
             self.notify(wpt_var, assignment.string())
+
+
+
+# Array of colors that can be used for pMarineViewer geometry. Not a complete list
+color_groups = {
+    "Red": [
+        "coral", "crimson", "hotpink", "palevioletred", "lightpink", "red"
+    ],
+    "Oranges": [
+        "darkorange", "goldenrod", "sandybrown", "lightsalmon", "peachpuff", "tan"
+    ],
+    "Yellows": [
+        "yellow", "gold", "lemonchiffon", "khaki", "lightgoldenrod", "pelegoldenrod"
+    ],
+    "Greens": [
+        "limegreen", "springgreen", "yellowgreen", "forestgreen", "seagreen", "chartreuse"
+    ],
+    "Blues": [
+        "dodgerblue", "deepskyblue", "royalblue", "lightskyblue", "powderblue", "teal"
+    ],
+    "Purples": [
+        "orchid", "violet", "darkviolet", "plum", "indigo", "lavender"
+    ],
+    "Whites": [
+        "floralwhite", "whitesmoke", "ivory", "linen", "seashell", "cornsilk"
+    ]
+}
+
+colors = [
+    'coral', 'dodgerblue', 'crimson', 'deepskyblue', 'hotpink', 'royalblue',
+    'red', 'lightskyblue', 'palevioletred', 'powderblue',
+    'darkorange', 'sandybrown', 'peachpuff', 'tan',
+    'yellow', 'gold', 'lemonchiffon', 'khaki', 'lightgoldenrod', 'pelegoldenrod',
+    'limegreen', 'springgreen', 'yellowgreen', 'forestgreen', 'seagreen', 'chartreuse',
+    'orchid', 'violet', 'darkviolet', 'plum', 'indigo', 'lavender',
+    'floralwhite', 'whitesmoke', 'ivory', 'linen', 'seashell', 'cornsilk'
+]
