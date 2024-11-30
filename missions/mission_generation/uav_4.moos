@@ -1,11 +1,11 @@
 //-------------------------------------------------
 // NAME: HARMONY TEAM
-// FILE: vehicle.moos
+// FILE: uav.moos
 //-------------------------------------------------
 
 ServerHost   = localhost
-ServerPort   = $(PORT)
-Community    = $(VNAME)
+ServerPort   = 9003
+Community    = uav_4
 MOOSTimeWarp = 1
 
 // Forest Lake
@@ -24,7 +24,7 @@ ProcessConfig = ANTLER
 
   Run = MOOSDB        @ NewConsole = false
   Run = pLogger       @ NewConsole = false
-  Run = uSimMarineV22 @ NewConsole = false
+  Run = uSimpleRobot @ NewConsole = false
   Run = pMarinePIDV22 @ NewConsole = false
   Run = pHelmIvP      @ NewConsole = false
   Run = uProcessWatch	@ NewConsole = false
@@ -85,19 +85,21 @@ ProcessConfig = uProcessWatch
 	nowatch   = uMAC*
 }
 
-//------------------------------------------
-// uSimMarineV22 config block
-
-ProcessConfig = uSimMarineV22
+//----------------------------------------------------------------------------
+ProcessConfig = uSimpleRobot
 {
-  AppTick  	= 4
-  CommsTick	= 4
+  AppTick   = 4
+  CommsTick = 4
 
-  start_pos     = $(START_X), $(START_Y), $(HEADING), 0
-  prefix        = NAV
-  turn_rate     = 95
-  thrust_map    = 0:0, 20:1, 40:2, 60:3, 80:4, 100:5
-	turn_spd_loss = 0.4
+  start_heading = 45   //degrees
+  start_speed   = 0.0   //meters per sec
+  start_depth   = 0.0   //meters
+  start_x       = 50
+  start_y       = -20
+
+  rate_heading  = 180.0 //degrees per sec
+  rate_speed    = 2.5   //meters  per sec^2
+  rate_depth    = 3.5   //meters  per sec
 }
 
 //------------------------------------------
@@ -108,7 +110,7 @@ ProcessConfig = pHelmIvP
   AppTick    = 4
   CommsTick  = 4
 
-  behaviors  = $(BHV)
+  behaviors  = uav_4.bhv
   domain     = course:0:359:360
   domain     = speed:0:4:41
 }
@@ -155,8 +157,8 @@ ProcessConfig = pNodeReporter
   AppTick    = 2
   CommsTick	 = 2
 
-  platform_type   = $(VEHICLE_TYPE)
-  platform_color  = $(VEHICLE_COLOR)
+  platform_type   = AUV
+  platform_color  = green
          
 }
 
@@ -184,7 +186,7 @@ ProcessConfig = pShare
    AppTick    = 4
    CommsTick  = 4
 
-   input  = route = localhost:$(PORT)
+   input  = route = localhost:9003
  }
 
 //--------------------------------
@@ -196,6 +198,7 @@ ProcessConfig = pShare
    
    paused = false
    reset_time = 1
-   event = var =HARMONY_REPORT, val = "NAME=$(VNAME),TYPE=$(VEHICLE_TYPE),X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
+   event = var =HARMONY_REPORT, val = "NAME=uav_4,TYPE=AUV,X=50,Y=-20,SPD=1.0,ENDURANCE=850,SENSOR_RANGE=20"
 
  }
+

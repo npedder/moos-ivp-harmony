@@ -1,8 +1,8 @@
 #!/bin/bash -e
 #----------------------------------------------------------
-#  Script: launch.sh
-#  Author: Michael Benjamin
-#  LastEd: May 20th 2019
+#  Script: launch_harmony.sh
+#  Author: HARMONY TEAM
+#  LastEd: November 29, 2024
 #----------------------------------------------------------
 #  Part 1: Set Exit actions and declare global var defaults
 #----------------------------------------------------------
@@ -41,8 +41,14 @@ vehicle_files=(vehicle_*.moos)
 # Get the total number of vehicle files found
 m=${#vehicle_files[@]}
 
-if [ $m -eq 0 ]; then
-    echo "No vehicle_*.moos files found. Exiting."
+# Find all uav_* files in the current directory 
+uav_files=(uav_*.moos)
+
+# Get the total number of uav files found
+u=${#uav_files[@]}
+
+if [ $m -eq 0] && [$u -eq 0]; then
+    echo "No vehicle_*.moos or urav_*.moos files found. Exiting."
     exit 1
 fi
 
@@ -53,6 +59,12 @@ xterm -e "python3 $HARMONY_PATH" &
 for vehicle in "${vehicle_files[@]}"; do
     pAntler $vehicle --MOOSTimeWarp=$TIME_WARP >& /dev/null &
 done
+
+# Launch all uav_*.moos files
+for uav in "${uav_files[@]}"; do
+    pAntler $uav --MOOSTimeWarp=$TIME_WARP >& /dev/null &
+done
+
 
 # Launch the shoreside process
 pAntler shoreside.moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
