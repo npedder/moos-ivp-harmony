@@ -155,7 +155,7 @@ ProcessConfig = pNodeReporter
   AppTick    = 2
   CommsTick	 = 2
 
-  platform_type   = $(VEHICLE_TYPE)
+  platform_type   = kayak //used to differentiate uuv from uav
   platform_color  = $(VEHICLE_COLOR)
          
 }
@@ -196,6 +196,6 @@ ProcessConfig = pShare
    
    paused = false
    reset_time = 1
-   event = var =HARMONY_REPORT, val = "NAME=$(VNAME),TYPE=$(VEHICLE_TYPE),X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
+   event = var =HARMONY_REPORT, val = "NAME=$(VNAME),TYPE=kayak,X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
 
  }

@@ -25,7 +25,7 @@ def parseNodeReportAndCreateVehicle(nodeReport):
         # print(f"Latitude: {lat}")
         # print(f"Longitude: {lon}")
 
-        vehicle = UxV(name, (x,y), None, None, None);
+        vehicle = UxV(name, '',(x,y), None, None, None);
         return vehicle
     else:
         print("Pattern not found in the string.")
@@ -51,7 +51,7 @@ def parseHarmonyReportAndCreateVehicle(nodeReport):
         # print(f"Latitude: {lat}")
         # print(f"Longitude: {lon}")
 
-        vehicle = UxV(name, (x, y), speed,sensor_range,endurance);
+        vehicle = UxV(name, type, (x, y), speed,sensor_range,endurance);
         return vehicle
     else:
         print("Pattern not found in the string.")

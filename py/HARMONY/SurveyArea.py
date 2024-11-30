@@ -5,7 +5,7 @@ class SurveyArea:
         self.height = height
         self.position = position  # (x, y)
 
-    def areaToGrid(self):
+    def areaToGrid(self, label):
         # neded for VIEW_GRID
         x, y = self.position
 
@@ -15,7 +15,7 @@ class SurveyArea:
 
         # Return the corners in order
 
-        grid = f'pts={{{self.position[0]},{self.position[1]}:{top_left[0]},{top_left[1]}:{top_right[0]},{top_right[1]}:{bottom_right[0]},{bottom_right[1]}}},label=sa'
+        grid = f"pts={{{self.position[0]},{self.position[1]}:{top_left[0]},{top_left[1]}:{top_right[0]},{top_right[1]}:{bottom_right[0]},{bottom_right[1]}}},label='{label}', msg='{label}'"
         return grid
 
 
