@@ -1,6 +1,6 @@
 //-------------------------------------------------
-// NAME: M. Benjamin, MIT CSAIL
-// FILE: alpha.moos
+// NAME: HARMONY TEAM
+// FILE: vehicle.moos
 //-------------------------------------------------
 
 ServerHost   = localhost
@@ -9,8 +9,8 @@ Community    = $(VNAME)
 MOOSTimeWarp = 1
 
 // Forest Lake
-LatOrigin  = $(LATORG) 
-LongOrigin = $(LONGORG)
+LatOrigin  = -41.9237674
+LongOrigin = 60.298463
 
 // MIT Sailing Pavilion (use this one)
 // LatOrigin  = $(LATORG)
@@ -31,6 +31,9 @@ ProcessConfig = ANTLER
   Run = pNodeReporter	@ NewConsole = false
   Run = pRealm	      @ NewConsole = false
   Run = pShare	      @ NewConsole = false
+  Run = pHostInfo     @ NewConsole = false
+  Run = uFldNodeBroker @ NewConsole = false
+  Run = uTimerScript @ NewConsole = false
 }
 
 //------------------------------------------
@@ -58,6 +61,15 @@ ProcessConfig = pLogger
   WildCardExclusionLog = true
 }
 
+//pHostInfo configuration block
+ProcessConfig = pHostInfo
+{
+    AppTick = 4
+    CommsTick = 4
+
+    DEFAULT_HOSTIP = localhost
+}
+
 //------------------------------------------
 // uProcessWatch config block
 
@@ -81,7 +93,7 @@ ProcessConfig = uSimMarineV22
   AppTick  	= 4
   CommsTick	= 4
 
-  start_pos     = $(START_X), $(START_Y), $(HEADING), $(SPEED)
+  start_pos     = $(START_X), $(START_Y), $(HEADING), 0
   prefix        = NAV
   turn_rate     = 95
   thrust_map    = 0:0, 20:1, 40:2, 60:3, 80:4, 100:5
@@ -96,7 +108,7 @@ ProcessConfig = pHelmIvP
   AppTick    = 4
   CommsTick  = 4
 
-  behaviors  = default.bhv
+  behaviors  = $(BHV)
   domain     = course:0:359:360
   domain     = speed:0:4:41
 }
@@ -148,23 +160,22 @@ ProcessConfig = pNodeReporter
          
 }
 
- //ProcessConfig = uFldNodeBroker                                  
-   //6  {                                                               
-   //7    AppTick   = 4                                                 
-  // 8    CommsTick = 4                                                 
-   //9         
-  //10    keyword        = lemon                                        
-  //11                                                            
-  //12    try_shore_host = pshare_route=localhost:9200                  
-  //13    try_shore_host = pshare_route=192.168.0.122:9301              
-  //14    try_shore_host = pshare_route=multicast_8           
-  //15                                                            
-  //16    bridge = src=VIEW_POLYGON                                     
-  //17    bridge = src=VIEW_POINT                                       
-  //18    bridge = src=VIEW_SEGLIST                                     
-  //19                                                              
-  //20    bridge = src=NODE_REPORT_LOCAL, alias=NODE_REPORT             
-  //21  }                           
+//---------------------------------
+ProcessConfig = uFldNodeBroker
+ {
+    AppTick   = 4
+    CommsTick = 4
+
+    try_shore_host = pshare_route=localhost:8999
+
+    bridge = src=VIEW_POLYGON
+    bridge = src=VIEW_POINT
+    bridge = src=VIEW_SEGLIST
+    bridge = src=APPCAST
+    bridge = src=HARMONY_REPORT
+    bridge = src=NODE_REPORT_LOCAL, alias=NODE_REPORT
+  }
+//------------
 
 //--------------------------------
 //pShare
@@ -175,7 +186,21 @@ ProcessConfig = pShare
 
    input  = route = localhost:$(PORT)
 
-   output = src_name=NODE_REPORT_LOCAL, dest_name=NODE_REPORT, route=localhost:9200
-   output = src_name=VIEW_SEGLIST , route=localhost:9200
-   output = src_name=VIEW_POINT , route=localhost:9200
+   //output = src_name=NODE_REPORT_LOCAL, dest_name=NODE_REPORT, route=localhost:8999
+   //output = src_name=VIEW_SEGLIST , route=localhost:8999
+   //output = src_name=VIEW_POINT , route=localhost:8999
+   //output = src_name=HARMONY_REPORT, route=localhost:8999
+ }
+
+//--------------------------------
+//uTimerScript
+ ProcessConfig = uTimerScript
+ {
+   AppTick    = 4
+   CommsTick  = 4
+   
+   paused = false
+   reset_time = 1
+   event = var =HARMONY_REPORT, val = "NAME=$(VNAME),TYPE=UUV,X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
+
  }

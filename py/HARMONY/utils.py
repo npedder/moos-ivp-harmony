@@ -11,21 +11,47 @@ import random
 
 def parseNodeReportAndCreateVehicle(nodeReport):
     # Regular expression to extract NAME, LAT, and LON
-    pattern = r"NAME=([^,]+),.*LAT=([-\d.]+),.*LON=([-\d.]+)"
+    pattern = r"NAME=([^,]+),.*X=([-\d.]+),.*Y=([-\d.]+)"
 
     # Search for the match
     match = re.search(pattern, nodeReport)
 
     if match:
         name = match.group(1)
-        lat = float(match.group(2))
-        lon = float(match.group(3))
+        x = float(match.group(2))
+        y = float(match.group(3))
 
         # print(f"Name: {name}")
         # print(f"Latitude: {lat}")
         # print(f"Longitude: {lon}")
 
-        vehicle = UxV(name, (lat,lon), 10, 20, 100 );
+        vehicle = UxV(name, (x,y), None, None, None);
+        return vehicle
+    else:
+        print("Pattern not found in the string.")
+        return None
+
+def parseHarmonyReportAndCreateVehicle(nodeReport):
+    # Regular expression to extract NAME, LAT, and LON
+    pattern = r"NAME=([^,]+),.*TYPE=([^,]+),.*X=([-\d.]+),.*Y=([-\d.]+),.*SPD=([-\d.]+),.*ENDURANCE=([-\d.]+),.*SENSOR_RANGE=([-\d.]+)"
+
+    # Search for the match
+    match = re.search(pattern, nodeReport)
+
+    if match:
+        name = match.group(1)
+        type = match.group(2) # TODO incorporate type (UUV or UAV)
+        x = float(match.group(3))
+        y = float(match.group(4))
+        speed = float(match.group(5))
+        endurance = float(match.group(6))
+        sensor_range = float(match.group(7))
+
+        # print(f"Name: {name}")
+        # print(f"Latitude: {lat}")
+        # print(f"Longitude: {lon}")
+
+        vehicle = UxV(name, (x, y), speed,sensor_range,endurance);
         return vehicle
     else:
         print("Pattern not found in the string.")

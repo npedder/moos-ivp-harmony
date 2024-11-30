@@ -6,12 +6,11 @@
 #----------------------------------------------------------
 #  Part 1: Set Exit actions and declare global var defaults
 #----------------------------------------------------------
-#source file to run your congfig and vehicle amounts before launch!
-m=(grep'^m='MakeVehicle.sh|cut -d'='-f2|tr-d"")
 TIME_WARP=1
-COMMUNITY="vehicle_0"
+COMMUNITY="alpha"
+HARMONY_PATH="../../py/HARMONY/main.py"
 GUI="yes"
-n=0
+
 #----------------------------------------------------------
 #  Part 2: Check for and handle command-line arguments
 #----------------------------------------------------------
@@ -34,17 +33,15 @@ done
 #----------------------------------------------------------
 #  Part 3: Launch the processes
 #----------------------------------------------------------
-echo "Launching $COMMUNITY MOOS Community with WARP:" $TIME_WARP
+
+echo "Launching HARMONY app from $HARMONY_PATH" 
+xterm -e "python3 $HARMONY_PATH" &
+
+echo "Launching $COMMUNITY MOOS Community with WARP:" $TIME_WARP 
 pAntler $COMMUNITY.moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
-for i in {seq 0 to "$m"}; do
-pAntler vehicle_"$n".moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
-((n++))
-done
+pAntler bravo.moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
 pAntler shoreside.moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
 uMAC -t shoreside.moos &
-for i in {seq 0 to "$m"}; do
-uMAC -t vehicle_"$n".moos &
-((n++))
-done
-uMAC -t $COMMUNITY.moos
+uMAC -t bravo.moos &
+uMAC -t $COMMUNITY.moos 
 kill -- -$$

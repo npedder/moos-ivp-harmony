@@ -100,7 +100,7 @@ def calculateProportions2(vehicles: dict, surveyArea: SurveyArea):
                 startTimeScalar = 0
         else:
             startTimeScalar = 1
-        totalWeightCapSum += min(totalSurveyArea * (timeEffRatio * startTimeScalar), max(0, totalAreaCapability - (totalTravelDistance * vehicle.sensorRange)))
+        totalWeightCapSum += min(totalSurveyArea * (timeEffRatio * startTimeScalar), max(0.0, totalAreaCapability - (totalTravelDistance * vehicle.sensorRange)))
         
     for vehicle_name, vehicle in vehicles.items():
         coverageRate = vehicle.speed * vehicle.sensorRange
@@ -123,8 +123,13 @@ def calculateProportions2(vehicles: dict, surveyArea: SurveyArea):
                 startTimeScalar = 0
         else:
             startTimeScalar = 1
-        vehicleProportions[vehicle_name] = (vehicle, min(totalSurveyArea * (timeEffRatio * startTimeScalar), max(0, totalAreaCapability - (totalTravelDistance * vehicle.sensorRange)))/totalWeightCapSum)
+
+        try:
+            vehicleProportions[vehicle_name] = (vehicle, min(totalSurveyArea * (timeEffRatio * startTimeScalar), max(0, totalAreaCapability - (totalTravelDistance * vehicle.sensorRange)))/totalWeightCapSum)
+        except:
+            print("Vehicles cannot complete survey area.")
+            vehicleProportions[vehicle_name] = (vehicle, 0)
+
         print(vehicle_name + " is assigned a proportion of: " + str(vehicleProportions[vehicle_name][1]))
 
     return vehicleProportions
-

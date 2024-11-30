@@ -55,3 +55,14 @@ lib/
 # Temp files (emacs, etc)
 *#
 *~
+
+# Python virtual environment files
+__pycache__*/
+venv*/
+.idea*/
+
+
+# Buildable vehicle files 
+vehicle_*.*
+
+
