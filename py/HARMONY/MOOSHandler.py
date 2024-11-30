@@ -23,6 +23,8 @@ class MOOSHandler:
 
     def __on_connect(self):
         # Runs after connection
+        self.survey_area = None
+        self.available_vehicles = {}
         self.register_variables()
         return True
 
@@ -84,11 +86,17 @@ class MOOSHandler:
 
         # Notify MOOSDB with the waypoint updates
         for count, (name, assignment) in enumerate(vehicle_assignments.items()):
-            color = colors[count % len(colors)]
+            assignment.reposition();
+            color = colors[count % len(colors)]     # for waypoint color
             wpt_var = f"{name}_WPT_UPDATE"
             print(f"SENDING {assignment.string()} to {wpt_var}")
-            self.notify("VIEW_SEGLIST", f'{assignment.string()},label={name}_wpt_survey, edge_color={color}')  # Displays waypoints before deployment
-            self.notify(wpt_var, assignment.string())
+
+            if assignment.width == 0:     # No waypoint assigned because survey area is too large
+                print("Waypoint notifications not sent because vehicle area assignment = 0")
+                self.notify("VIEW_SEGLIST", f'{assignment.string()},label={name}_wpt_survey, active=false')  # removes any prior waypoint visuals
+            else:
+                self.notify("VIEW_SEGLIST", f'{assignment.string()},label={name}_wpt_survey, edge_color={color}')  # Displays waypoints before deployment
+                self.notify(wpt_var, assignment.string())
 
 
 

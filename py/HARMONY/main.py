@@ -11,8 +11,8 @@ PORT = 8999
 MOOS_HOST = 'localhost'
 CLIENT_NAME = "HARMONY"
 
-
 def main():
+
     # Handles MOOSDB connection, stores survey area and vehicle information, and sends waypoints based on algorithm
     moos_handler = MOOSHandler(MOOS_HOST, PORT, CLIENT_NAME)
 
@@ -24,6 +24,7 @@ def main():
 
         messages = moos_handler.fetch_messages()
 
+        # moos_handler.notify("APPCAST", "node=HARMONY")
         # When respective messages are received, moos_handler.survey_area and mood_handler.available_vehicles updates.
         moos_handler.parse_incoming_messages(messages)
 

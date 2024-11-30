@@ -2,6 +2,10 @@ import re
 import numpy as np
 from UxV import UxV
 from SurveyArea import SurveyArea
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import matplotlib.patches as patches
+import random
 
 
 
@@ -99,3 +103,42 @@ def convertSurveyAreaIntoMatrix(survey_area):
     coords = zip(x, y)
 
     print(tuple(coords))
+
+def plotAssignments(vehicleAssignments: dict, vehicles: dict, totalSurvey: SurveyArea):
+    # Create a figure and axis
+    fig, ax = plt.subplots()
+
+    count = 0
+    legend_labels = []  # To store legend labels
+    legend_colors = []  # To store legend color patches
+
+    for name, survey in vehicleAssignments.items():
+        # Create a rectangle
+        colors = ["purple", "blue", "green", "yellow", "orange", "red"]
+        color = colors[count % 5]
+        rect = patches.Rectangle(
+            (survey.position[0], survey.position[1]), survey.width, survey.height, 
+            linewidth=1, edgecolor='g', facecolor=color
+        )
+
+        count = count + 1
+        
+        # Add the rectangle to the plot
+        ax.add_patch(rect)
+        ax.scatter(vehicles[name].position[0], vehicles[name].position[1], color=color)
+        ax.text(vehicles[name].position[0], vehicles[name].position[1], f"{name}", fontsize=8, color='black')
+
+        # Create legend entry for this rectangle
+        if color not in legend_colors:  # Avoid duplicate legend entries for the same color
+            legend_labels.append(name)  # Vehicle name
+            legend_colors.append(patches.Patch(color=color))  # Color patch for legend
+
+    ax.autoscale()
+    plt.gca().set_aspect('equal', adjustable='box')
+
+    # Add the legend
+    ax.legend(legend_colors, legend_labels, title="Vehicles", bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+    # plt.tight_layout()
+    ax.set_title("Vehicle Assignments")
+
+    plt.show()

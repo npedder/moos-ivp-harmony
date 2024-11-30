@@ -1,8 +1,8 @@
 from SurveyArea import SurveyArea
 from UxV import UxV
 from AreaAssignment import startAssignArea
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
+import math as math
+
 
 # Pre-condition:
 #   Takes a dictionary that maps vehicle name to vehicle object, and a survey area
@@ -37,30 +37,99 @@ def calculateProportions(vehicles: dict, surveyArea: SurveyArea):
         weightedCapRatio = (min(totalSurveyArea * vehicleProportions[vehicle[1].name][1], 
                             vehicle[1].endurance * vehicle[1].sensorRange))/totalWeightedCapacity
         vehicleProportions[vehicle[1].name] = (vehicle[1], weightedCapRatio)
-        print(vehicle[1].name + "'s propotion of the area is " + str(weightedCapRatio))
+        print(vehicle[1].name + " is assigned a proportion of: " + str(weightedCapRatio))
     return vehicleProportions
         
-def plotAssignments(vehicleAssignments: dict):
-    plt.figure(figsize=(10, 5))
+# Below is a re-implementation of the startAreaAssign function which utilizes new
+# equations which consider 
+def calculateProportions2(vehicles: dict, surveyArea: SurveyArea):
 
-    for vehicle_name, survey in vehicleAssignments.items():
-        # Start and end of the range (as a line segment)
-        x_start = survey.position[0]
-        x_end = survey.position[0] + survey.width
+    # Initial variables
+    surveyCenter = (surveyArea.position[0] + surveyArea.width / 2, surveyArea.position[1] + surveyArea.height / 2)
+    totalSurveyArea = surveyArea.height * surveyArea.width
+    totalCoverageRate = 0
+    totalWeightCapSum = 0
+    vehicleProportions = {}
+    T_max = 0 # estimated time taken to cover survey area
+
+    # First sum coverage rates
+    for vehicle_name, vehicle in vehicles.items():
+        totalCoverageRate += (vehicle.speed * vehicle.sensorRange)
+
+    # Then calculate all the fun stuff
+    for vehicle_name, vehicle in vehicles.items():
+
+        coverageRate = vehicle.speed * vehicle.sensorRange
+        timeEffRatio = coverageRate / totalCoverageRate
+        assignedArea = totalSurveyArea * timeEffRatio
+
+        startTravelDistance = math.dist(vehicle.position, surveyCenter)
+        if vehicle.speed == 0:
+            startTravelTime = 0
+        else: 
+            startTravelTime = startTravelDistance / vehicle.speed
+        # Subject to change once we have an endpoint attribute for the vehicle
+        endTravelDistance = math.dist(vehicle.position, surveyCenter)  
+        totalTravelDistance = startTravelDistance + endTravelDistance
+
+        if coverageRate == 0:
+            T_max += 0 + startTravelTime # both should be 0 anyways
+        else:
+            T_max += (assignedArea / coverageRate) + startTravelTime
+
+    # Now calc the weight 
+    for vehicle_name, vehicle in vehicles.items():
         
-        # Plot the range as a horizontal line for each vehicle
-        plt.plot([x_start, x_end], [0, 0], label=vehicle_name, marker='o')
+        coverageRate = vehicle.speed * vehicle.sensorRange
+        timeEffRatio = coverageRate / totalCoverageRate
+        assignedArea = totalSurveyArea * timeEffRatio
+        totalAreaCapability = vehicle.endurance * vehicle.sensorRange
 
-    # Set labels and title
-    plt.xlabel("Survey Area Range")
-    plt.title("Vehicle Assignment Ranges in Survey Area")
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+        startTravelDistance = math.dist(vehicle.position, surveyCenter)
+        if vehicle.speed == 0:
+            startTravelTime = 0
+        else: 
+            startTravelTime = startTravelDistance / vehicle.speed
+        # Subject to change once we have an endpoint attribute for the vehicle
+        endTravelDistance = math.dist(vehicle.position, surveyCenter)  
+        totalTravelDistance = startTravelDistance + endTravelDistance
+        if(startTravelTime >= 1):
+            if(startTravelTime <= T_max):
+                startTimeScalar = 1 - (startTravelTime)/(T_max)
+            else:
+                startTimeScalar = 0
+        else:
+            startTimeScalar = 1
+        totalWeightCapSum += min(totalSurveyArea * (timeEffRatio * startTimeScalar), max(0.0, totalAreaCapability - (totalTravelDistance * vehicle.sensorRange)))
+        
+    for vehicle_name, vehicle in vehicles.items():
+        coverageRate = vehicle.speed * vehicle.sensorRange
+        timeEffRatio = coverageRate / totalCoverageRate
+        assignedArea = totalSurveyArea * timeEffRatio
+        totalAreaCapability = vehicle.endurance * vehicle.sensorRange
 
+        startTravelDistance = math.dist(vehicle.position, surveyCenter)
+        if vehicle.speed == 0:
+            startTravelTime = 0
+        else: 
+            startTravelTime = startTravelDistance / vehicle.speed
+        # Subject to change once we have an endpoint attribute for the vehicle
+        endTravelDistance = math.dist(vehicle.position, surveyCenter)  
+        totalTravelDistance = startTravelDistance + endTravelDistance
+        if(startTravelTime >= 1):
+            if(startTravelTime <= T_max):
+                startTimeScalar = 1 - (startTravelTime)/(T_max)
+            else:
+                startTimeScalar = 0
+        else:
+            startTimeScalar = 1
 
+        try:
+            vehicleProportions[vehicle_name] = (vehicle, min(totalSurveyArea * (timeEffRatio * startTimeScalar), max(0, totalAreaCapability - (totalTravelDistance * vehicle.sensorRange)))/totalWeightCapSum)
+        except:
+            print("Vehicles cannot complete survey area.")
+            vehicleProportions[vehicle_name] = (vehicle, 0)
 
+        print(vehicle_name + " is assigned a proportion of: " + str(vehicleProportions[vehicle_name][1]))
 
-    
-
-
+    return vehicleProportions

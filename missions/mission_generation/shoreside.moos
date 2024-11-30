@@ -49,8 +49,12 @@ ProcessConfig = pMarineViewer
   hash_delta           = 50
   hash_shade           = 0.22
   hash_viewable        = false
+  grid_opaqueness = 1.0
+  
 
   trails_point_size   = 1
+  
+  vehicles_name_mode=false
 
 	//op_vertex = x=-83, y=-47,    lwidth=1,lcolor=yellow,looped=true,group=moa
   //op_vertex = x=-46.4, y=-129.2, lwidth=1,lcolor=yellow,looped=true,group=moa
