@@ -59,14 +59,14 @@ class MOOSHandler:
 
                 case "HARMONY_REPORT":
                     vehicle = utils.parseHarmonyReportAndCreateVehicle(msg.string())
-                    if vehicle.type == 'kayak':
+                    if vehicle.type == 'UUV' or 'glider':
                         if vehicle and vehicle.name not in self.available_vehicles:
                             self.available_vehicles[vehicle.name] = vehicle
                             print("Updated vehicles:", self.available_vehicles)
-                    if vehicle.type == 'AUV':
-                        if vehicle and vehicle.name not in self.available_uavs:
-                            self.available_uavs[vehicle.name] = vehicle
-                            print("Updated UAVs:", self.available_uavs)
+                    # if vehicle.type == 'glider':
+                    #     if vehicle and vehicle.name not in self.available_uavs:
+                    #         self.available_uavs[vehicle.name] = vehicle
+                    #         print("Updated UAVs:", self.available_uavs)
 
                 case "SURVEY_AREA":
                     self.survey_area = utils.parseSurveyAreaAndCreateObject(msg.string())
@@ -121,7 +121,15 @@ class MOOSHandler:
             # Notify MOOSDB with the waypoint updates
             for count, (name, assignment) in enumerate(uav_assignments.items()):
                 assignment.reposition();
-                color = colors[count % len(colors)]  # for waypoint color
+
+
+                # color = colors[count % len(colors)]  # for waypoint color
+
+                if "uav" in name:
+                    color = warm_colors[count % len(warm_colors)]
+                elif "vehicle" in name:
+                    color = cool_colors[count % len(cool_colors)]
+
                 wpt_var = f"{name}_WPT_UPDATE"
                 print(f"SENDING {assignment.string()} to {wpt_var}")
 
@@ -170,4 +178,16 @@ colors = [
     'limegreen', 'springgreen', 'yellowgreen', 'forestgreen', 'seagreen', 'chartreuse',
     'orchid', 'violet', 'darkviolet', 'plum', 'indigo', 'lavender',
     'floralwhite', 'whitesmoke', 'ivory', 'linen', 'seashell', 'cornsilk'
+]
+
+warm_colors = [
+    'crimson', 'hotpink', 'red',
+    'yellow', 'gold', 'lemonchiffon',
+    'lightgoldenrod', 'palegoldenrod'
+]
+
+cool_colors = [
+    'dodgerblue', 'deepskyblue', 'royalblue',
+    'lightskyblue', 'powderblue', 'orchid',
+    'violet', 'darkviolet', 'plum', 'indigo', 'lavender'
 ]

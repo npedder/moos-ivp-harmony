@@ -100,6 +100,7 @@ ProcessConfig = uSimpleRobot
   rate_heading  = 180.0 //degrees per sec
   rate_speed    = 2.5   //meters  per sec^2
   rate_depth    = 3.5   //meters  per sec
+  thrust_map    = 0:0, 20:1, 40:2, 60:3, 80:4, 100:$(SPEED)
 }
 
 //------------------------------------------
@@ -112,7 +113,7 @@ ProcessConfig = pHelmIvP
 
   behaviors  = $(BHV)
   domain     = course:0:359:360
-  domain     = speed:0:4:41
+  domain     = speed:0:$(SPEED):50
 }
 
 //------------------------------------------
@@ -157,7 +158,7 @@ ProcessConfig = pNodeReporter
   AppTick    = 2
   CommsTick	 = 2
 
-  platform_type   = AUV
+  platform_type   = glider
   platform_color  = $(VEHICLE_COLOR)
          
 }
@@ -198,6 +199,6 @@ ProcessConfig = pShare
    
    paused = false
    reset_time = 1
-   event = var =HARMONY_REPORT, val = "NAME=$(VNAME),TYPE=AUV,X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
+   event = var =HARMONY_REPORT, val = "NAME=$(VNAME),TYPE=glider,X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
 
  }

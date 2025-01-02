@@ -23,7 +23,7 @@ if [ "$#" -ne 1 ]; then
   exit 1
 fi
 
-input_file=$1
+input_file="MissionConfigs/${1}"
 
 # Check if the file exists
 if [ ! -f "$input_file" ]; then

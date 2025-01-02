@@ -9,12 +9,18 @@ Community    = shoreside
 MOOSTimeWarp = 1
 
 // Forest Lake
-LatOrigin  = 43.825300 
+LatOrigin  = 43.825300
 LongOrigin = -70.330400 
 
 // MIT Sailing Pavilion (use this one)
 // LatOrigin  = 42.358456 
 // LongOrigin = -71.087589
+
+
+// Martha'sVineyard
+//  LatOrigin = 41.315286
+// LongOrigin  = -70.309013
+
 
 //------------------------------------------
 // Antler configuration  block
@@ -38,7 +44,8 @@ ProcessConfig = pMarineViewer
   AppTick    = 4
   CommsTick  = 4
 
-  tiff_file            = forrest19.tif
+  //tiff_file            = forrest19.tif
+  tiff_file = forrest19.tif
   tiff_viewable	       = true
 	//tiff_file            = MIT_SP.tif
 
@@ -50,6 +57,8 @@ ProcessConfig = pMarineViewer
   hash_shade           = 0.22
   hash_viewable        = false
   grid_opaqueness = 1.0
+  vehicle_shape_scale = 3
+  point_viewable_all = false
   
 
   trails_point_size   = 1
@@ -101,7 +110,7 @@ ProcessConfig = pMarineViewer
   action  = MENU_KEY=deploy # DEPLOY = true # RETURN = false
   action+ = MENU_KEY=deploy # MOOS_MANUAL_OVERRIDE=false
   action  = RETURN=true
-  action  = UPDATES_RETURN=speed=1.4
+  //action  = UPDATES_RETURN=speed=1.4
 }
 
 //pHostInfo configuration block

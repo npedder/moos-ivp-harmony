@@ -4,8 +4,8 @@
 //-------------------------------------------------
 
 ServerHost   = localhost
-ServerPort   = 9002
-Community    = uav_3
+ServerPort   = 9005
+Community    = uav_6
 MOOSTimeWarp = 1
 
 // Forest Lake
@@ -91,15 +91,16 @@ ProcessConfig = uSimpleRobot
   AppTick   = 4
   CommsTick = 4
 
-  start_heading = 45   //degrees
+  start_heading = 80   //degrees
   start_speed   = 0.0   //meters per sec
   start_depth   = 0.0   //meters
-  start_x       = 40
-  start_y       = -15
+  start_x       = 80
+  start_y       = 40
 
   rate_heading  = 180.0 //degrees per sec
   rate_speed    = 2.5   //meters  per sec^2
   rate_depth    = 3.5   //meters  per sec
+  thrust_map    = 0:0, 20:1, 40:2, 60:3, 80:4, 100:6.0
 }
 
 //------------------------------------------
@@ -110,9 +111,9 @@ ProcessConfig = pHelmIvP
   AppTick    = 4
   CommsTick  = 4
 
-  behaviors  = uav_3.bhv
+  behaviors  = uav_6.bhv
   domain     = course:0:359:360
-  domain     = speed:0:4:41
+  domain     = speed:0:6.0:50
 }
 
 //------------------------------------------
@@ -157,8 +158,8 @@ ProcessConfig = pNodeReporter
   AppTick    = 2
   CommsTick	 = 2
 
-  platform_type   = AUV
-  platform_color  = yellow
+  platform_type   = glider
+  platform_color  = red
          
 }
 
@@ -186,7 +187,7 @@ ProcessConfig = pShare
    AppTick    = 4
    CommsTick  = 4
 
-   input  = route = localhost:9002
+   input  = route = localhost:9005
  }
 
 //--------------------------------
@@ -198,7 +199,7 @@ ProcessConfig = pShare
    
    paused = false
    reset_time = 1
-   event = var =HARMONY_REPORT, val = "NAME=uav_3,TYPE=AUV,X=40,Y=-15,SPD=1.0,ENDURANCE=850,SENSOR_RANGE=20"
+   event = var =HARMONY_REPORT, val = "NAME=uav_6,TYPE=glider,X=80,Y=40,SPD=6.0,ENDURANCE=10000,SENSOR_RANGE=15"
 
  }
 
