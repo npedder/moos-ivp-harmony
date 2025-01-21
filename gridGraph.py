@@ -4,7 +4,11 @@ import matplotlib.pyplot as plt
 class gridGraph:
     def __init__(self, xNumNodes, yNumNodes, distanceBetweenNodes):
         self.graph = nx.grid_2d_graph(xNumNodes, yNumNodes)
-        self.pos = {(x, y): (y * distanceBetweenNodes, -x * distanceBetweenNodes) for x, y in self.graph.nodes()}
+        mapping = {}
+        for x, y in self.graph.nodes:
+            mapping[(x,y)] = (x * distanceBetweenNodes, y * distanceBetweenNodes)
+        self.graph = nx.relabel_nodes(self.graph, mapping, copy=False)
+        self.pos = {(x, y): (y, -x) for x, y in self.graph.nodes()}
         nx.set_edge_attributes(self.graph, values=distanceBetweenNodes, name='weight')
 
 
@@ -34,4 +38,4 @@ class gridGraph:
             print(f"Edge ({u}, {v}) has weight {wt['weight']}")
 
 
-    # edge_weights = [SurveyAreaGraph[u][v]['weight'] for u, v in SurveyAreaGraph.edges()]
+    # edge_weights = [SurveyAreaGraph[u][v]['weight'] for u, v in SurveyAreaGraph.edges()]+9
