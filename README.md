@@ -27,16 +27,20 @@ The HARMONY system is demonstrated within a MOOS-IvP simulation. The MOOS-IvP Co
 The HARMONY system uses the python-moos wrapper for MOOSApps for its shore-side application. 
 To install python-moos:
 
-## `python-moos`
-```shell
-git clone https://github.com/msis/python-moos
+## Python MOOS Build Instructions
+Clone the repository:
+
+```
+git clone https://github.com/npedder/python-moos.git python-moos
+```
+
+Build and install python-moos:
+
+```
 cd python-moos
-mkdir build
-cd build
-cmake ../
-make
-sudo make install
-cd ../..
+python setup.py build
+python setup.py install
+```
 ```
 
 This will produce a "pymoos*.so" file that needs to be added to your python interpreter in order to import the pymoos library into your python code. 
