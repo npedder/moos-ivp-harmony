@@ -41,7 +41,6 @@ cd python-moos
 python setup.py build
 python setup.py install
 ```
-```
 
 This will produce a "pymoos*.so" file that needs to be added to your python interpreter in order to import the pymoos library into your python code. 
 
