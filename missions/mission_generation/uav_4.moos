@@ -159,7 +159,7 @@ ProcessConfig = pNodeReporter
   CommsTick	 = 2
 
   platform_type   = glider
-  platform_color  = crimson
+  platform_color  = dodgerblue
          
 }
 

@@ -11,8 +11,8 @@ import random
 
 def parseNodeReportAndCreateVehicle(nodeReport):
     # Regular expression to extract NAME, LAT, and LON
-    pattern = r"NAME=([^,]+),.*X=([-\d.]+),.*Y=([-\d.]+)"
-
+    pattern = r"NAME=([^,]+),.*X=([-\d.]+),.*Y=([-\d.]+),.*COLOR=([^,]+)"
+    print(nodeReport)
     # Search for the match
     match = re.search(pattern, nodeReport)
 
@@ -20,12 +20,13 @@ def parseNodeReportAndCreateVehicle(nodeReport):
         name = match.group(1)
         x = float(match.group(2))
         y = float(match.group(3))
+        color = match.group(4)
 
         # print(f"Name: {name}")
         # print(f"Latitude: {lat}")
         # print(f"Longitude: {lon}")
-
-        vehicle = UxV(name, '',(x,y), None, None, None);
+        # print(f"Color: {color}")
+        vehicle = UxV(name, '',(x,y), None, None, None, color);
         return vehicle
     else:
         print("Pattern not found in the string.")
@@ -51,7 +52,7 @@ def parseHarmonyReportAndCreateVehicle(nodeReport):
         # print(f"Latitude: {lat}")
         # print(f"Longitude: {lon}")
 
-        vehicle = UxV(name, type, (x, y), speed,sensor_range,endurance);
+        vehicle = UxV(name, type, (x, y), speed,sensor_range,endurance, None);
         return vehicle
     else:
         print("Pattern not found in the string.")

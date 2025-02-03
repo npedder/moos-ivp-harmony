@@ -80,6 +80,7 @@ class MOOSHandler:
                     if vehicle and vehicle.name in self.available_vehicles:
                         self.available_vehicles[vehicle.name].x = vehicle.position[0]
                         self.available_vehicles[vehicle.name].y = vehicle.position[1]
+                        self.available_vehicles[vehicle.name].color = vehicle.color
                         #print("Updated vehicles:", self.available_vehicles)
 
 
@@ -99,7 +100,8 @@ class MOOSHandler:
             # Notify MOOSDB with the waypoint updates
             for count, (name, assignment) in enumerate(vehicle_assignments.items()):
                 assignment.reposition();
-                color = colors[count % len(colors)]     # for waypoint color
+                # color = colors[count % len(colors)]     # for waypoint color
+                color = self.available_vehicles[name].color
                 wpt_var = f"{name}_WPT_UPDATE"
                 print(f"SENDING {assignment.string()} to {wpt_var}")
 

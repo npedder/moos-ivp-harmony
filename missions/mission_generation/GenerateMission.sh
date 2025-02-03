@@ -33,6 +33,8 @@ fi
 
 # Read the file line by line
 line_number=0
+uuvcount=0
+uavcount=0
 while IFS= read -r line; do
   # Stop processing if line contains the stop character (~)
   if [[ "$line" == *~* ]]; then
@@ -49,15 +51,30 @@ while IFS= read -r line; do
   # Increment the line number
   ((line_number++))
   PORT=$(($START_PORT + $line_number - 1))
+  # Define an array of colors sorted by ROYGBIV order
+
+  warm_colors=(
+    'crimson' 'hotpink' 'red'
+    'yellow' 'gold' 'lemonchiffon'
+    'lightgoldenrod' 'palegoldenrod'
+    )
+
+  cool_colors=(
+    'dodgerblue' 'deepskyblue' 'royalblue'
+    'lightskyblue' 'powderblue' 'orchid'
+    'violet' 'darkviolet' 'plum' 'indigo' 'lavender'
+  )
 
   if [ "$CURRENT_OBJECT_TYPE" == "vehicle" ]; then
     # For vehicles, use the vehicle templates
-    nsplug vehicle.moos "vehicle_${line_number}.moos" VNAME="vehicle_${line_number}" PORT="$PORT" BHV="vehicle_${line_number}.bhv" $line
+    nsplug vehicle.moos "vehicle_${line_number}.moos" VNAME="vehicle_${line_number}" PORT="$PORT" BHV="vehicle_${line_number}.bhv" VEHICLE_COLOR=${warm_colors[uuvcount]} $line
     nsplug default.bhv "vehicle_${line_number}.bhv" $line
+    ((uuvcount++))
   elif [ "$CURRENT_OBJECT_TYPE" == "uav" ]; then
     # For UAVs, use the uav templates
-    nsplug uav.moos "uav_${line_number}.moos" VNAME="uav_${line_number}" PORT="$PORT" BHV="uav_${line_number}.bhv" $line
+    nsplug uav.moos "uav_${line_number}.moos" VNAME="uav_${line_number}" PORT="$PORT" BHV="uav_${line_number}.bhv" VEHICLE_COLOR=${cool_colors[uavcount]} $line
     nsplug uav.bhv "uav_${line_number}.bhv" $line
+    ((uavcount++))
   fi
 done < "$input_file"
 
