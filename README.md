@@ -44,6 +44,9 @@ python setup.py install
 
 This will produce a "pymoos*.so" file that needs to be added to your python interpreter in order to import the pymoos library into your python code. 
 
+If there is a PATH error when running the "build" file in a linux environment, you may need to install some python dev tools by running the command "sudo apt-get install python[version]-dev*"
+
+
 ## Python packages
 - numpy
 - matplotlib
