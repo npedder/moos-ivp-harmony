@@ -49,6 +49,22 @@ This will produce a "pymoos*.so" file that needs to be added to your python inte
 - matplotlib
   
 # Usage
-Once setup is complete, example HAMRONY missions can be generated in the missions/s1_alpha folder. This folder contains bash scripts that can quickly set up new mission configurations based on the InitVehicleConig.txt file. 
+Once setup is complete, example HAMRONY missions can be generated in the missions/mission_generation folder. This folder contains bash scripts that can quickly set up new mission configurations based on the ".txt" files located in the 'MissionConfigs' folder.
 
+To build the vehicles based on the config file, from inside the MissionGeneration folder, run
+```
+./GenerateMission.sh config.txt
+```
+
+To launch the mission with the HARMONY shoreside app, run
+```
+./launch_harmony.sh
+```
+
+Now, a survey area can be sent to the application using running "./inject_survey width height start_x start_y", for example, 
+```
+./inject_survey 0 0 50 100
+```
+
+The survey area should appear in pMarineViewer followed by the vehicle assignments. The vehicles can be deployed onto their assigned waypoints with the "RUN" button.
 
