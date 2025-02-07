@@ -12,7 +12,6 @@ import random
 def parseNodeReportAndCreateVehicle(nodeReport):
     # Regular expression to extract NAME, LAT, and LON
     pattern = r"NAME=([^,]+),.*X=([-\d.]+),.*Y=([-\d.]+),.*COLOR=([^,]+)"
-    print(nodeReport)
     # Search for the match
     match = re.search(pattern, nodeReport)
 
