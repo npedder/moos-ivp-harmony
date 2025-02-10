@@ -1,139 +1,88 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-from gridGraph import gridGraph
+import numpy as np
 import math
 
+from gridGraph import gridGraph
+from gridVisualizer import GridVisualizer
+from MissionArea import MissionArea
+from gridArrayGenerator import genGrid
+from UxV import UxV
+from networkx.algorithms import approximation as approx
 
+#TODO: Allow veheicles to have same position as nodes in grid graph
+# ------------------------ Mission 1 ----------------------------
+# Uses tuples
+VehicleArray = [(1,50) , (10,-90), (-30, 70), (-60,-60)]
+grid_data = genGrid(22)
+mission_alpha = MissionArea("Alpha", grid_data, 10)
+# mission_alpha.add_vehicle_to_graph(VehicleArray[0])
+# mission_alpha.add_vehicle_to_graph(VehicleArray[1])
+# mission_alpha.add_vehicle_to_graph(VehicleArray[2])
 
-plt.figure(1, figsize=(6,6))
+mission_alpha.add_vehicles_to_graph(VehicleArray)
 
-# Grid Graph
-SurveyAreaGraph = gridGraph(5,5,10)
-SurveyAreaGraph.drawGraph()
-# print(list(SurveyAreaGraph.graph.nodes()))
-# print(SurveyAreaGraph.print_node_attributes())
-SurveyAreaGraph.print_edge_weights()
-# plt.show()
+# print(list(mission_alpha.grid_graph.graph.nodes()))
 
+# print(mission_alpha.grid_graph.pos)
 
-# --------------------------------------
-# Graph for vehicles
-VehiclesGraph = nx.Graph()
-VehiclesGraph.add_node((90, 0))
-VehiclesGraph.add_node((50, 50))
-print(VehiclesGraph.nodes())
-pos={(x,y):(y,-x) for x,y in VehiclesGraph.nodes()}
-print(pos)
-nx.draw(VehiclesGraph, pos=pos,
-        node_color='blue',
-        with_labels=True,
-        node_size=600)
+# vehicle_graph = nx.Graph()
+# vehicle_graph.add_node(VehicleArrays[1])
+# pos = {(x, y): (y, -x) for x, y in v1_graph.nodes()}
 
+mission_alpha.draw()
 
-#-------------------------------
-# Graph for vehicle 1 from vehicle graph
-plt.figure(2, figsize=(6,6))
-v1_graph = nx.Graph()
-v1_graph.add_node(list(VehiclesGraph.nodes())[0])
-v1_graph = nx.union(v1_graph, SurveyAreaGraph.graph)
-pos = {(x,y):(y,-x) for x,y in v1_graph.nodes()}
-pos.update(SurveyAreaGraph.pos) #combines the two pos dictionaries
+# ------------------------ Mission 2 ----------------------------
+# Create UxV obejects to be added as nodes
+uxv1 = UxV(name="alpha", position=(15,10), speed=(10), sensorRange=(10), type="UUV", endurance=200)
+uxv2 = UxV(name="bravo", position=(50,-15), speed=(5), sensorRange=(15), type="UUV", endurance=100)
 
-v1_node = (90,0)
-nodes = list(v1_graph.nodes())
-print(nodes)
-for node in nodes:
-    if node != v1_node :
-        weight = math.dist(v1_node, node) #distance between the two nodes is the weight
-        v1_graph.add_edge(v1_node, node, weight=weight)
+grid_data = genGrid(92)
+mission_bravo = MissionArea("Bravo", grid_data, 10)
+mission_bravo.add_vehicle_to_graph(uxv1)
+mission_bravo.add_vehicle_to_graph(uxv2)
+mission_bravo.grid_graph.print_node_attributes()
+mission_bravo.draw()
 
-print(v1_graph.edges())
+plt.show()
 
-edge_labels = nx.get_edge_attributes(v1_graph, 'weight')
-nx.draw_networkx_edge_labels(v1_graph, pos, edge_labels=edge_labels)
-
-nx.draw(v1_graph, pos=pos,
-        node_color='blue',
-        with_labels=True,
-        node_size=600)
-#-------------------------------
-# Graph for vehicle 2 from vehicle graph
-plt.figure(3, figsize=(6,6))
-v2_graph = nx.Graph()
-v2_graph.add_node(list(VehiclesGraph.nodes())[1])
-v2_graph = nx.union(v2_graph, SurveyAreaGraph.graph)
-pos = {(x,y):(y,-x) for x,y in v2_graph.nodes()}
-pos.update(SurveyAreaGraph.pos) #combines the two pos dictionaries
-
-v2_node = (50, 50)
-nodes = list(v2_graph.nodes())
-print(nodes)
-for node in nodes:
-    if node != v2_node :
-        weight = math.dist(v2_node, node) #distance between the two nodes is the weight
-        v2_graph.add_edge(v2_node, node, weight=weight)
-
-print(v2_graph.edges())
-
-edge_labels = nx.get_edge_attributes(v2_graph, 'weight')
-nx.draw_networkx_edge_labels(v2_graph, pos, edge_labels=edge_labels)
-
-nx.draw(v2_graph, pos=pos,
-        node_color='blue',
-        with_labels=True,
-        node_size=600)
-
-#--------------------------------
-# v1 and v2 straight line distance comparison
-
-plt.figure(4, figsize=(6,6))
-solution_graph = nx.Graph()
-solution_graph.add_node(list(VehiclesGraph.nodes())[0])
-solution_graph = nx.union(solution_graph, SurveyAreaGraph.graph)
-pos = {(x,y):(y,-x) for x,y in solution_graph.nodes()}
-pos.update(SurveyAreaGraph.pos) #combines the two pos dictionaries
-
-
-
+#---------------------------------------------------------------------------------------------------------------
 # Lame solution using a weight offset to account for how many nodes are visited. Doesnt really make sense
 print("starting comparion...")
 v1_weight_offset = 0
 v2_weight_offset = 0
 
+G = mission_bravo.grid_graph.graph
+vehicles = mission_bravo.vehicles
 
-for v1_edge in v1_graph.edges((90,0)):
-    v2_edge = ((50,50), v1_edge[1])
+# Add edges for each vehicle with weight of distance between edges
+for vehicle in vehicles:
+        for node in G.nodes:
+            G.add_edge(vehicle, node, weight=math.dist(vehicle,node) * G.nodes[vehicle]["speed"])
 
-    if v1_graph[v1_edge[0]][v1_edge[1]]['weight'] + v1_weight_offset < v2_graph[v2_edge[0]][v2_edge[1]]['weight'] + v2_weight_offset:
-        print(v1_graph[v1_edge[0]][v1_edge[1]]['weight'] + v1_weight_offset, "is less than" , v2_graph[v2_edge[0]][v2_edge[1]]['weight'] + v2_weight_offset)
-        v1_weight_offset += 10
-        # solution_graph.add_edge(v1_edge[0], v1_edge[1])
-    else:
-        print(v1_graph[v1_edge[0]][v1_edge[1]]['weight'] + v1_weight_offset, "is greater than" , v2_graph[v2_edge[0]][v2_edge[1]]['weight'] + v2_weight_offset)
-        v2_weight_offset += 10
+
+print(G.nodes[vehicles[1]])
+
+
+
+
+
+# for v in G.edges:
+#     v2_edge = ((50,50), v1_edge[1])
+#
+#     if G[v1_edge[0]][v1_edge[1]]['weight'] + v1_weight_offset < v2_graph[v2_edge[0]][v2_edge[1]]['weight'] + v2_weight_offset:
+#         print(G[v1_edge[0]][v1_edge[1]]['weight'] + v1_weight_offset, "is less than" , v2_graph[v2_edge[0]][v2_edge[1]]['weight'] + v2_weight_offset)
+#         v1_weight_offset += 10
+#         # solution_graph.add_edge(v1_edge[0], v1_edge[1])
+#     else:
+#         print(v1_graph[v1_edge[0]][v1_edge[1]]['weight'] + v1_weight_offset, "is greater than" , v2_graph[v2_edge[0]][v2_edge[1]]['weight'] + v2_weight_offset)
+#         v2_weight_offset += 10
+#
+# for v in G.edges:
+#     for in
 # Lame Solution ends
 
 #--------------------------------------------------------------------------------
-v1_min_edge = min(v1_graph.edges((90,0),data=True), key=lambda x: x[2]['weight'])
-v2_min_edge = min(v2_graph.edges((50,50),data=True), key=lambda x: x[2]['weight'])
-
-for u, v in nx.bfs_edges(SurveyAreaGraph.graph, (40,0)):
-    v1_graph[(90,0)][(v)]['weight'] +=10
-    print(v1_graph[(90,0)][(v)]['weight'])
-    print(u,v)
 
 
-edge_labels = nx.get_edge_attributes(solution_graph, 'weight')
-nx.draw_networkx_edge_labels(solution_graph, pos, edge_labels=edge_labels)
-
-nx.draw(solution_graph, pos=pos,
-        node_color='blue',
-        with_labels=True,
-        node_size=600)
-
-#-------------------------------
-shortest_path = dict(nx.all_pairs_dijkstra_path(v1_graph))
-print("Shortest Path ",  shortest_path[(0,0)][(0,0)])
-
-plt.show()
 
