@@ -7,13 +7,21 @@ from gridArrayGenerator import genGrid
 
 
 class GridVisualizer:
-    def __init__(self, gridArray):
+    def __init__(self, gridArray, cellDimension):
         self.gridArray = gridArray
-        self.nrows, self.ncols = gridArray.shape
+        self.nrows, self.ncols = self.gridArray.shape  # New expanded grid size
+
+        self.scale_x = cellDimension
+        self.scale_y = cellDimension
+
+        # Expand the grid array so each cell is scale_y × scale_x in size
+        self.scaledGrid = np.kron(gridArray, np.ones((self.scale_x, self.scale_y)))
+        self.scaledNRows, self.scaledNCols = self.scaledGrid.shape  # New expanded grid size
 
         # Define grid edges (pcolormesh uses edges, so one more than number of cells)
-        x = np.arange(self.ncols + 1)
-        y = np.arange(self.nrows + 1)
+        x = np.arange(self.scaledNCols + 1)
+        y = np.arange(self.scaledNRows + 1)
+
 
         # Create a ListedColormap for our discrete colors:
         # Order: black (for 0), white (for 1), green (for 1.1), blue (for 1.2)
@@ -24,10 +32,10 @@ class GridVisualizer:
         boundaries = [-0.5, 0.5, 1.05, 1.15, 1.25]
         norm = BoundaryNorm(boundaries, cmap.N, clip=True)
         # Create the figure and axis
-        self.fig, self.ax = plt.subplots(figsize=(20, 20))
+        self.fig, self.ax = plt.subplots(figsize=(250,250))
 
         # Draw the colormesh grid with our custom colormap and normalization.
-        c = self.ax.pcolormesh(x, y, gridArray, shading='flat', cmap=cmap, norm=norm)
+        c = self.ax.pcolormesh(x, y, self.scaledGrid, shading='flat', cmap=cmap, norm=norm, rasterized=True)
 
         # Add a colorbar with tick marks at our data values.
         cbar = self.fig.colorbar(c, ax=self.ax, ticks=[0, 1, 1.1, 1.2])

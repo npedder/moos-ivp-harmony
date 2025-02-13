@@ -4,12 +4,12 @@ exampleArray = np.array
 import numpy as np
 from scipy.ndimage import gaussian_filter
 
-def genGrid(seed):
+def genGrid(x, y, seed):
     # For reproducibility
     np.random.seed(seed)
 
     # Create random noise over a 75x50 area
-    noise = np.random.rand(50, 75)
+    noise = np.random.rand(y, x)
 
     # Apply Gaussian smoothing to group similar values together.
     # Adjust sigma to control cluster size

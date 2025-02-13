@@ -10,11 +10,10 @@ from gridArrayGenerator import genGrid
 from UxV import UxV
 from networkx.algorithms import approximation as approx
 
-#TODO: Allow veheicles to have same position as nodes in grid graph
 # ------------------------ Mission 1 ----------------------------
 # Uses tuples
 VehicleArray = [(1,50) , (10,-90), (-30, 70), (-60,-60)]
-grid_data = genGrid(22)
+grid_data = genGrid(75,50,22)
 mission_alpha = MissionArea("Alpha", grid_data, 10)
 # mission_alpha.add_vehicle_to_graph(VehicleArray[0])
 # mission_alpha.add_vehicle_to_graph(VehicleArray[1])
@@ -37,33 +36,35 @@ mission_alpha.draw()
 uxv1 = UxV(name="alpha", position=(15,10), speed=(10), sensorRange=(10), type="UUV", endurance=200)
 uxv2 = UxV(name="bravo", position=(50,-15), speed=(5), sensorRange=(15), type="UUV", endurance=100)
 
-grid_data = genGrid(92)
+grid_data = genGrid(75, 50, 92)
 mission_bravo = MissionArea("Bravo", grid_data, 10)
+print(list(mission_bravo.grid_graph.graph.nodes()))
 mission_bravo.add_vehicle_to_graph(uxv1)
 mission_bravo.add_vehicle_to_graph(uxv2)
 mission_bravo.grid_graph.print_node_attributes()
+
 mission_bravo.draw()
 
 plt.show()
 
 #---------------------------------------------------------------------------------------------------------------
 # Lame solution using a weight offset to account for how many nodes are visited. Doesnt really make sense
-print("starting comparion...")
-v1_weight_offset = 0
-v2_weight_offset = 0
-
-G = mission_bravo.grid_graph.graph
-vehicles = mission_bravo.vehicles
-
-# Add edges for each vehicle with weight of distance between edges
-for vehicle in vehicles:
-        for node in G.nodes:
-            G.add_edge(vehicle, node, weight=math.dist(vehicle,node) * G.nodes[vehicle]["speed"])
-
-
-print(G.nodes[vehicles[1]])
-
-
+# print("starting comparion...")
+# v1_weight_offset = 0
+# v2_weight_offset = 0
+#
+# G = mission_bravo.grid_graph.graph
+# vehicles = mission_bravo.vehicles
+#
+# # Add edges for each vehicle with weight of distance between edges
+# for vehicle in vehicles:
+#         for node in G.nodes:
+#             G.add_edge(vehicle, node, weight=math.dist(vehicle,node) * G.nodes[vehicle]["speed"])
+#
+#
+# print(G.nodes[vehicles[1]])
+#
+# print()
 
 
 

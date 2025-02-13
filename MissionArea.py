@@ -10,11 +10,11 @@ from UxV import UxV
 class MissionArea:
     def __init__(self, name, gridArray, cellDimension):
         self.name = name
-        self.grid_visualizer = GridVisualizer(gridArray)
+        self.grid_visualizer = GridVisualizer(gridArray, cellDimension)
         nrows = self.grid_visualizer.nrows
         ncols = self.grid_visualizer.ncols
         self.vehicles = []
-        self.grid_graph = gridGraph(nrows, ncols, cellDimension, scale="auto")
+        self.grid_graph = gridGraph(nrows, ncols, cellDimension, scale="equal")
 
     def draw(self):
         pos = self.grid_graph.pos
@@ -24,7 +24,7 @@ class MissionArea:
                 with_labels=False,
                 node_color=node_colors,
                 # edge_color='black',
-                edge_color="none",
+                edge_color="black",
                 node_size=node_size,
                 font_color='yellow')
 
@@ -32,8 +32,8 @@ class MissionArea:
         self.grid_visualizer.ax.set_aspect('equal')
 
         # Adjust plot limits and add a title.
-        self.grid_visualizer.ax.set_xlim(-0.7, self.grid_visualizer.ncols)
-        self.grid_visualizer.ax.set_ylim(-0.7, self.grid_visualizer.nrows + 0.2)
+        self.grid_visualizer.ax.set_xlim(-0.7, self.grid_visualizer.scaledNCols)
+        self.grid_visualizer.ax.set_ylim(-0.7, self.grid_visualizer.scaledNRows + 0.2)
         self.grid_visualizer.ax.set_title(self.name)
 
         # Only label the vehicle nodes. Different for UxV and tuple
@@ -64,6 +64,7 @@ class MissionArea:
                                                         "speed": node.speed, "sensorRange": node.sensorRange,
                                                         "endurance": node.endurance, "color": node.color}})
             self.vehicles.append(node.position)
+
 
 
     def add_vehicles_to_graph(self, nodesArray):

@@ -13,7 +13,7 @@ class gridGraph:
         if scale == "auto":
             self.pos = {(x, y): (y/distanceBetweenNodes+ .5, x/distanceBetweenNodes+ .5) for x, y in self.graph.nodes()}
         if scale == "equal":
-            self.pos = {(x, y): (y, -x) for x, y in self.graph.nodes()}
+            self.pos = {(x, y): (y + distanceBetweenNodes/2, x + distanceBetweenNodes/2) for x, y in self.graph.nodes()}
 
         nx.set_edge_attributes(self.graph, values=distanceBetweenNodes, name='weight')
 
@@ -48,6 +48,9 @@ class gridGraph:
         vehicle_graph.add_node(node)
         pos = {(x, y): (y, x) for x, y in vehicle_graph.nodes()}
         # print(pos)
+
+        if(self.graph.has_node(node)): # Replace node if already in graph
+            self.graph.remove_node(node)
 
         self.graph = nx.union(vehicle_graph, self.graph)
 
