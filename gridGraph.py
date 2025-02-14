@@ -1,19 +1,19 @@
 import networkx as nx
 
 class gridGraph:
-    def __init__(self, xNumNodes, yNumNodes, distanceBetweenNodes, scale="auto"):
+    def __init__(self, xNumNodes, yNumNodes, distanceBetweenNodes, scale="equal"):
         self.graph = nx.grid_2d_graph(xNumNodes, yNumNodes)
         mapping = {}
         for x, y in self.graph.nodes:
-            mapping[(x,y)] = (x * distanceBetweenNodes, y * distanceBetweenNodes)
+            mapping[(x,y)] = (x * distanceBetweenNodes + distanceBetweenNodes/2, y * distanceBetweenNodes + distanceBetweenNodes/2)
         self.graph = nx.relabel_nodes(self.graph, mapping, copy=False)
 
-        # Setting scale to "equal" uses matplotlib coordinates to position nodes
+        # Setting scale to "equal" uses matplotlib coordinates to position nodes TODO: This is no longer true
         # Setting scale to auto will automatically adjust to a gridVisualizer
         if scale == "auto":
             self.pos = {(x, y): (y/distanceBetweenNodes+ .5, x/distanceBetweenNodes+ .5) for x, y in self.graph.nodes()}
         if scale == "equal":
-            self.pos = {(x, y): (y + distanceBetweenNodes/2, x + distanceBetweenNodes/2) for x, y in self.graph.nodes()}
+            self.pos = {(x, y): (y, x) for x, y in self.graph.nodes()}
 
         nx.set_edge_attributes(self.graph, values=distanceBetweenNodes, name='weight')
 
@@ -42,22 +42,25 @@ class gridGraph:
     def print_edge_weights(self):
         for (u, v, wt) in self.graph.edges(data=True):
             print(f"Edge ({u}, {v}) has weight {wt['weight']}")
-
-    def __add_vehicle_to_graph__(self,node):
-        vehicle_graph = nx.Graph()
-        vehicle_graph.add_node(node)
-        pos = {(x, y): (y, x) for x, y in vehicle_graph.nodes()}
-        # print(pos)
-
-        if(self.graph.has_node(node)): # Replace node if already in graph
-            self.graph.remove_node(node)
-
-        self.graph = nx.union(vehicle_graph, self.graph)
-
-        self.pos.update(pos)  # combines the two pos dictionaries
+    #
+    # def __add_vehicle_to_graph__(self,node):
+    #     vehicle_graph = nx.Graph()
+    #     vehicle_graph.add_node(node)
+    #     pos = {(x, y): (y, x) for x, y in vehicle_graph.nodes()}
+    #     # print(pos)
+    #
+    #     if(self.graph.has_node(node)): # Replace node if already in graph
+    #         self.graph.remove_node(node)
+    #
+    #     self.graph = nx.union(vehicle_graph, self.graph)
+    #
+    #     self.pos.update(pos)  # combines the two pos dictionaries
 
     def __add_vehicles_to_graph__(self, nodeList):
         print("does nothing")
+
+    def __update_pos__(self, node):
+        self.pos[(node[0], node[1])] =  (node[1], node[0])
 
 
 

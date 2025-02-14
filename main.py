@@ -33,8 +33,9 @@ mission_alpha.draw()
 
 # ------------------------ Mission 2 ----------------------------
 # Create UxV obejects to be added as nodes
-uxv1 = UxV(name="alpha", position=(15,10), speed=(10), sensorRange=(10), type="UUV", endurance=200)
-uxv2 = UxV(name="bravo", position=(50,-15), speed=(5), sensorRange=(15), type="UUV", endurance=100)
+uxv1 = UxV(name="alpha", position=(5,15), speed=(10), sensorRange=(10), type="UUV", endurance=200)
+uxv2 = UxV(name="bravo", position=(35,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
+uxv3 = UxV(name="Charlie", position=(12,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
 
 grid_data = genGrid(75, 50, 92)
 mission_bravo = MissionArea("Bravo", grid_data, 10)

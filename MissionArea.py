@@ -36,40 +36,40 @@ class MissionArea:
         self.grid_visualizer.ax.set_ylim(-0.7, self.grid_visualizer.scaledNRows + 0.2)
         self.grid_visualizer.ax.set_title(self.name)
 
-        # Only label the vehicle nodes. Different for UxV and tuple
-        pos_offset = {}
-        for node in self.vehicles:
-            if isinstance(node, UxV): #This is probably unnecessary now
-                pos_offset[node] = (self.grid_graph.pos[node.position][0] + 2, self.grid_graph.pos[node.position][1] + 1)  # offset labels
-            else: #tuple
-                pos_offset[node] = (self.grid_graph.pos[node][0] + 2, self.grid_graph.pos[node][1] + 1) # offset labels
-        print(pos_offset)
-
         labels = {}
         for node in self.vehicles:
             labels[node] = node
-        nx.draw_networkx_labels(self.grid_graph.graph, pos_offset, labels, font_size=12, font_color='r')
+        nx.draw_networkx_labels(self.grid_graph.graph, self.grid_graph.pos, labels, font_size=12, font_color='r')
 
         plt.show()
 
     def add_vehicle_to_graph(self, node):
         # Input node as a tuple or vehicle object. Must be consistent throughout graph
         if isinstance(node, tuple):
-            self.grid_graph.__add_vehicle_to_graph__(node)
+            # self.grid_graph.__add_vehicle_to_graph__(node)
+            if self.grid_graph.graph.has_node(node) is False:
+                self.grid_graph.graph.add_node(node)
+
             self.vehicles.append(node)
+            self.grid_graph.__update_pos__(node)
+
 
         if isinstance(node, UxV): # TODO: this may need to change with implementation of vehicles in algorithm
-            self.grid_graph.__add_vehicle_to_graph__(node.position)
-            nx.set_node_attributes(self.grid_graph.graph, {node.position:{'name':node.name, 'type': node.type, "position": node.position,
+           # self.grid_graph.__add_vehicle_to_graph__(node.position)
+            if self.grid_graph.graph.has_node(node.position) is False:
+                self.grid_graph.graph.add_node(node.position)
+
+            self.vehicles.append(node.position)
+            nx.set_node_attributes(self.grid_graph.graph,
+                                       {node.position: {'name': node.name, 'type': node.type, "position": node.position,
                                                         "speed": node.speed, "sensorRange": node.sensorRange,
                                                         "endurance": node.endurance, "color": node.color}})
-            self.vehicles.append(node.position)
 
 
 
     def add_vehicles_to_graph(self, nodesArray):
         for node in nodesArray:
-            self.grid_graph.__add_vehicle_to_graph__(node)
+            self.add_vehicle_to_graph(node)
             self.vehicles.append(node)
 
     def print_vehicle_attributes(self):
