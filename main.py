@@ -86,5 +86,52 @@ plt.show()
 
 #--------------------------------------------------------------------------------
 
+# ------------- Mission 3 --------------------
+
+
+def calculate_pk(mission: MissionArea, vehicle):
+    summation_v_r = 0
+    R = mission.vehicles
+    for r in R:
+        velocity_r = mission.grid_graph.graph.nodes[vehicle]['speed']
+        summation_v_r += velocity_r
+        p_k = (velocity_r / summation_v_r) * w(mission)
+
+    return p_k
+
+
+def w(mission: MissionArea):  # would only work if all cells are the same size?
+    R = mission.vehicles
+    summation_node_weights = 0
+    for r in R:
+        summation_node_weights += len(R) * mission.cellDimension
+
+    return summation_node_weights
+
+
+
+
+
+# Create UxV obejects to be added as nodes
+uxv1 = UxV(name="alpha", position=(5,15), speed=(10), sensorRange=(10), type="UUV", endurance=200)
+uxv2 = UxV(name="bravo", position=(35,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
+uxv3 = UxV(name="Charlie", position=(12,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
+
+grid_data = genGrid(75, 50, 92)
+mission_3 = MissionArea("Misison3", grid_data, 10)
+mission_3.add_vehicle_to_graph(uxv1)
+mission_3.add_vehicle_to_graph(uxv2)
+mission_3.add_vehicle_to_graph(uxv3)
+
+# Optimal number of tasks for vehicle rk
+print(calculate_pk(mission_3, uxv1.position))
+
+
+mission_bravo.draw()
+
+plt.show()
+
+
+
 
 

@@ -11,15 +11,32 @@ class MissionArea:
     def __init__(self, name, gridArray, cellDimension):
         self.name = name
         self.grid_visualizer = GridVisualizer(gridArray, cellDimension)
+        self.cellDimension = cellDimension
         nrows = self.grid_visualizer.nrows
         ncols = self.grid_visualizer.ncols
         self.vehicles = []
+        self.vehicle_assignments = {}
         self.grid_graph = gridGraph(nrows, ncols, cellDimension, scale="equal")
 
     def draw(self):
         pos = self.grid_graph.pos
+
         node_colors = ['red' if node in self.vehicles else 'blue' for node in self.grid_graph.graph.nodes()]
-        node_size = [50 if node in self.vehicles else 1 for node in self.grid_graph.graph.nodes()]
+        colors = ['yellow', 'purple', 'green', 'orange']
+        #node_colors = [0] * self.grid_graph.graph.number_of_nodes()
+        i = 0
+        for assignment in self.vehicle_assignments:
+            for index, val in enumerate(self.grid_graph.graph.nodes()):
+                if val in self.vehicle_assignments[assignment]:
+                    node_colors[index] = colors[i]
+                    if assignment == (15, 275):
+                        print("here")
+
+            i += 1
+            #node_colors.append [colors[i % len(colors)] for node in assignment]
+            print(node_colors)
+
+        node_size = [50 if node in self.vehicles else 25 for node in self.grid_graph.graph.nodes()]
         nx.draw(self.grid_graph.graph, pos=pos, ax=self.grid_visualizer.ax,
                 with_labels=False,
                 node_color=node_colors,
@@ -64,7 +81,7 @@ class MissionArea:
                                        {node.position: {'name': node.name, 'type': node.type, "position": node.position,
                                                         "speed": node.speed, "sensorRange": node.sensorRange,
                                                         "endurance": node.endurance, "color": node.color}})
-
+            self.grid_graph.__update_pos__(node.position)
 
 
     def add_vehicles_to_graph(self, nodesArray):
