@@ -49,6 +49,10 @@ def update_NV_K(mission: MissionArea, NV_K, cell, assigned_nodes):
             if node in newNodes:
                 newNodes.remove(node)
 
+        for node in mission.vehicles: # TODO: questionable for statement probably a better way
+            if node in newNodes:
+                newNodes.remove(node)
+
         NV_K.update(newNodes)
         NV_K.remove(cell)
         print("NVK ", NV_K)
@@ -79,8 +83,6 @@ def cylcic_region_growth(mission: MissionArea, R, OptimalTasks):
             if k == 1: print("-----------------------------------", rate[k])
             if k == 2: print("-----------------------------------", rate[k])
             for j in range(0, rate[k]):
-                NV_K = update_NV_K(mission, NV_K, last_updated_cell, assigned_nodes) #NV_K is the task set that has not been purchased yet, adjacent to Vk
-                NV_k[k] = update_NV_K(mission, NV_k[k], last_updated_cell, assigned_nodes)
                 print(rate[k])
                 if NV_k[k]: #Checks if list of NVs are empty
                     last_updated_cell =  list(NV_k[k])[j] # select a cell from NV_k
@@ -91,6 +93,8 @@ def cylcic_region_growth(mission: MissionArea, R, OptimalTasks):
                     # TODO: some sort of logic for changing node color or assigning nodes to vehicles
                     mission.grid_graph.graph.nodes[last_updated_cell]['weight'] = 1 + 0.1 * k;
                     f[k] = f[k] - 1
+                    NV_K = update_NV_K(mission, NV_K, last_updated_cell, assigned_nodes)  # NV_K is the task set that has not been purchased yet, adjacent to Vk
+                    NV_k[k] = update_NV_K(mission, NV_k[k], last_updated_cell, assigned_nodes)
                     N = N - 1
                     print("K = ", k)
 
