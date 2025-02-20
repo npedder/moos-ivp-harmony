@@ -22,19 +22,17 @@ class MissionArea:
         pos = self.grid_graph.pos
 
         node_colors = ['red' if node in self.vehicles else 'blue' for node in self.grid_graph.graph.nodes()]
-        colors = ['yellow', 'purple', 'green', 'orange']
-        #node_colors = [0] * self.grid_graph.graph.number_of_nodes()
+        colors = [
+            "yellow", "purple","green", "orange", "cyan", "magenta",
+            "lime", "pink", "brown", "gray", "olive", "teal",
+            "navy", "maroon", "gold", "indigo", "violet", "turquoise"
+        ]
         i = 0
         for assignment in self.vehicle_assignments:
             for index, val in enumerate(self.grid_graph.graph.nodes()):
                 if val in self.vehicle_assignments[assignment]:
-                    node_colors[index] = colors[i]
-                    if assignment == (15, 275):
-                        print("here")
-
+                    node_colors[index] = colors[i % len(colors)]
             i += 1
-            #node_colors.append [colors[i % len(colors)] for node in assignment]
-            print(node_colors)
 
         node_size = [50 if node in self.vehicles else 25 for node in self.grid_graph.graph.nodes()]
         nx.draw(self.grid_graph.graph, pos=pos, ax=self.grid_visualizer.ax,
@@ -89,13 +87,14 @@ class MissionArea:
             self.add_vehicle_to_graph(node)
             self.vehicles.append(node)
 
-    def print_vehicle_attributes(self):
-        vehicle_attributes = {node: self.grid_graph.nodes[node] for node in self.vehicles if node in self.grid_graph.graph
-}
+    def get_vehicle_attributes(self):
+        vehicle_attributes = {node: self.grid_graph.nodes[node] for node in self.vehicles if node in self.grid_graph.graph}
+        return vehicle_attributes
+
 
 if __name__ == '__main__':
 
-    grid_data = genGrid(42)
+    grid_data = genGrid(50,75,42)
 
     mission = MissionArea("alpha", grid_data, 10)
     mission.draw()
