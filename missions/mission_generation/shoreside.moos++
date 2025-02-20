@@ -1,0 +1,188 @@
+//-------------------------------------------------
+// NAME: HARMONY TEAM
+// FILE: shoreside.moos
+//-------------------------------------------------
+
+ServerHost   = localhost
+ServerPort   = 8999
+Community    = shoreside
+//----  Next Line was commented and replaced with a command line overload ---- //
+//MOOSTimeWarp = 1    (default)
+MOOSTimeWarp = 5
+
+// Forest Lake
+LatOrigin  = 43.825300
+LongOrigin = -70.330400 
+
+// MIT Sailing Pavilion (use this one)
+// LatOrigin  = 42.358456 
+// LongOrigin = -71.087589
+
+
+// Martha'sVineyard
+//  LatOrigin = 41.315286
+// LongOrigin  = -70.309013
+
+
+//------------------------------------------
+// Antler configuration  block
+ProcessConfig = ANTLER
+{
+  MSBetweenLaunches = 200
+
+  Run = MOOSDB        @ NewConsole = false
+  Run = pMarineViewer	@ NewConsole = false
+  Run = pShare	      @ NewConsole = false
+  Run = uFldShoreBroker @ NewConsole = false
+  Run = pHostInfo     @ NewConsole = false
+}
+
+
+//------------------------------------------
+// pMarineViewer config block
+
+ProcessConfig = pMarineViewer
+{
+  AppTick    = 4
+  CommsTick  = 4
+
+  //tiff_file            = forrest19.tif
+  tiff_file = forrest19.tif
+  tiff_viewable	       = true
+	//tiff_file            = MIT_SP.tif
+
+  set_pan_x            = -90
+  set_pan_y            = -280
+  zoom                 = 0.65
+  vehicle_shape_scale  = 1.5
+  hash_delta           = 50
+  hash_shade           = 0.22
+  hash_viewable        = false
+  grid_opaqueness = 1.0
+  vehicle_shape_scale = 3
+  point_viewable_all = false
+  
+
+  trails_point_size   = 1
+  
+  vehicles_name_mode=false
+
+	//op_vertex = x=-83, y=-47,    lwidth=1,lcolor=yellow,looped=true,group=moa
+  //op_vertex = x=-46.4, y=-129.2, lwidth=1,lcolor=yellow,looped=true,group=moa
+  //op_vertex = x=94.6, y=-62.2,   lwidth=1,lcolor=yellow,looped=true,group=moa
+  //op_vertex = x=58,   y=20,    lwidth=1,lcolor=yellow,looped=true,group=moa
+
+  // Appcast configuration
+  appcast_height       = 75
+  appcast_width        = 30
+  appcast_viewable     = true
+  appcast_color_scheme = indigo
+  nodes_font_size      = xlarge
+  procs_font_size      = xlarge
+  appcast_font_size    = large
+  
+  // datum_viewable = true
+  // datum_size     = 18
+  // gui_size = small
+
+  // left_context[survey-point] = DEPLOY=true
+  // left_context[survey-point] = MOOS_MANUAL_OVERRIDE=false
+  // left_context[survey-point] = RETURN=false
+
+  right_context[return] = DEPLOY=true
+  right_context[return] = MOOS_MANUAL_OVERRIDE=false
+  right_context[return] = RETURN=false
+
+  scope  = SUMMARY
+  scope  = RETURN
+  scope  = WPT_STAT
+  scope  = VIEW_SEGLIST
+  scope  = VIEW_POINT
+  scope  = VIEW_POLYGON
+  scope  = MVIEWER_LCLICK
+  scope  = MVIEWER_RCLICK
+  scope  = DEPLOY
+
+  button_one = DEPLOY # DEPLOY_ALL=true
+  button_one = MOOS_MANUAL_OVERRIDE_ALL=false # RETURN_ALL=false
+  button_two = RETURN # RETURN_ALL=true
+  // button_three = SLOWER # WPT_UPDATE=speed=1.5
+  // button_four = FASTER # WPT_UPDATE=speed=3.5
+
+  action  = MENU_KEY=deploy # DEPLOY = true # RETURN = false
+  action+ = MENU_KEY=deploy # MOOS_MANUAL_OVERRIDE=false
+  action  = RETURN=true
+  //action  = UPDATES_RETURN=speed=1.4
+}
+
+//pHostInfo configuration block
+ProcessConfig = pHostInfo
+{
+    AppTick = 4
+    CommsTick = 4
+}
+
+//uFldShoreBroker
+  ProcessConfig = uFldShoreBroker
+  {
+    AppTick   = 4
+    CommsTick = 4
+
+    warning_on_stale      = false
+    auto_bridge_realmcast = true
+    auto_bridge_appcast   = true
+    auto_bridge_mhash     = true
+
+    bridge =  src=DEPLOY_ALL, alias=DEPLOY
+    bridge = src=DEPLOY_$V, alias=DEPLOY
+    bridge = src=RETURN_ALL, alias=RETURN
+    bridge = src=RETURN_$V, alias=RETURN
+    bridge = src=$v_WPT_UPDATE, alias=WPT_UPDATE
+    bridge = src=FASTER
+    bridge = src=SLOWER
+    qbridge = NODE_REPORT, STATION_KEEP
+    qbridge = MOOS_MANUAL_OVERRIDE, APPCAST_REQ
+
+ }
+
+
+//pShare
+//-------------
+ProcessConfig = pShare
+ {
+   AppTick    = 4
+   CommsTick  = 4
+
+   input  = route = localhost:8999  
+   
+   //output = src_name=DEPLOY , route=localhost:9000
+   //output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9000
+   //output = src_name=RETURN , route=localhost:9000
+   //output = src_name=SLOWER , route=localhost:9000
+   //output = src_name=FASTER , route=localhost:9000
+   //output = src_name=vehicle_1_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9000
+   
+   //output = src_name=DEPLOY , route=localhost:9001
+   //output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9001
+   //output = src_name=RETURN , route=localhost:9001
+   //output = src_name=SLOWER , route=localhost:9001
+   //output = src_name=FASTER , route=localhost:9001
+   //output = src_name=vehicle_2_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9001
+   
+   //output = src_name=DEPLOY , route=localhost:9002
+   //output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9002
+   //output = src_name=RETURN , route=localhost:9002
+   //output = src_name=SLOWER , route=localhost:9002
+   //output = src_name=FASTER , route=localhost:9002
+   //output = src_name=vehicle_3_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9002
+   
+   //output = src_name=DEPLOY , route=localhost:9003
+   //output = src_name=MOOS_MANUAL_OVERRIDE , route=localhost:9003
+   //output = src_name=RETURN , route=localhost:9003
+   //output = src_name=SLOWER , route=localhost:9003
+   //output = src_name=FASTER , route=localhost:9003
+   //output = src_name=vehicle_4_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9003
+ }
+
+
+
