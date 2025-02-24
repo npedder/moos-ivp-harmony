@@ -4,10 +4,13 @@ class gridGraph:
     def __init__(self, xNumNodes, yNumNodes, distanceBetweenNodes, scale="equal"):
         self.graph = nx.grid_2d_graph(xNumNodes, yNumNodes)
         mapping = {}
+        self.normalized_nodes = {(y, x) for x, y in self.graph.nodes()}
+
         for x, y in self.graph.nodes:
             mapping[(x,y)] = (x * distanceBetweenNodes + distanceBetweenNodes/2, y * distanceBetweenNodes + distanceBetweenNodes/2)
         self.graph = nx.relabel_nodes(self.graph, mapping, copy=False)
 
+        #self.old_pos = {(x, y): (y, x) for x, y in self.graph.nodes()}
         # Setting scale to "equal" uses matplotlib coordinates to position nodes TODO: This is no longer true
         # Setting scale to auto will automatically adjust to a gridVisualizer
         if scale == "auto":
@@ -29,11 +32,11 @@ class gridGraph:
     # possibly useless
     def update_edge_weights(self, weight):
             for edge in self.graph.edges():
-                print(edge)
+                #print(edge)
                 u, v = edge
                 # Update the edge with the new weight
                 self.graph[u][v]['weight'] = weight
-                print(self.graph[u][v]['weight'])
+                #print(self.graph[u][v]['weight'])
 
     def print_node_attributes(self):
         for node, attributes in self.graph.nodes(data=True):
@@ -65,4 +68,13 @@ class gridGraph:
 
 
 
+
+
+
+
     # edge_weights = [SurveyAreaGraph[u][v]['weight'] for u, v in SurveyAreaGraph.edges()]
+
+
+if __name__ == '__main__':
+    gg = gridGraph(20,10,10)
+    print(gg.normalized_nodes)

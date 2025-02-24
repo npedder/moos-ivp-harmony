@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import math
 
 from MissionArea import MissionArea
-from gridArrayGenerator import genGrid
+from gridArrayGenerator import genGrid, genConnectedGrid
 from UxV import UxV
 
 
@@ -99,13 +99,16 @@ def cylcic_region_growth(mission: MissionArea, R, OptimalTasks):
 
 
 
+
+
 # Create UxV obejects to be added as nodes
 uxv1 = UxV(name="alpha", position=(5,15), speed=(10), sensorRange=(10), type="UUV", endurance=200)
 uxv2 = UxV(name="bravo", position=(35,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
-uxv3 = UxV(name="Charlie", position=(15,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
-uxv4 = UxV(name="Delta", position=(325, 345), speed=(15), sensorRange=(15), type="UUV", endurance=100)
+uxv3 = UxV(name="Charlie", position=(155,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
+uxv4 = UxV(name="Delta", position=(315, 345), speed=(15), sensorRange=(15), type="UUV", endurance=100)
 
-grid_data = genGrid(75, 50, 92)
+
+grid_data = genConnectedGrid(75, 50, .2, 5) #Generate a random 2D numpy array to represent mission area
 mission_3 = MissionArea("Misison3", grid_data, 10)
 mission_3.add_vehicle_to_graph(uxv1)
 mission_3.add_vehicle_to_graph(uxv2)

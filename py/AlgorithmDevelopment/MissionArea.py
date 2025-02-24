@@ -17,6 +17,7 @@ class MissionArea:
         self.vehicles = []
         self.vehicle_assignments = {}
         self.grid_graph = gridGraph(nrows, ncols, cellDimension, scale="equal")
+        self.__remove_obstacle_nodes__()
 
     def draw(self):
         pos = self.grid_graph.pos
@@ -92,9 +93,20 @@ class MissionArea:
         return vehicle_attributes
 
 
+    def __remove_obstacle_nodes__(self):
+        obstacle_nodes = []
+        for node in self.grid_graph.graph.nodes():
+            index_tuple = (int((node[0] - .5 * self.cellDimension) / self.cellDimension), int((node[1]- .5 * self.cellDimension) / self.cellDimension))
+            if(self.grid_visualizer.gridArray[index_tuple[0], index_tuple[1]] == 0):
+                obstacle_nodes.append(node)
+
+        for o_node in obstacle_nodes:
+            self.grid_graph.graph.remove_node(o_node)
+
+
 if __name__ == '__main__':
 
-    grid_data = genGrid(50,75,42)
+    grid_data = genGrid(50,75,10)
 
     mission = MissionArea("alpha", grid_data, 10)
     mission.draw()
