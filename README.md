@@ -68,3 +68,24 @@ Now, a survey area can be sent to the application using running "./inject_survey
 
 The survey area should appear in pMarineViewer followed by the vehicle assignments. The vehicles can be deployed onto their assigned waypoints with the "RUN" button.
 
+# UMASSD-MOOS REPO SETUP
+```
+git clone https://github.com/scottsideleau/moos-ivp-umassd.git
+```
+  
+  open moos-ivp-umassd in file directory
+  
+  open CMakeLists.txt
+  
+  in " # Set the output directories for the binary and library files " add below 
+
+  ("pwd" in moos-ivp to find path)
+
+  ```
+set(MOOSIVP_SOURCE_TREE_BASE "/pasth/to/moos-ivp" CACHE STRING "MOOS-IvP Base Directory" FORCE) 
+```
+
+  ```
+./build.sh
+```
+  
