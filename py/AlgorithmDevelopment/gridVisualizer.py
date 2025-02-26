@@ -32,7 +32,7 @@ class GridVisualizer:
         boundaries = [-0.5, 0.5, 1.05, 1.15, 1.25]
         norm = BoundaryNorm(boundaries, cmap.N, clip=True)
         # Create the figure and axis
-        self.fig, self.ax = plt.subplots(figsize=(250,250))
+        self.fig, self.ax = plt.subplots(figsize=(10,10))
 
         # Draw the colormesh grid with our custom colormap and normalization.
         c = self.ax.pcolormesh(x, y, self.scaledGrid, shading='flat', cmap=cmap, norm=norm, rasterized=True)

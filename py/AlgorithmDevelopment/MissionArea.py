@@ -18,7 +18,7 @@ class MissionArea:
         self.vehicle_assignments = {}
         self.grid_graph = gridGraph(nrows, ncols, cellDimension, scale="equal")
         self.__remove_obstacle_nodes__()
-
+        
     def draw(self):
         pos = self.grid_graph.pos
 
