@@ -118,7 +118,7 @@ uxv2 = UxV(name="bravo", position=(35,275), speed=(5), sensorRange=(15), type="U
 uxv3 = UxV(name="Charlie", position=(12,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
 
 grid_data = genGrid(75, 50, 92)
-mission_3 = MissionArea("Misison3", grid_data, 10)
+mission_3 = MissionArea("Mission3", grid_data, 10)
 mission_3.add_vehicle_to_graph(uxv1)
 mission_3.add_vehicle_to_graph(uxv2)
 mission_3.add_vehicle_to_graph(uxv3)
