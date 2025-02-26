@@ -14,7 +14,7 @@ def calculate_pk(mission: MissionArea, vehicle):
     R = mission.vehicles
     for r in R:
         velocity_k = mission.grid_graph.graph.nodes[r]['speed']
-        summation_v_k+= velocity_k
+        summation_v_k += velocity_k
 
     p_k = (velocity_r / summation_v_k) * w(mission)
 
@@ -75,7 +75,7 @@ def cylcic_region_growth(mission: MissionArea, R, OptimalTasks):
 
 
     last_updated_cell = 0;
-    while (N > len(R)):  #TODO: this is len R because the once the last nodes are updated, the if statement is not triggered to N-1 again.
+    while (N > (len(R))):  #TODO: this is len R because the once the last nodes are updated, the if statement is not triggered to N-1 again.
         for k in range(0, len(R)):
             print("-----------------------------------", "K = ", k)
             for j in range(0, rate[k]):
@@ -91,21 +91,23 @@ def cylcic_region_growth(mission: MissionArea, R, OptimalTasks):
                     N = N - 1
                     print("N = ", N)
 
+    #return f
+
+
+
+
+def region_fine_tuning(mission: MissionArea, f):
+    print("none")
 
 
 
 
 
-
-
-
-
-
-# Create UxV obejects to be added as nodes
+# Create UxV obejects to be added as nint odes
 uxv1 = UxV(name="alpha", position=(5,15), speed=(10), sensorRange=(10), type="UUV", endurance=200)
 uxv2 = UxV(name="bravo", position=(35,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
 uxv3 = UxV(name="Charlie", position=(155,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
-uxv4 = UxV(name="Delta", position=(315, 345), speed=(15), sensorRange=(15), type="UUV", endurance=100)
+uxv4 = UxV(name="Delta", position=(315, 345), speed=(20), sensorRange=(15), type="UUV", endurance=100)
 
 
 grid_data = genConnectedGrid(75, 50, .2, 5) #Generate a random 2D numpy array to represent mission area
@@ -129,8 +131,8 @@ pk = [int(x) + 1 for x in pk]
 # print("GCG", gcd_of_list(pk))
 for vehicle in mission_3.vehicles:
     mission_3.vehicle_assignments[vehicle] = []
-cylcic_region_growth(mission_3, mission_3.vehicles, pk)
 
+cylcic_region_growth(mission_3, mission_3.vehicles, pk)
 
 
 mission_3.draw()
