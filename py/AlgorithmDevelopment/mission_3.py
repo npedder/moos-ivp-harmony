@@ -68,7 +68,7 @@ def cylcic_region_growth(mission: MissionArea, R, OptimalTasks):
     f = [0] * len(R) # each robot's capital (optimal number of tasks
     for i in range(len(R)):
         f[i] = OptimalTasks[i]
-        rate[i] = int(OptimalTasks[i]/gcd_of_list(OptimalTasks))
+        rate[i] = int(OptimalTasks[i]/min(OptimalTasks))
         # print(OptimalTasks[i])
         # print(list(mission.grid_graph.graph[R[i]].keys()))
         NV_k[i] = set((mission.grid_graph.graph[R[i]].keys()))
@@ -78,6 +78,7 @@ def cylcic_region_growth(mission: MissionArea, R, OptimalTasks):
     while (N > len(R)):  #TODO: this is len R because the once the last nodes are updated, the if statement is not triggered to N-1 again.
         for k in range(0, len(R)):
             # print("-----------------------------------", "K = ", k)
+            mission.grid_graph.graph.nodes[mission.vehicles[k]]['region'] = k
             for j in range(0, rate[k]):
                 for n in range(0,len(R)): # Update NV_K
                     NV_k[n] = update_NV_K(mission, NV_k[n], n, last_updated_cell, assigned_nodes)
@@ -87,7 +88,7 @@ def cylcic_region_growth(mission: MissionArea, R, OptimalTasks):
                     assigned_nodes.add(last_updated_cell)
                     # print("last updated cell: ", last_updated_cell)
                     mission.grid_graph.graph.nodes[last_updated_cell]['weight'] = 1 + 0.1 * k
-                    mission.grid_graph.graph.nodes[last_updated_cell]['region'] = n
+                    mission.grid_graph.graph.nodes[last_updated_cell]['region'] = k
                     f[k] = f[k] - 1
                     N = N - 1
                     # print("N = ", N)
@@ -103,12 +104,10 @@ def findNeighborNodes (mission: MissionArea) :
     # Iterate through the keys of each node and then the keys of that node's neighbors
     for node_key in dict(mission.grid_graph.graph.nodes).keys(): 
         node_data = mission.grid_graph.graph.nodes[node_key]
-        # print(node_data['region'])
-        for neighbor_key in dict(mission.grid_graph.graph[5, 15]).keys():  
+        for neighbor_key in dict(mission.grid_graph.graph[node_key]).keys():  
             neighbor_data = mission.grid_graph.graph.nodes[neighbor_key]
             if neighbor_data['region'] != node_data['region']:
-                print("Success")
-                regionNeighborNodes[node_data['region']].add(neighbor)
+                 regionNeighborNodes[node_data['region']].add(neighbor_key)
     return regionNeighborNodes 
 
 
@@ -125,8 +124,8 @@ def findNeighborNodes (mission: MissionArea) :
 uxv1 = UxV(name="alpha", position=(5,15), speed=(10), sensorRange=(10), type="UUV", endurance=200)
 uxv2 = UxV(name="bravo", position=(35,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
 uxv3 = UxV(name="Charlie", position=(155,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
-uxv4 = UxV(name="Delta", position=(315, 345), speed=(15), sensorRange=(15), type="UUV", endurance=100)
-
+uxv4 = UxV(name="Delta", position=(315, 345), speed=(1), sensorRange=(15), type="UUV", endurance=100)
+uxv5 = UxV(name="Elijah", position=(275, 155), speed=(2), sensorRange=(15), type="UUV", endurance=100)
 
 grid_data = genConnectedGrid(75, 50, .2, 5) #Generate a random 2D numpy array to represent mission area
 mission_3 = MissionArea("Misison3", grid_data, 10)
@@ -134,7 +133,6 @@ mission_3.add_vehicle_to_graph(uxv1)
 mission_3.add_vehicle_to_graph(uxv2)
 mission_3.add_vehicle_to_graph(uxv3)
 mission_3.add_vehicle_to_graph(uxv4)
-
 
 
 # Optimal number of tasks for vehicle rk
@@ -153,8 +151,8 @@ cylcic_region_growth(mission_3, mission_3.vehicles, pk)
 
 
 # findBorderNodes(mission_3)
-for sets in findNeighborNodes(mission_3).values():
-     print(len(sets))
+for (region, sets) in findNeighborNodes(mission_3).items():
+      print("Region: " + str(region) + " Region Neighbors: " + str(sets))
 # print(mission_3.grid_graph.graph.nodes[(20, 15)]['region'])
 # print(dict(mission_3.grid_graph.graph[5, 15]).keys()) # Get keys of all neighbor nodes of a node
 # print(dict(mission_3.grid_graph.graph.nodes).keys()) # Get key of all nodes in the graph
