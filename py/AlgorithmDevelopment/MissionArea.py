@@ -17,23 +17,34 @@ class MissionArea:
         self.vehicles = []
         self.vehicle_assignments = {}
         self.grid_graph = gridGraph(nrows, ncols, cellDimension, scale="equal")
+        self.neighbors = {}
         self.__remove_obstacle_nodes__()
 
-    def draw(self):
+        
+    def draw(self, show_neighbors = False):
         pos = self.grid_graph.pos
 
-        node_colors = ['red' if node in self.vehicles else 'blue' for node in self.grid_graph.graph.nodes()]
+        node_colors = ['red' if node in self.vehicles else 'blue' for node in self.grid_graph.graph.nodes()] # Init vehicles as red and empty space as blue
         colors = [
             "yellow", "purple","green", "orange", "cyan", "magenta",
             "lime", "pink", "brown", "gray", "olive", "teal",
             "navy", "maroon", "gold", "indigo", "violet", "turquoise"
         ]
+
+        # Assign region colors
         i = 0
         for assignment in self.vehicle_assignments:
             for index, val in enumerate(self.grid_graph.graph.nodes()):
                 if val in self.vehicle_assignments[assignment]:
                     node_colors[index] = colors[i % len(colors)]
             i += 1
+
+        # Assign bordering nodes color (for testing)
+        if show_neighbors:
+            for neighbors in list(self.neighbors.values()):
+                for neighbor in neighbors:
+                    index = list(self.grid_graph.graph.nodes()).index(neighbor)
+                    node_colors[index] = "turquoise"
 
         node_size = [50 if node in self.vehicles else 25 for node in self.grid_graph.graph.nodes()]
         nx.draw(self.grid_graph.graph, pos=pos, ax=self.grid_visualizer.ax,
