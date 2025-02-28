@@ -60,7 +60,7 @@ def update_NV_K(mission: MissionArea, NV_K, k, cell, assigned_nodes):
 
 
 
-def cylcic_region_growth(mission: MissionArea, R, OptimalTasks):
+def cyclic_region_growth(mission: MissionArea, R, OptimalTasks):
     assigned_nodes = set() # not sure if this is right
     N = mission.grid_graph.graph.number_of_nodes()
     rate = [0] * len(R)
@@ -128,7 +128,7 @@ uxv4 = UxV(name="Delta", position=(315, 345), speed=(1), sensorRange=(15), type=
 uxv5 = UxV(name="Elijah", position=(275, 155), speed=(2), sensorRange=(15), type="UUV", endurance=100)
 
 grid_data = genConnectedGrid(75, 50, .2, 5) #Generate a random 2D numpy array to represent mission area
-mission_3 = MissionArea("Misison3", grid_data, 10)
+mission_3 = MissionArea("Mission3", grid_data, 10)
 mission_3.add_vehicle_to_graph(uxv1)
 mission_3.add_vehicle_to_graph(uxv2)
 mission_3.add_vehicle_to_graph(uxv3)
@@ -147,7 +147,7 @@ pk = [int(x) + 1 for x in pk]
 # print("GCG", gcd_of_list(pk))
 for vehicle in mission_3.vehicles:
     mission_3.vehicle_assignments[vehicle] = []
-cylcic_region_growth(mission_3, mission_3.vehicles, pk)
+cyclic_region_growth(mission_3, mission_3.vehicles, pk)
 
 
 # findBorderNodes(mission_3)
@@ -157,7 +157,8 @@ for (region, sets) in findNeighborNodes(mission_3).items():
 # print(dict(mission_3.grid_graph.graph[5, 15]).keys()) # Get keys of all neighbor nodes of a node
 # print(dict(mission_3.grid_graph.graph.nodes).keys()) # Get key of all nodes in the graph
 # print(mission_3.grid_graph.graph.nodes[15, 15]['region'])
-mission_3.draw()
+mission_3.neighbors = findNeighborNodes(mission_3)
+mission_3.draw(show_neighbors=True)
 
 plt.show()
 
