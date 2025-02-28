@@ -91,11 +91,6 @@ def cyclic_region_growth(mission: MissionArea, R, OptimalTasks):
                     mission.grid_graph.graph.nodes[last_updated_cell]['region'] = k
                     f[k] = f[k] - 1
                     N = N - 1
-<<<<<<< HEAD
-                    print("N = ", N)
-                    
-max_Inum = input("enter innumeration as the amount of vehicles: ")
-=======
                     # print("N = ", N)
 
 
@@ -114,61 +109,8 @@ def findNeighborNodes (mission: MissionArea) :
             if neighbor_data['region'] != node_data['region']:
                  regionNeighborNodes[node_data['region']].add(neighbor_key)
     return regionNeighborNodes 
->>>>>>> region-bordering
 
-def region_fine_tuning(mission: MissionArea, N_prime, f_prime, V, max_Inum):
-    # Step 1: Initialize variables
-    N_two_prime = N_prime.copy()
-    max_f = max(abs(x) for x in f_prime)
-    iter_number = 0
-    
-    # Step 2: Generate the set of connected cells of K partitions
-    BV = {v: set(mission.grid_graph.graph[v]) for v in V}  # BV_k for each vehicle
-    
-    # Step 3: Iteratively balance task assignments
-    while max_f != 0 and iter_number <= max_Inum:
-        # Step 4: Identify the partitions with max and min tasks
-        start = f_prime.index(max(f_prime))  # Partition with max tasks
-        dest = f_prime.index(min(f_prime))  # Partition with min tasks
-        
-        # Step 6: Generate a path for task exchange using DFS
-        path = [start]
-        visited = set()
-        stack = [start] 
-        
-        while stack:
-            node = stack.pop()
-            if node == dest:
-                break
-            visited.add(node)
-            neighbors = BV[node] - visited
-            stack.extend(neighbors)
-            path.append(node)
-        path.append(dest)
-        
-        # Step 7: Task exchange along the path
-        for i in range(1, len(path) - 1):
-            cell = next(iter(BV[path[i - 1]]), None)  # Select a cell to move
-            if cell is None:
-                continue
-            
-            # Step 9: Assign cell to new partition
-            N_two_prime[cell] = path[i]
-            
-            # Step 10-11: Update BV sets
-            BV[path[i - 1]].remove(cell)
-            BV[path[i]].add(cell)
-        
-        # Step 13-14: Update function values
-        f_prime[start] -= 1
-        f_prime[dest] += 1
-        
-        # Step 15-16: Update max_f and iteration count
-        max_f = max(abs(x) for x in f_prime)
-        iter_number += 1
-    
-    # Step 18: Return the adjusted partitions
-    return N_two_prime
+
 
 
 
@@ -192,11 +134,6 @@ mission_3.add_vehicle_to_graph(uxv2)
 mission_3.add_vehicle_to_graph(uxv3)
 mission_3.add_vehicle_to_graph(uxv4)
 
-<<<<<<< HEAD
-for vehicle in mission_3.vehicles:
-    mission_3.vehicle_assignments[vehicle] = []
-=======
->>>>>>> region-bordering
 
 # Optimal number of tasks for vehicle rk
 # print("Optimal number of nodes for ", uxv3.name, ": " ,calculate_pk(mission_3, uxv1.position))
@@ -206,19 +143,12 @@ for vehicle in mission_3.vehicles:
 
 pk = [calculate_pk(mission_3, uxv1.position), calculate_pk(mission_3, uxv2.position), calculate_pk(mission_3, uxv3.position), calculate_pk(mission_3, uxv4.position)]
 pk = [int(x) + 1 for x in pk]
-f = cylcic_region_growth(mission_3, mission_3.vehicles, pk)
-#finalSolution = region_fine_tuning(mission_3, f)
 # print(pk)
 # print("GCG", gcd_of_list(pk))
-<<<<<<< HEAD
-=======
 for vehicle in mission_3.vehicles:
     mission_3.vehicle_assignments[vehicle] = []
 cyclic_region_growth(mission_3, mission_3.vehicles, pk)
->>>>>>> region-bordering
 
-cylcic_region_growth(mission_3, mission_3.vehicles, pk)
-region_fine_tuning(mission_3, f, mission_3.vehicles, max_Inum)
 
 # findBorderNodes(mission_3)
 for (region, sets) in findNeighborNodes(mission_3).items():
