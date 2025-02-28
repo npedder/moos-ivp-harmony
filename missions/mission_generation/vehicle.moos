@@ -6,7 +6,8 @@
 ServerHost   = localhost
 ServerPort   = $(PORT)
 Community    = $(VNAME)
-MOOSTimeWarp = 1
+MOOSTimeWarp = $(TIME_WARP)
+// MOOSTimeWarp = 1
 
 // Forest Lake
 //LatOrigin  = -41.9237674
@@ -114,6 +115,7 @@ ProcessConfig = pHelmIvP
   behaviors  = $(BHV)
   domain     = course:0:359:360
   domain     = speed:0:$(SPEED):50
+  //ok_skew=any
 }
 
 //------------------------------------------
