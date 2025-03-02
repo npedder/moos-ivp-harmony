@@ -1,10 +1,4 @@
-import numpy as np
-
-exampleArray = np.array
-import numpy as np
 from scipy.ndimage import gaussian_filter
-import matplotlib.pyplot as plt
-import random
 
 def genGrid(x, y, seed):
     # For reproducibility
@@ -85,7 +79,7 @@ if __name__ == "__main__":
     obstacle_density = 0.3  # 30% of the grid will be obstacles
     seed = 42
 
-    grid = createConnectedGrid(width, height, obstacle_density, seed)
+    grid = genConnectedGrid(width, height, obstacle_density, seed)
 
     # Display the grid
     plt.figure(figsize=(10, 6))

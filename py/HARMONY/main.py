@@ -6,15 +6,20 @@ from MOOSHandler import MOOSHandler
 # listen for NODE_REPORTs from vehicles
 # and add to a dictionary of available vehicles.
 # Generate waypoint information and send to 
+import sys
 
 PORT = 8999
 MOOS_HOST = 'localhost'
 CLIENT_NAME = "HARMONY"
+if len(sys.argv) > 1:
+    TIME_WARP = int(sys.argv[1])
+else:
+    TIME_WARP = 1
 
 def main():
 
     # Handles MOOSDB connection, stores survey area and vehicle information, and sends waypoints based on algorithm
-    moos_handler = MOOSHandler(MOOS_HOST, PORT, CLIENT_NAME)
+    moos_handler = MOOSHandler(MOOS_HOST, PORT, CLIENT_NAME, TIME_WARP)
 
     moos_handler.connect()
 
