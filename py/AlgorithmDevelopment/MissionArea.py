@@ -93,6 +93,7 @@ class MissionArea:
                                                         "speed": node.speed, "sensorRange": node.sensorRange,
                                                         "endurance": node.endurance, "color": node.color}})
             self.grid_graph.__update_pos__(node_label)
+            self.grid_graph.graph.nodes[node_label]['region'] = self.vehicles.index(node_label)
 
 
     def add_vehicles_to_graph(self, nodesArray):
