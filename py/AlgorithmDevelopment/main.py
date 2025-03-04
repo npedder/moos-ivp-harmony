@@ -1,133 +1,37 @@
-import networkx as nx
 import matplotlib.pyplot as plt
-import numpy as np
-import math
-
-from gridGraph import gridGraph
-from gridVisualizer import GridVisualizer
 from MissionArea import MissionArea
-from gridArrayGenerator import genGrid
+from gridArrayGenerator import genConnectedGrid
 from UxV import UxV
-from networkx.algorithms import approximation as approx
+from cyclicRegionGrowth import cyclic_region_growth, calculate_optimal_tasks
+from regionFineTuning import findNeighborNodes, region_fine_tuning
 
-# ------------------------ Mission 1 ----------------------------
-# Uses tuples
-VehicleArray = [(1,50) , (10,-90), (-30, 70), (-60,-60)]
-grid_data = genGrid(75,50,22)
-mission_alpha = MissionArea("Alpha", grid_data, 10)
-# mission_alpha.add_vehicle_to_graph(VehicleArray[0])
-# mission_alpha.add_vehicle_to_graph(VehicleArray[1])
-# mission_alpha.add_vehicle_to_graph(VehicleArray[2])
-
-mission_alpha.add_vehicles_to_graph(VehicleArray)
-
-# print(list(mission_alpha.grid_graph.graph.nodes()))
-
-# print(mission_alpha.grid_graph.pos)
-
-# vehicle_graph = nx.Graph()
-# vehicle_graph.add_node(VehicleArrays[1])
-# pos = {(x, y): (y, -x) for x, y in v1_graph.nodes()}
-
-mission_alpha.draw()
-
-# ------------------------ Mission 2 ----------------------------
-# Create UxV obejects to be added as nodes
+# Create UxV objects to be added as nodes
 uxv1 = UxV(name="alpha", position=(5,15), speed=(10), sensorRange=(10), type="UUV", endurance=200)
 uxv2 = UxV(name="bravo", position=(35,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
-uxv3 = UxV(name="Charlie", position=(12,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
+uxv3 = UxV(name="charlie", position=(155,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
+uxv4 = UxV(name="delta", position=(315, 345), speed=(20), sensorRange=(15), type="UUV", endurance=100)
 
-grid_data = genGrid(75, 50, 92)
-mission_bravo = MissionArea("Bravo", grid_data, 10)
-print(list(mission_bravo.grid_graph.graph.nodes()))
-mission_bravo.add_vehicle_to_graph(uxv1)
-mission_bravo.add_vehicle_to_graph(uxv2)
-mission_bravo.grid_graph.print_node_attributes()
+# Generate a random 2D numpy array to represent mission area
+grid_data = genConnectedGrid(75, 50, .2, 5)
 
-mission_bravo.draw()
+# Create a MissionArea object to manage mission info
+mission_3 = MissionArea("Mission", grid_data, 10)
 
-plt.show()
-
-#---------------------------------------------------------------------------------------------------------------
-# Lame solution using a weight offset to account for how many nodes are visited. Doesnt really make sense
-# print("starting comparion...")
-# v1_weight_offset = 0
-# v2_weight_offset = 0
-#
-# G = mission_bravo.grid_graph.graph
-# vehicles = mission_bravo.vehicles
-#
-# # Add edges for each vehicle with weight of distance between edges
-# for vehicle in vehicles:
-#         for node in G.nodes:
-#             G.add_edge(vehicle, node, weight=math.dist(vehicle,node) * G.nodes[vehicle]["speed"])
-#
-#
-# print(G.nodes[vehicles[1]])
-#
-# print()
-
-
-
-# for v in G.edges:
-#     v2_edge = ((50,50), v1_edge[1])
-#
-#     if G[v1_edge[0]][v1_edge[1]]['weight'] + v1_weight_offset < v2_graph[v2_edge[0]][v2_edge[1]]['weight'] + v2_weight_offset:
-#         print(G[v1_edge[0]][v1_edge[1]]['weight'] + v1_weight_offset, "is less than" , v2_graph[v2_edge[0]][v2_edge[1]]['weight'] + v2_weight_offset)
-#         v1_weight_offset += 10
-#         # solution_graph.add_edge(v1_edge[0], v1_edge[1])
-#     else:
-#         print(v1_graph[v1_edge[0]][v1_edge[1]]['weight'] + v1_weight_offset, "is greater than" , v2_graph[v2_edge[0]][v2_edge[1]]['weight'] + v2_weight_offset)
-#         v2_weight_offset += 10
-#
-# for v in G.edges:
-#     for in
-# Lame Solution ends
-
-#--------------------------------------------------------------------------------
-
-# ------------- Mission 3 --------------------
-
-
-def calculate_pk(mission: MissionArea, vehicle):
-    summation_v_r = 0
-    R = mission.vehicles
-    for r in R:
-        velocity_r = mission.grid_graph.graph.nodes[vehicle]['speed']
-        summation_v_r += velocity_r
-        p_k = (velocity_r / summation_v_r) * w(mission)
-
-    return p_k
-
-
-def w(mission: MissionArea):  # would only work if all cells are the same size?
-    R = mission.vehicles
-    summation_node_weights = 0
-    for r in R:
-        summation_node_weights += len(R) * mission.cellDimension
-
-    return summation_node_weights
-
-
-
-
-
-# Create UxV obejects to be added as nodes
-uxv1 = UxV(name="alpha", position=(5,15), speed=(10), sensorRange=(10), type="UUV", endurance=200)
-uxv2 = UxV(name="bravo", position=(35,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
-uxv3 = UxV(name="Charlie", position=(12,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
-
-grid_data = genGrid(75, 50, 92)
-mission_3 = MissionArea("Mission3", grid_data, 10)
+# Add each vehicle to mission
 mission_3.add_vehicle_to_graph(uxv1)
 mission_3.add_vehicle_to_graph(uxv2)
 mission_3.add_vehicle_to_graph(uxv3)
+mission_3.add_vehicle_to_graph(uxv4)
+f = cyclic_region_growth(mission_3)
+max_Inum = input("enter innumeration as the amount of vehicles: ")
+# Apply algorithms to mission to determine task allocation
+cyclic_region_growth(mission_3)
+region_fine_tuning(mission_3, f, mission_3.vehicles, findNeighborNodes, max_Inum)
+mission_3.neighbors = findNeighborNodes(mission_3)
+print(mission_3.neighbors)
 
-# Optimal number of tasks for vehicle rk
-print(calculate_pk(mission_3, uxv1.position))
-
-
-mission_bravo.draw()
+# Display result
+mission_3.draw(show_neighbors=True)
 
 plt.show()
 

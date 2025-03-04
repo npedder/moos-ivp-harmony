@@ -82,16 +82,18 @@ class MissionArea:
 
 
         if isinstance(node, UxV): # TODO: this may need to change with implementation of vehicles in algorithm
-           # self.grid_graph.__add_vehicle_to_graph__(node.position)
-            if self.grid_graph.graph.has_node(node.position) is False:
-                self.grid_graph.graph.add_node(node.position)
+            node_label = node.position
+            if self.grid_graph.graph.has_node(node_label) is False:
+                self.grid_graph.graph.add_node(node_label)
 
-            self.vehicles.append(node.position)
+            self.vehicles.append(node_label)
+            self.vehicle_assignments[node_label] = []
             nx.set_node_attributes(self.grid_graph.graph,
-                                       {node.position: {'name': node.name, 'type': node.type, "position": node.position,
+                                       {node_label: {'name': node.name, 'type': node.type, "position": node.position,
                                                         "speed": node.speed, "sensorRange": node.sensorRange,
                                                         "endurance": node.endurance, "color": node.color}})
-            self.grid_graph.__update_pos__(node.position)
+            self.grid_graph.__update_pos__(node_label)
+            self.grid_graph.graph.nodes[node_label]['region'] = self.vehicles.index(node_label)
 
 
     def add_vehicles_to_graph(self, nodesArray):
