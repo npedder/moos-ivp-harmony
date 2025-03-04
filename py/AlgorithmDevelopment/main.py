@@ -7,7 +7,7 @@ from regionFineTuning import findNeighborNodes
 
 # Create UxV objects to be added as nodes
 uxv1 = UxV(name="alpha", position=(5,15), speed=(10), sensorRange=(10), type="UUV", endurance=200)
-uxv2 = UxV(name="bravo", position=(35,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
+uxv2 = UxV(name="bravo", position=(45,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
 uxv3 = UxV(name="charlie", position=(155,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
 uxv4 = UxV(name="delta", position=(315, 345), speed=(20), sensorRange=(15), type="UUV", endurance=100)
 
@@ -28,8 +28,9 @@ cyclic_region_growth(mission_3)
 mission_3.neighbors = findNeighborNodes(mission_3)
 print(mission_3.neighbors)
 
+
 # Display result
-mission_3.draw(show_neighbors=True)
+mission_3.draw(show_neighbors=False)
 
 plt.show()
 

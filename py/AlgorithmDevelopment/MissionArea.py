@@ -110,7 +110,7 @@ class MissionArea:
         obstacle_nodes = []
         for node in self.grid_graph.graph.nodes():
             index_tuple = (int((node[0] - .5 * self.cellDimension) / self.cellDimension), int((node[1]- .5 * self.cellDimension) / self.cellDimension))
-            if(self.grid_visualizer.gridArray[index_tuple[0], index_tuple[1]] == 0):
+            if(self.grid_visualizer.gridArray[index_tuple[1], index_tuple[0]] == 0):
                 obstacle_nodes.append(node)
 
         for o_node in obstacle_nodes:
