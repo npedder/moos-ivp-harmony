@@ -26,7 +26,14 @@ mission_3.add_vehicle_to_graph(uxv4)
 # Apply algorithms to mission to determine task allocation
 cyclic_region_growth(mission_3)
 mission_3.neighbors = findNeighborNodes(mission_3)
-print(mission_3.neighbors)
+# print(mission_3.neighbors)
+
+# Testing
+for (k, neighborSet) in mission_3.neighbors.items():
+    # Check to see if neighboring set includes a region's own nodes
+    if (mission_3.vehicle_assignments[mission_3.vehicles[k]] - neighborSet) != mission_3.vehicle_assignments[k]:
+        print("Test case 1 failed: neighborSet includes a regions own nodes")
+
 
 # Display result
 mission_3.draw(show_neighbors=True)

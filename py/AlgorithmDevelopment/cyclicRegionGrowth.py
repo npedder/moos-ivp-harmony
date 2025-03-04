@@ -16,7 +16,7 @@ def cyclic_region_growth(mission: MissionArea):
         rate[i] = int(OptimalTasks[i]/gcd_of_list(OptimalTasks))
         NV_k[i] = set((mission.grid_graph.graph[R[i]].keys()))
 
-    last_updated_cell = 0;
+    last_updated_cell = 0
     while (N > (len(R))):  # This is len R because the once the last nodes are updated, if statement doesn't N-1 again.
         for k in range(0, len(R)):
             for j in range(0, rate[k]):
