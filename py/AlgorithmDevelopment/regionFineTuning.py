@@ -16,11 +16,10 @@ def findNeighborNodes (mission: MissionArea):
                  regionNeighborNodes[node_data['region']].add(neighbor_key)
     return regionNeighborNodes
 
-
 def region_fine_tuning(mission: MissionArea, N_prime, f_prime, V, max_Inum):
     # Step 1: Initialize variables
     N_two_prime = N_prime.copy()
-    max_f = max(abs(x) for x in f_prime)
+    max_f = max(abs(x[0]) for x in f_prime)
     iter_number = 0
     
     # Step 2: Generate the set of connected cells of K partitions
@@ -42,7 +41,10 @@ def region_fine_tuning(mission: MissionArea, N_prime, f_prime, V, max_Inum):
             if node == dest:
                 break
             visited.add(node)
-            neighbors = BV[node] - visited
+            if node in BV:
+             neighbors = BV[node] - visited
+            else:
+             continue  # Skip this node or handle accordingly, may be a key error
             stack.extend(neighbors)
             path.append(node)
         path.append(dest)
@@ -61,11 +63,12 @@ def region_fine_tuning(mission: MissionArea, N_prime, f_prime, V, max_Inum):
             BV[path[i]].add(cell)
         
         # Step 13-14: Update function values
-        f_prime[start] -= 1
-        f_prime[dest] += 1
+        f_prime[start] = (f_prime[start][0] - 1, f_prime[start][1] - 1)
+        f_prime[dest] += (f_prime[start][0] + 1, f_prime[start][1] + 2)
         
         # Step 15-16: Update max_f and iteration count
-        max_f = max(abs(x) for x in f_prime)
+        
+        max_f = max(abs(x[0]) for x in f_prime)
         iter_number += 1
     
     # Step 18: Return the adjusted partitions
