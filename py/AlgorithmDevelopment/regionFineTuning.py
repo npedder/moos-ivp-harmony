@@ -16,9 +16,11 @@ def findNeighborNodes(mission: MissionArea):
     return regionNeighborNodes
 
 
-def region_fine_tuning(mission: MissionArea, N_prime, f_prime, V, max_Inum):
+def region_fine_tuning(mission_3: MissionArea, f_prime, V, max_Inum):
     # Step 1: Initialize variables
-    N_two_prime = N_prime.copy()
+    
+    N_two_prime = dict(mission_3.grid_graph.graph.nodes)
+    
     max_f = max(abs(x) for x in f_prime)
     iter_number = 0
     
@@ -61,7 +63,7 @@ def region_fine_tuning(mission: MissionArea, N_prime, f_prime, V, max_Inum):
                 continue
             
             # Step 9: Assign cell to new partition
-            N_two_prime[(int)(cell[0])] = path[i]  # Use the first element of the tuple as the "cell"
+            N_two_prime[cell] = path[i]  
             
             # Step 10-11: Update BV sets
             BV[path[i - 1]].remove(cell)

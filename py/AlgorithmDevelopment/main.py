@@ -30,7 +30,7 @@ cyclic_region_growth(mission_3)
 
 mission_3.neighbors = findNeighborNodes(mission_3)
 print(mission_3.neighbors)
-region_fine_tuning(mission_3, mission_3.vehicles, f, mission_3.neighbors, max_Inum)
+region_fine_tuning(mission_3, f, mission_3.neighbors, max_Inum)
 
 
 
