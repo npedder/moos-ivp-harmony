@@ -15,7 +15,7 @@ class MissionArea:
         nrows = self.grid_visualizer.nrows
         ncols = self.grid_visualizer.ncols
         self.vehicles = []
-        self.vehicle_assignments = {}
+        self.vehicle_assignments = {} # Key - vehicle as tuple: Value - assigned nodes as tuple
         self.grid_graph = gridGraph(nrows, ncols, cellDimension, scale="equal")
         self.neighbors = {}
         self.__remove_obstacle_nodes__()
