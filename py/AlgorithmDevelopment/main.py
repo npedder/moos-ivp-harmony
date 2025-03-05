@@ -22,15 +22,17 @@ mission_3.add_vehicle_to_graph(uxv1)
 mission_3.add_vehicle_to_graph(uxv2)
 mission_3.add_vehicle_to_graph(uxv3)
 mission_3.add_vehicle_to_graph(uxv4)
+
 f = cyclic_region_growth(mission_3)
 max_Inum = (int)(input("enter innumeration as the amount of vehicles: "))
 # Apply algorithms to mission to determine task allocation
 cyclic_region_growth(mission_3)
-mission_3.neighbors = findNeighborNodes(mission_3)
-print("hello")
-region_fine_tuning(mission_3, f, mission_3.vehicles, mission_3.vehicle_assignments, max_Inum)
 
+mission_3.neighbors = findNeighborNodes(mission_3)
 print(mission_3.neighbors)
+region_fine_tuning(mission_3, mission_3.vehicles, f, mission_3.neighbors, max_Inum)
+
+
 
 # Display result
 mission_3.draw(show_neighbors=True)
