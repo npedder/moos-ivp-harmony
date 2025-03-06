@@ -4,6 +4,7 @@ import AllocationControl
 import time
 import sys
 
+from Points import Points
 # Class to handle MOOS communication and hold available vehicles and survey area.
 class MOOSHandler:
 
@@ -99,12 +100,27 @@ class MOOSHandler:
         print(f"{len(self.available_vehicles)} vehicles found. Survey area: {self.survey_area}")
         print(f"{len(self.available_uavs)} uavs found. UAV Survey area: {self.survey_area_land}")
 
+        """ 
+        #-------WAYPOINT TEST----------
+        WAYPOINTS_DATA = {
+            "alpha": [(10, 10), (20, 20), (30, 10), (40, 0)],
+            "bravo": [(5, 5), (15, 15), (25, 5)],
+        }
+        for vehicle, waypoint_list in WAYPOINTS_DATA.items():
+            points = Points(waypoint_list)
+            waypoints_str = points.string()
+            msg_key = f"{vehicle}_WAYPOINTS"
+            color = self.available_vehicles[vehicle].color
+            wpt_var = f"{vehicle}_WPT_UPDATE"
+            print(f"SENDING {waypoints_str} to {wpt_var}")
+            self.notify(wpt_var, waypoints_str)
+        """
         # Run if dict not empty
         if self.available_vehicles:
             # Assign areas to vehicles using allocation algorithm
             vehicle_assignments = AllocationControl.allocateArea(self.available_vehicles, self.survey_area)
             print("Vehicle Assignments:", vehicle_assignments)
-
+            
             # Notify MOOSDB with the waypoint updates
             for count, (name, assignment) in enumerate(vehicle_assignments.items()):
                 assignment.reposition();
@@ -118,6 +134,7 @@ class MOOSHandler:
                     self.notify("VIEW_SEGLIST", f'{assignment.string()},label={name}_wpt_survey, active=false')  # removes any prior waypoint visuals
                 else:
                     self.notify("VIEW_SEGLIST", f'{assignment.string()},label={name}_wpt_survey, edge_color={color}, edge_size=2')  # Displays waypoints before deployment
+                    # CHANGE THIS LINE BELOW
                     self.notify(wpt_var, assignment.string())
 
     # ------------------------------------------------------
