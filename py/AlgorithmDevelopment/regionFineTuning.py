@@ -1,7 +1,7 @@
 import MissionArea
 
 # Pre-condition: A mission area
-# Post-condtion: Returns a dictionary mapping region to a set of nodes
+# Post-condtion: Returns a dictionary mapping an integer representing region to a set of nodes that neighbor that region
 def find_neighbor_nodes (mission: MissionArea):
     print("Entering findNeighborNodes")
     # initalize a dictionary of empty sets for holding the neighbors of each region
@@ -44,7 +44,7 @@ def region_fine_tuning (mission, iterations, account_balances):
         seller = smallestAccountBalNode['region']
 
         # Determine what is kept and what is sold     
-        keptNodes = find_kept_nodes(mission, buyer, seller)
+        keptNodes = find_kept_nodes(mission, buyer, seller, account_balances)
         mission.vehicleAssignment[buyer] = mission.vehicleAssignments[seller] - keptNodes
         mission.vehicleAssignments[seller] = keptNodes
 
@@ -58,6 +58,52 @@ def region_fine_tuning (mission, iterations, account_balances):
 # Pre-condition: Receives mission area, the buyer region, and the seller region
 # Post-condition: Returns the subtree that when kept by the seller region, leads to an ideal transaction,
 #                 otherwise if no trees are found that lead to an ideal transaction, -1 is returned (for now)
-def find_kept_nodes() :
-    # to be implemented on 3/4/2025
+def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances) :
     print("Begin finding kept nodes")
+
+    # Largest cell in the set of buyer that belongs to the seller is selected for candidate trade
+    # AC
+    sellerNeighborsToBuyer = regionNeighborNodes[buyer].intersection(mission.vehicle_assignments[seller])
+    
+    largest_weight = -1
+    for node_key in sellerNeighborsToBuyer:
+        node_data = mission.grid_graph.graph.nodes[node_key]
+        if node_data['weight'] > largest_weight:
+            largest_weight = node_data['weight']
+            largest_weight_node = node_key
+
+    candidate = largest_weight_node
+    stack = [largest_weight_node]
+    visited = set()
+    bestTradeIndex = float('inf')
+
+    while stack:
+        node = stack.pop()
+        if node not in visited:
+            visited.append(node)
+        
+        candidateTrade = mission.vehicle_assignments[seller] - visited
+        tradeSum = sum_weights(candidateTrade)
+        currTradeIndex = max(abs(buyer - tradeSum), abs(seller + tradeSum))
+        
+        if currTradeIndex < bestTradeIndex:
+            bestTradeIndex = currTradeIndex
+
+        regionSubgraph = mission.gridGraph.graph.subgraph(mission.vehicleAssignments)
+        for neighbor in regionSubgraph[node]:
+            if neighbor not in visited:
+                stack.push(neighbor)
+    
+    
+
+# Pre-condition: Takes a mission graph, and set of nodes to sum in the graph
+# Post-condition: Sums nodes and returns sum
+def sum_weights(mission, graph):
+    
+    weightSum = 0
+    for node_key in graph:
+        node_data = mission.grid_graph.graph.nodes[node_key]
+        weightSum += node_data['weight']
+    return weightSum
+    
+
