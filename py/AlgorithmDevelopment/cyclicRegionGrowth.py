@@ -13,7 +13,7 @@ def cyclic_region_growth(mission: MissionArea):
 
     for i in range(len(R)):
         account_balances[i] = OptimalTasks[i]
-        rate[i] = int(OptimalTasks[i]/gcd_of_list(OptimalTasks))
+        rate[i] = int(OptimalTasks[i]/min(OptimalTasks))
         NV_k[i] = set((mission.grid_graph.graph[R[i]].keys()))
 
     last_updated_cell = 0;
@@ -28,9 +28,8 @@ def cyclic_region_growth(mission: MissionArea):
                     last_updated_cell =  list(NV_k[k])[0] # select a cell from NV_k
                     mission.vehicle_assignments[mission.vehicles[k]].append(last_updated_cell)  # Assign selected cell
                     assigned_nodes.add(last_updated_cell)
-                    mission.grid_graph.graph.nodes[last_updated_cell]['weight'] = 1 + 0.1 * k
                     mission.grid_graph.graph.nodes[last_updated_cell]['region'] = k
-                    account_balances[k] = account_balances[k] - 1
+                    account_balances[k] = account_balances[k] - mission.grid_graph.graph.nodes[last_updated_cell]["weight"]
                     N = N - 1
                     print("Remaining Nodes: ", N - 4)
 
@@ -53,7 +52,10 @@ def calculate_optimal_tasks(mission: MissionArea, vehicle):
 def w(mission: MissionArea):  # TODO: would only work if all cells are the same size?
     V = mission.grid_graph.graph.number_of_nodes()
     print("Total number of nodes: ", V)
-    summation_node_weights = V #* mission.cellDimension # just assumes that each cell is same size
+    summation_node_weights = 0
+    for node in mission.grid_graph.graph.nodes():
+        if node not in mission.vehicles:
+            summation_node_weights += mission.grid_graph.graph.nodes[node]["weight"]
 
     return summation_node_weights
 

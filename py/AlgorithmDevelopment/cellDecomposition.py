@@ -10,48 +10,68 @@ def decomposed_vehicle_assignments():
 
 
 def cell_decomposition(mission: MissionArea):
+    vehicle_node_objects = [mission.grid_graph.graph.nodes(v) for v in mission.vehicles] #get vehicles and data
+
     cell_graph = nx.Graph() # A new graph that will hold a node representing each decomposed cell
     cell_graph_pos = {}
     removed_nodes = set()
     decomposed_vehicle_assignments = {} # Would replace vehicle assignments
     center_nodes_old_neighbors = {} # A dictionary with key center cell and value of neighbors before decomp. Cam be used to determine bordering nodes
 
-    for region in mission.vehicle_assignments:
-        decomposed_vehicle_assignments[region] = []
-        for node in mission.vehicle_assignments[region]:
-            if node not in removed_nodes:
-                removed_nodes.add(node)
-                nodes_to_combine = [node]
-                visited = set()
-                highest_node = node
-                lowest_node = node
-                highest_node, lowest_node = _dfs_combine_nodes(mission.grid_graph.graph, node, visited, nodes_to_combine, highest_node, lowest_node)
-                print(" Highest Node: " ,highest_node, "   Lowest Node: ",  lowest_node)
+    # for region in mission.vehicle_assignments:
+    #     decomposed_vehicle_assignments[region] = []
+    for node in mission.grid_graph.graph.nodes:
+        vehicles_in_cell = []
+        if node not in removed_nodes:
+            removed_nodes.add(node)
+            nodes_to_combine = [node]
+            visited = set()
+            highest_node = node
+            lowest_node = node
+            highest_node, lowest_node = _dfs_combine_nodes(mission.grid_graph.graph, node, visited, nodes_to_combine, highest_node, lowest_node)
+            print(" Highest Node: " ,highest_node, "   Lowest Node: ",  lowest_node)
 
-                # Add a node in new graph representing a decomposed cell
-                center_node = (int((highest_node[0] + lowest_node[0]) / 2), int((highest_node[1] + lowest_node[1]) / 2))
-                add_node_and_update_pos(cell_graph, cell_graph_pos, center_node)
+            # Add a node in new graph representing a decomposed cell
+            center_node = (int((highest_node[0] + lowest_node[0]) / 2), int((highest_node[1] + lowest_node[1]) / 2))
+            add_node_and_update_pos(cell_graph, cell_graph_pos, center_node)
 
-                center_nodes_old_neighbors[center_node] = set()
-                # Track the neighbors of the nodes in to be combined. Add nodes to be removed/visited
-                for cell_node in nodes_to_combine:
-                    center_nodes_old_neighbors[center_node].update(set(mission.grid_graph.graph[cell_node]))
-                    #eif cell_node != highest_node and cell_node != lowest_node and cell_node not in mission.vehicles:
-                        #mission.grid_graph.graph.remove_node(cell_node)
-                    removed_nodes.add(cell_node)
+            center_nodes_old_neighbors[center_node] = set()
+            # Track the neighbors of the nodes in to be combined. Add nodes to be removed/visited
+            weight = 0
+            for cell_node in nodes_to_combine:
+                weight += 1     # The amount of nodes to be combined will be the weight of the cell
+                if cell_node in mission.vehicles:
+                    vehicles_in_cell.append(cell_node)
+                center_nodes_old_neighbors[center_node].update(set(mission.grid_graph.graph[cell_node]))
+                #if cell_node != highest_node and cell_node != lowest_node and cell_node not in mission.vehicles:
+                    #mission.grid_graph.graph.remove_node(cell_node)
+                removed_nodes.add(cell_node)
 
-                # mission.grid_graph.graph.remove_edges_from(list(mission.grid_graph.graph.edges(highest_node)))
-                # mission.grid_graph.graph.remove_edges_from(list(mission.grid_graph.graph.edges(lowest_node)))
+            # Assign weight of cell
+            cell_graph.nodes[center_node]["weight"] = weight
 
-                if highest_node != lowest_node:
-                    mission.grid_graph.graph.add_edge(highest_node,lowest_node)
 
-                # Keep track of top and bottom of cells to determine bordering cells
-                cell_graph.nodes[center_node]['top'] = highest_node
-                cell_graph.nodes[center_node]['bottom'] = lowest_node
-                decomposed_vehicle_assignments[region].append(center_node)
+            # mission.grid_graph.graph.remove_edges_from(list(mission.grid_graph.graph.edges(highest_node)))
+            # mission.grid_graph.graph.remove_edges_from(list(mission.grid_graph.graph.edges(lowest_node)))
 
-    center_nodes_grouped_by_x = group_by_x(set(cell_graph.nodes)) # Makes it easier to find bordering cells
+            # Add an edge between highest_node and lowest node. TODO: this does not matter as of now.
+            if highest_node != lowest_node:
+                mission.grid_graph.graph.add_edge(highest_node, lowest_node)
+
+            # Keep track of top and bottom of cells to determine bordering cells
+            cell_graph.nodes[center_node]['top'] = highest_node
+            cell_graph.nodes[center_node]['bottom'] = lowest_node
+
+
+
+            # Add vehicle node and make an edge between the vehicle and the cell containing it
+            for vehicle in vehicles_in_cell:
+                add_node_and_update_pos(cell_graph, cell_graph_pos, vehicle)
+                cell_graph.nodes[vehicle].update(mission.grid_graph.graph.nodes[vehicle])  # Update attributes
+                cell_graph.add_edge(vehicle, center_node)
+
+
+    center_nodes_grouped_by_x = group_by_x(set(cell_graph.nodes).difference(set(mission.vehicles))) # Makes it easier to find bordering cells
     distance_between_nodes = mission.cellDimension
     # Create edges between bordering cells.
     for center_node in center_nodes_old_neighbors:
@@ -72,13 +92,14 @@ def cell_decomposition(mission: MissionArea):
                 if neighbor in center_nodes_old_neighbors[possible_bordering_cell]:
                     cell_graph.add_edge(center_node, possible_bordering_cell)
 
+
     # Replace mission graph with new decomposed graph
     for vehicle in mission.vehicles:
         add_node_and_update_pos(cell_graph, cell_graph_pos, vehicle)
 
     mission.grid_graph.graph = cell_graph
     mission.grid_graph.pos = cell_graph_pos
-    mission.vehicle_assignments = decomposed_vehicle_assignments
+    #mission.vehicle_assignments = decomposed_vehicle_assignments
 
 
 

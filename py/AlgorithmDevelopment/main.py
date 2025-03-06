@@ -18,6 +18,10 @@ grid_data = genConnectedGrid(75, 50, .2, 5)
 # Create a MissionArea object to manage mission info
 mission_3 = MissionArea("Mission", grid_data, 10)
 
+
+
+
+
 # Add each vehicle to mission
 mission_3.add_vehicle_to_graph(uxv1)
 mission_3.add_vehicle_to_graph(uxv2)
@@ -25,11 +29,14 @@ mission_3.add_vehicle_to_graph(uxv3)
 mission_3.add_vehicle_to_graph(uxv4)
 
 # Apply algorithms to mission to determine task allocation
+
+cell_decomposition(mission_3)
+
 cyclic_region_growth(mission_3)
 mission_3.neighbors = findNeighborNodes(mission_3)
 print(mission_3.neighbors)
 
-cell_decomposition(mission_3)
+
 
 
 # Display result
