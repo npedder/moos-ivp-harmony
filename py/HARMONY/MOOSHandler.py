@@ -117,7 +117,7 @@ class MOOSHandler:
                     print("Waypoint notifications not sent because vehicle area assignment = 0")
                     self.notify("VIEW_SEGLIST", f'{assignment.string()},label={name}_wpt_survey, active=false')  # removes any prior waypoint visuals
                 else:
-                    self.notify("VIEW_SEGLIST", f'{assignment.string()},label={name}_wpt_survey, edge_color={color}, edge_size=2')  # Displays waypoints before deployment
+                    self.notify("VIEW_SEGLIST", f'{assignment.string()}, label={name}_wpt_survey, edge_color={color}, edge_size=2')  # Displays waypoints before deployment
                     self.notify(wpt_var, assignment.string())
 
     # ------------------------------------------------------
