@@ -28,8 +28,8 @@ def cyclic_region_growth(mission: MissionArea):
                     last_updated_cell =  list(NV_k[k])[0] # select a cell from NV_k
                     mission.vehicle_assignments[mission.vehicles[k]].append(last_updated_cell)  # Assign selected cell
                     assigned_nodes.add(last_updated_cell)
-                    mission.grid_graph.graph.nodes[last_updated_cell]['weight'] = 1 + 0.1 * k
                     mission.grid_graph.graph.nodes[last_updated_cell]['region'] = k
+                    mission.grid_graph.graph.nodes[last_updated_cell]['weight'] = 1
                     account_balances[k] = account_balances[k] - 1
                     N = N - 1
                     # print("Remaining Nodes: ", N - 4)
