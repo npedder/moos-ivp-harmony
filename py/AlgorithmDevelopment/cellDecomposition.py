@@ -33,15 +33,15 @@ def cell_decomposition(mission: MissionArea):
                 add_node_and_update_pos(cell_graph, cell_graph_pos, center_node)
 
                 center_nodes_old_neighbors[center_node] = set()
-                # Remove the nodes in between highest and lowest node
+                # Track the neighbors of the nodes in to be combined. Add nodes to be removed/visited
                 for cell_node in nodes_to_combine:
                     center_nodes_old_neighbors[center_node].update(set(mission.grid_graph.graph[cell_node]))
                     #eif cell_node != highest_node and cell_node != lowest_node and cell_node not in mission.vehicles:
                         #mission.grid_graph.graph.remove_node(cell_node)
                     removed_nodes.add(cell_node)
 
-                mission.grid_graph.graph.remove_edges_from(list(mission.grid_graph.graph.edges(highest_node)))
-                mission.grid_graph.graph.remove_edges_from(list(mission.grid_graph.graph.edges(lowest_node)))
+                # mission.grid_graph.graph.remove_edges_from(list(mission.grid_graph.graph.edges(highest_node)))
+                # mission.grid_graph.graph.remove_edges_from(list(mission.grid_graph.graph.edges(lowest_node)))
 
                 if highest_node != lowest_node:
                     mission.grid_graph.graph.add_edge(highest_node,lowest_node)
@@ -50,8 +50,6 @@ def cell_decomposition(mission: MissionArea):
                 cell_graph.nodes[center_node]['top'] = highest_node
                 cell_graph.nodes[center_node]['bottom'] = lowest_node
                 decomposed_vehicle_assignments[region].append(center_node)
-
-    mission.draw()
 
     center_nodes_grouped_by_x = group_by_x(set(cell_graph.nodes)) # Makes it easier to find bordering cells
     distance_between_nodes = mission.cellDimension
