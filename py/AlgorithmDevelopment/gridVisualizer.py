@@ -23,13 +23,20 @@ class GridVisualizer:
         y = np.arange(self.scaledNRows + 1)
 
 
+
         # Create a ListedColormap for our discrete colors:
-        # Order: black (for 0), white (for 1), green (for 1.1), blue (for 1.2)
-        cmap = ListedColormap(['black', 'white', 'green', 'blue'])
+        # Order: black (for 0), white (for 1),
+        colors = [
+            "black", "yellow", "purple", "green", "orange", "cyan", "magenta",
+            "lime", "pink", "brown", "gray", "olive", "teal",
+            "navy", "maroon", "gold", "indigo", "violet", "turquoise"
+        ]
+        cmap = ListedColormap(colors)
 
         # Define boundaries that separate our values.
         # Since our values are 0, 1, 1.1, and 1.2, we can choose boundaries in-between.
-        boundaries = [-0.5, 0.5, 1.05, 1.15, 1.25]
+        max_value = len(colors) - 1  # Ensure boundaries cover all possible values
+        boundaries = [i - 0.5 for i in range(max_value + 2)]
         norm = BoundaryNorm(boundaries, cmap.N, clip=True)
         # Create the figure and axis
         self.fig, self.ax = plt.subplots(figsize=(10,10))

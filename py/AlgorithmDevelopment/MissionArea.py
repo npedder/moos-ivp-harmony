@@ -5,6 +5,8 @@ from gridVisualizer import GridVisualizer
 from gridArrayGenerator import genGrid
 from UxV import UxV
 
+import numpy as np
+from matplotlib.colors import ListedColormap, BoundaryNorm
 
 
 class MissionArea:
@@ -22,6 +24,8 @@ class MissionArea:
 
         
     def draw(self, show_neighbors = False):
+        self.redraw_grid_colormesh()
+
         pos = self.grid_graph.pos
 
         node_colors = ['red' if node in self.vehicles else 'blue' for node in self.grid_graph.graph.nodes()] # Init vehicles as red and empty space as blue
@@ -115,6 +119,53 @@ class MissionArea:
 
         for o_node in obstacle_nodes:
             self.grid_graph.graph.remove_node(o_node)
+
+    def redraw_grid_colormesh(self):
+        colors = [
+            "black", "yellow", "purple", "green", "orange", "cyan", "magenta",
+            "lime", "pink", "brown", "gray", "olive", "teal",
+            "navy", "maroon", "gold", "indigo", "violet", "turquoise"
+        ]
+        updated_grid = self.grid_visualizer.gridArray.copy()
+
+        color_index = 1
+        for vehicle_assignment in self.vehicle_assignments:
+            for node in self.vehicle_assignments[vehicle_assignment]:
+                top_node = self.grid_graph.graph.nodes[node]["top"]
+                bottom_node = self.grid_graph.graph.nodes[node]["bottom"]
+                num_cells_between = int((top_node[1] - bottom_node[1]) / self.cellDimension)
+                for i in range(0, num_cells_between + 1):
+                    cell_to_change = (top_node[0], top_node[1] - self.cellDimension * i)
+                    index_tuple = (int((cell_to_change[0] - .5 * self.cellDimension) / self.cellDimension), int((cell_to_change[1] - .5 * self.cellDimension) / self.cellDimension))
+                    updated_grid[index_tuple[1], index_tuple[0]] = color_index
+            color_index += 1
+
+        # Rescale the updated grid
+        self.grid_visualizer.scaledGrid = np.kron(updated_grid, np.ones((self.grid_visualizer.scale_x, self.grid_visualizer.scale_y)))
+
+        # Clear the previous plot
+        self.grid_visualizer.ax.clear()
+
+        # Redraw the colormesh with updated data
+        x = np.arange(self.grid_visualizer.scaledGrid.shape[1] + 1)
+        y = np.arange(self.grid_visualizer.scaledGrid.shape[0] + 1)
+        cmap = ListedColormap(colors)
+
+        # Generate dynamic boundaries for whole numbers from 0 to len(vehicle_assignments)
+        max_value = len(self.vehicle_assignments)
+        boundaries = [i - 0.5 for i in range(max_value + 2)]
+
+        norm = BoundaryNorm(boundaries, len(self.vehicle_assignments) + 1, clip=False)
+
+        c = self.grid_visualizer.ax.pcolormesh(x, y, self.grid_visualizer.scaledGrid, shading='flat', norm=norm, cmap=cmap, rasterized=True)
+
+        # Add colorbar again
+        cbar = self.grid_visualizer.fig.colorbar(c, ax=self.grid_visualizer.ax, ticks=range(max_value + 1))
+        cbar.ax.set_yticklabels([f'Value {i}' for i in range(max_value + 1)])
+
+        print(self.grid_visualizer.scaledGrid)
+
+
 
 
 if __name__ == '__main__':
