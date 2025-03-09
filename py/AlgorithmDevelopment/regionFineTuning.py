@@ -13,10 +13,13 @@ def region_fine_tuning (mission, iterations, account_balances):
         # Region with the highest balance is set to be the buyer
         print("Length of account_balances: " + str((range(len(account_balances) - 1))))
         largestAccountBal = account_balances[0]
+        largestAccountBalIndex = 0
+
         for j in range(len(account_balances) - 1):
             if account_balances[j] > largestAccountBal:
                 largestAccountBal = account_balances[j]
-        buyer = j
+                largestAccountBalIndex = j
+        buyer = largestAccountBalIndex
 
         # Out of neighbors of the buyer, the one with the most debt will be the seller
         regionNeighborNodes = find_neighbor_nodes(mission)
@@ -54,10 +57,16 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
     # Largest cell in the set of buyer that belongs to the seller is selected for candidate trade
     # AC
     sellerNeighborsToBuyer = regionNeighborNodes[buyer].intersection(set(mission.vehicle_assignments[mission.vehicles[seller]]))
-    
+
+    if not sellerNeighborsToBuyer:
+        # return empty and mark the pair as untradable
+        return set()
     largest_weight = -1
+    
+    
     for node_key in sellerNeighborsToBuyer:
         node_data = mission.grid_graph.graph.nodes[node_key]
+        print("Weight of neighbor " + str(node_key) + "is " + str(node_data['weight']))
         if node_data['weight'] > largest_weight:
             largest_weight = node_data['weight']
             largest_weight_node = node_key
@@ -94,6 +103,7 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
 
     account_balances[buyer] = account_balances[buyer] - bestTradeIndex
     account_balances[seller] = account_balances[seller] + bestTradeIndex
+    print("Leaving finding kept nodes")
     return bestTrade
 
 # Pre-condition: A mission area
