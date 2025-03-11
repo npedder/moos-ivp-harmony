@@ -34,7 +34,7 @@ def region_fine_tuning (mission, iterations, account_balances):
         print(str(account_balances))
         print(str(buyer) + " is the buyer with a balance of: " + str(account_balances[buyer]))
         print(str(seller) + " is the seller with a balance of: " + str(account_balances[seller]))
-
+        prevBals = account_balances
 
         # Determine what is kept by the seller and what is sold to the buyer
         # ** NOTE ** For now I am casting the vehicle lists to sets in order to perform set operations on them
@@ -43,6 +43,8 @@ def region_fine_tuning (mission, iterations, account_balances):
         mission.vehicle_assignments[mission.vehicles[buyer]] = set(mission.vehicle_assignments[mission.vehicles[seller]]) - keptNodes
         mission.vehicle_assignments[seller] = keptNodes
 
+        print(str(prevBals))
+        print("\/\/\/turns to")
         print(str(account_balances))
         print(str(buyer) + " is the buyer with a balance of: " + str(account_balances[buyer]))
         print(str(seller) + " is the seller with a balance of: " + str(account_balances[seller]))
@@ -56,23 +58,24 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
     print("Entering finding kept nodes")
     # Largest cell in the set of buyer that belongs to the seller is selected for candidate trade
     # AC
-    sellerNeighborsToBuyer = regionNeighborNodes[buyer].intersection(set(mission.vehicle_assignments[mission.vehicles[seller]]))
+    buyerNeighborsInSeller = regionNeighborNodes[buyer].intersection(set(mission.vehicle_assignments[mission.vehicles[seller]]))
 
-    if not sellerNeighborsToBuyer:
+    if not buyerNeighborsInSeller:
         # return empty and mark the pair as untradable
         return set()
+    
     largest_weight = -1
-    
-    
-    for node_key in sellerNeighborsToBuyer:
+    for node_key in buyerNeighborsInSeller:
         node_data = mission.grid_graph.graph.nodes[node_key]
-        print("Weight of neighbor " + str(node_key) + "is " + str(node_data['weight']))
+        # print("Weight of neighbor " + str(node_key) + "is " + str(node_data['weight']))
         if node_data['weight'] > largest_weight:
             largest_weight = node_data['weight']
             largest_weight_node = node_key
 
     candidate = largest_weight_node
-    stack = [largest_weight_node]
+
+    print("Node: " + str(candidate) + " is chosen as the root for q-subtrees checking")
+    stack = [candidate]
     visited = set()
     bestTradeIndex = float('inf') # Set to high number to start
 
@@ -80,6 +83,7 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
     # ** NOTE ** Avoids loops by using a visited node
     while stack:
         node = stack.pop()
+        print("Searching all subtrees from root node: " + str(node))
         # print("Visiting node: " + str(node))
         if node not in visited:
             visited.add(node)
@@ -89,8 +93,13 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
         currTradeIndex = max(abs(buyer - tradeSum), abs(seller + tradeSum))
         
         if currTradeIndex < bestTradeIndex:
+            print("The current trade index: " + str(currTradeIndex) + " is less than the best trade index: "
+            + str(bestTradeIndex))
+            print("Thus current trade is the new best trade.")
             bestTradeIndex = currTradeIndex
             bestTrade = candidateTrade
+        else:
+            print("Candidate trade is not better than best trade")
 
         # \\//Casting assignments to the be a set during DFS is probably not best idea\\//
         regionSubgraph = mission.grid_graph.graph.subgraph(set(mission.vehicle_assignments[mission.vehicles[seller]]))

@@ -26,7 +26,7 @@ mission_3.add_vehicle_to_graph(uxv4)
 # Apply algorithms to mission to determine task allocation
 bals = cyclic_region_growth(mission_3)
 print("Starting bals: " + str(bals))
-# region_fine_tuning(mission_3, 30, bals)
+region_fine_tuning(mission_3, 1, bals)
 
 # Display result
 mission_3.draw(show_neighbors=False)
