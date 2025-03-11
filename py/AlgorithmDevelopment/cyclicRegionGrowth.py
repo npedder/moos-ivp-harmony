@@ -13,7 +13,7 @@ def cyclic_region_growth(mission: MissionArea):
 
     for i in range(len(R)):
         account_balances[i] = OptimalTasks[i]
-        rate[i] = int(OptimalTasks[i]/gcd_of_list(OptimalTasks))
+        rate[i] = int(OptimalTasks[i]/min(OptimalTasks))
         NV_k[i] = set((mission.grid_graph.graph[R[i]].keys()))
 
     last_updated_cell = 0
@@ -52,8 +52,11 @@ def calculate_optimal_tasks(mission: MissionArea, vehicle):
 
 def w(mission: MissionArea):  # TODO: would only work if all cells are the same size?
     V = mission.grid_graph.graph.number_of_nodes()
-    # print("Total number of nodes: ", V)
-    summation_node_weights = V #* mission.cellDimension # just assumes that each cell is same size
+    print("Total number of nodes: ", V)
+    summation_node_weights = 0
+    for node in mission.grid_graph.graph.nodes():
+        if node not in mission.vehicles:
+            summation_node_weights += mission.grid_graph.graph.nodes[node]["weight"]
 
     return summation_node_weights
 

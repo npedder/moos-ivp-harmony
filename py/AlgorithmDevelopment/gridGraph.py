@@ -2,9 +2,9 @@ import networkx as nx
 
 class gridGraph:
     def __init__(self, xNumNodes, yNumNodes, distanceBetweenNodes, scale="equal"):
-        self.graph = nx.grid_2d_graph(xNumNodes, yNumNodes)
+        self.graph = nx.grid_2d_graph(yNumNodes, xNumNodes)
         mapping = {}
-        self.normalized_nodes = {(y, x) for x, y in self.graph.nodes()}
+        self.normalized_nodes = {(x, y) for x, y in self.graph.nodes()}
 
         for x, y in self.graph.nodes:
             mapping[(x,y)] = (x * distanceBetweenNodes + distanceBetweenNodes/2, y * distanceBetweenNodes + distanceBetweenNodes/2)
@@ -16,7 +16,7 @@ class gridGraph:
         if scale == "auto":
             self.pos = {(x, y): (y/distanceBetweenNodes+ .5, x/distanceBetweenNodes+ .5) for x, y in self.graph.nodes()}
         if scale == "equal":
-            self.pos = {(x, y): (y, x) for x, y in self.graph.nodes()}
+            self.pos = {(x, y): (x, y) for x, y in self.graph.nodes()}
 
         nx.set_edge_attributes(self.graph, values=distanceBetweenNodes, name='weight')
         nx.set_node_attributes(self.graph, values=-1, name='region')
@@ -63,7 +63,7 @@ class gridGraph:
         print("does nothing")
 
     def __update_pos__(self, node):
-        self.pos[(node[0], node[1])] =  (node[1], node[0])
+        self.pos[(node[0], node[1])] =  (node[0], node[1])
 
 
 
