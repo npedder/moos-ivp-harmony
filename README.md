@@ -21,7 +21,7 @@ The directory structure for the moos-ivp-extend is described below:
 
 
 # Setup
-The HARMONY system is demonstrated within a MOOS-IvP simulation. The MOOS-IvP Core modules are required to demonstrate the HARMONY system. 
+The HARMONY system is demonstrated within a MOOS-IvP simulation. The MOOS-IvP Core modules are required to demonstrate the HARMONY system. The moos-ivp-umassd repository is needed to simulate UAVs. See "**Setup moos-ivp-umassd**" below. 
 
 
 The HARMONY system uses the python-moos wrapper for MOOSApps for its shore-side application. 
@@ -68,20 +68,23 @@ Now, a survey area can be sent to the application using running "./inject_survey
 
 The survey area should appear in pMarineViewer followed by the vehicle assignments. The vehicles can be deployed onto their assigned waypoints with the "RUN" button.
 
-# UMASSD-MOOS REPO SETUP
+# Setup moos-ivp-umassd
+HARMONY uses the _uSimpleRobot_ application from moos-ivp-umassd. To set up, clone the following repo and follow the instructions found in its README. 
+ 
 ```
 git clone https://github.com/scottsideleau/moos-ivp-umassd.git
 ```
-  
-  open moos-ivp-umassd in file directory
-  
-  open CMakeLists.txt
-  
-  in " # Set the output directories for the binary and library files " add below 
 
-  ("pwd" in moos-ivp to find path)
+## Possible fix to cmake build error
+open moos-ivp-umassd in file directory
+  
+open CMakeLists.txt
+  
+in " # Set the output directories for the binary and library files " add below 
 
-  ```
+("pwd" in moos-ivp to find path)
+
+```
 set(MOOSIVP_SOURCE_TREE_BASE "/pasth/to/moos-ivp" CACHE STRING "MOOS-IvP Base Directory" FORCE) 
 ```
 
