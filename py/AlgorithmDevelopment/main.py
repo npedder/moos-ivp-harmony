@@ -38,13 +38,15 @@ cyclic_region_growth(mission_3)
 mission_3.neighbors = findNeighborNodes(mission_3)
 print(mission_3.neighbors)
 
+
 # Path finding
 tsp = traveling_salesman_problem
-
+print(tsp(mission_3.grid_graph.graph, nodes=[uxv1.position, uxv2.position]))
 
 
 # Display result
-mission_3.draw(show_neighbors=False)
+mission_3.redraw_grid_colormesh()
+mission_3.draw(show_neighbors=False, node_color="dimgray")
 
 plt.show()
 

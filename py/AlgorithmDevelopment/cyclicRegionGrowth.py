@@ -49,7 +49,7 @@ def calculate_optimal_tasks(mission: MissionArea, vehicle):
     return int(p_k)
 
 
-def w(mission: MissionArea):  # TODO: would only work if all cells are the same size?
+def w(mission: MissionArea):
     V = mission.grid_graph.graph.number_of_nodes()
     print("Total number of nodes: ", V)
     summation_node_weights = 0

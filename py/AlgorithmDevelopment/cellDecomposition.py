@@ -9,6 +9,8 @@ def decomposed_vehicle_assignments():
     pass
 
 
+
+
 def cell_decomposition(mission: MissionArea):
     vehicle_node_objects = [mission.grid_graph.graph.nodes(v) for v in mission.vehicles] #get vehicles and data
 
@@ -143,7 +145,7 @@ def add_node_and_update_pos(cell_graph, pos, node):
     cell_graph.add_node(node)
     pos[node] = node
 
-
+# Group the cells by their x values. Assists with finding neighboring nods
 def group_by_x(tuples):
     groups = {}
 

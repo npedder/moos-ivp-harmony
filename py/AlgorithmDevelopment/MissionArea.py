@@ -23,8 +23,7 @@ class MissionArea:
         self.__remove_obstacle_nodes__()
 
         
-    def draw(self, show_neighbors = False):
-        self.redraw_grid_colormesh()
+    def draw(self, show_neighbors = False, node_color = False):
 
         pos = self.grid_graph.pos
 
@@ -36,12 +35,15 @@ class MissionArea:
         ]
 
         # Assign region colors
-        i = 0
-        for assignment in self.vehicle_assignments:
-            for index, val in enumerate(self.grid_graph.graph.nodes()):
-                if val in self.vehicle_assignments[assignment]:
-                    node_colors[index] = colors[i % len(colors)]
-            i += 1
+        if node_color is False:
+            i = 0
+            for assignment in self.vehicle_assignments:
+                for index, val in enumerate(self.grid_graph.graph.nodes()):
+                    if val in self.vehicle_assignments[assignment]:
+                        node_colors[index] = colors[i % len(colors)]
+                i += 1
+        else:
+            node_colors = node_color
 
         # Assign bordering nodes color (for testing)
         if show_neighbors:
@@ -55,7 +57,7 @@ class MissionArea:
                 with_labels=False,
                 node_color=node_colors,
                 # edge_color='black',
-                edge_color="black",
+                edge_color="dimgray",
                 node_size=node_size,
                 font_color='yellow')
 
@@ -73,6 +75,7 @@ class MissionArea:
         nx.draw_networkx_labels(self.grid_graph.graph, self.grid_graph.pos, labels, font_size=12, font_color='r')
 
         plt.show()
+
 
     def add_vehicle_to_graph(self, node):
         # Input node as a tuple or vehicle object. Must be consistent throughout graph
@@ -105,6 +108,7 @@ class MissionArea:
             self.add_vehicle_to_graph(node)
             self.vehicles.append(node)
 
+
     def get_vehicle_attributes(self):
         vehicle_attributes = {node: self.grid_graph.nodes[node] for node in self.vehicles if node in self.grid_graph.graph}
         return vehicle_attributes
@@ -120,6 +124,8 @@ class MissionArea:
         for o_node in obstacle_nodes:
             self.grid_graph.graph.remove_node(o_node)
 
+
+    # Redraw colormesh after cell decomposition
     def redraw_grid_colormesh(self):
         colors = [
             "black", "yellow", "purple", "green", "orange", "cyan", "magenta",
@@ -128,6 +134,7 @@ class MissionArea:
         ]
         updated_grid = self.grid_visualizer.gridArray.copy()
 
+        # Assign a color to each of the unit cells in grid.
         color_index = 1
         for vehicle_assignment in self.vehicle_assignments:
             for node in self.vehicle_assignments[vehicle_assignment]:
@@ -142,6 +149,12 @@ class MissionArea:
 
         # Rescale the updated grid
         self.grid_visualizer.scaledGrid = np.kron(updated_grid, np.ones((self.grid_visualizer.scale_x, self.grid_visualizer.scale_y)))
+
+
+        # Add verticle lines to distinguish cells
+        # Set every 10th column (0-based index) to 0
+        self.grid_visualizer.scaledGrid[:, 9::10] = 0  # 9::10 selects columns at index 9, 19, etc.
+
 
         # Clear the previous plot
         self.grid_visualizer.ax.clear()

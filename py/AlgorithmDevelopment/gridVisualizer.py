@@ -44,9 +44,6 @@ class GridVisualizer:
         # Draw the colormesh grid with our custom colormap and normalization.
         c = self.ax.pcolormesh(x, y, self.scaledGrid, shading='flat', cmap=cmap, norm=norm, rasterized=True)
 
-        # Add a colorbar with tick marks at our data values.
-        cbar = self.fig.colorbar(c, ax=self.ax, ticks=[0, 1, 1.1, 1.2])
-        cbar.ax.set_yticklabels(['black (0)', 'white (1)', 'green (1.1)', 'blue (1.2)'])
 
         # For visual reference, mark the grid corners.
         # X, Y = np.meshgrid(x, y)
