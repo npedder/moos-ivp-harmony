@@ -176,7 +176,6 @@ class MissionArea:
         cbar = self.grid_visualizer.fig.colorbar(c, ax=self.grid_visualizer.ax, ticks=range(max_value + 1))
         cbar.ax.set_yticklabels([f'Value {i}' for i in range(max_value + 1)])
 
-        print(self.grid_visualizer.scaledGrid)
 
 
 

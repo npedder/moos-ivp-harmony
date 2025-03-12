@@ -21,9 +21,6 @@ grid_data = genConnectedGrid(75, 50, .2, 5)
 mission_3 = MissionArea("Mission", grid_data, 10)
 
 
-
-
-
 # Add each vehicle to mission
 mission_3.add_vehicle_to_graph(uxv1)
 mission_3.add_vehicle_to_graph(uxv2)

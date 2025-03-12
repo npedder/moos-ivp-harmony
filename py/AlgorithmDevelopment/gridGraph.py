@@ -19,6 +19,7 @@ class gridGraph:
             self.pos = {(x, y): (x, y) for x, y in self.graph.nodes()}
 
         nx.set_edge_attributes(self.graph, values=distanceBetweenNodes, name='weight')
+        nx.set_node_attributes(self.graph,values=1, name='weight')
         nx.set_node_attributes(self.graph, values=-1, name='region')
 
     def drawGraph(self):
