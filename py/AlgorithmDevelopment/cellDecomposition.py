@@ -1,8 +1,6 @@
 from MissionArea import MissionArea
 import networkx as nx
 
-
-
 # Performs a dfs to remove nodes between two endpoints
 # Input: Mission Area
 def decomposed_vehicle_assignments():
@@ -29,7 +27,7 @@ def cell_decomposition(mission: MissionArea):
             highest_node = node
             lowest_node = node
             highest_node, lowest_node = _dfs_combine_nodes(mission.grid_graph.graph, node, visited, nodes_to_combine, highest_node, lowest_node)
-            print(" Highest Node: " ,highest_node, "   Lowest Node: ",  lowest_node)
+            # print(" Highest Node: " ,highest_node, "   Lowest Node: ",  lowest_node)
 
             # Add a node in new graph representing a decomposed cell
             center_node = (int((highest_node[0] + lowest_node[0]) / 2), int((highest_node[1] + lowest_node[1]) / 2))
