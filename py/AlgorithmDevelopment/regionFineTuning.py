@@ -9,9 +9,9 @@ import MissionArea
 def region_fine_tuning (mission, iterations, account_balances):
     print("Enter region fine tuning")
     i = iterations
+    untradeablePairs = dict() # set of two regions to a value true
     while(i > 0):
         # Region with the highest balance is set to be the buyer
-        print("Length of account_balances: " + str((range(len(account_balances) - 1))))
         largestAccountBal = account_balances[0]
         largestAccountBalIndex = 0
 
@@ -23,25 +23,29 @@ def region_fine_tuning (mission, iterations, account_balances):
 
         # Out of neighbors of the buyer, the one with the most debt will be the seller
         regionNeighborNodes = find_neighbor_nodes(mission)
-        smallestAccountBal = account_balances[0]
+    
+        count = 0
         for node_key in regionNeighborNodes[buyer]:
             node_data = mission.grid_graph.graph.nodes[node_key]
-            if account_balances[node_data['region']] < smallestAccountBal:   
+            if count == 0:
                 smallestAccountBal = account_balances[node_data['region']]
                 smallestAccountBalNode = node_data
+            elif account_balances[node_data['region']] < smallestAccountBal and untradeablePairs[(buyer, seller)] == True:   
+                smallestAccountBal = account_balances[node_data['region']]
+                smallestAccountBalNode = node_data
+            count = count + 1
         seller = smallestAccountBalNode['region']
 
         print(str(account_balances))
         print(str(buyer) + " is the buyer with a balance of: " + str(account_balances[buyer]))
         print(str(seller) + " is the seller with a balance of: " + str(account_balances[seller]))
 
-
         # Determine what is kept by the seller and what is sold to the buyer
         # ** NOTE ** For now I am casting the vehicle lists to sets in order to perform set operations on them
         # I think this might be causing performance issues so I think vehicle assignments should be lists anyways     
-        keptNodes = find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances)
-        mission.vehicle_assignments[mission.vehicles[buyer]] = set(mission.vehicle_assignments[mission.vehicles[seller]]) - keptNodes
-        mission.vehicle_assignments[seller] = keptNodes
+        keptNodes = find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances, untradeablePairs)
+        mission.vehicle_assignments[mission.vehicles[buyer]] =  set(mission.vehicle_assignments[mission.vehicles[buyer]]).union(set(mission.vehicle_assignments[mission.vehicles[seller]]) - keptNodes)
+        mission.vehicle_assignments[mission.vehicles[seller]] = keptNodes
 
         print(str(account_balances))
         print(str(buyer) + " is the buyer with a balance of: " + str(account_balances[buyer]))
@@ -52,27 +56,55 @@ def region_fine_tuning (mission, iterations, account_balances):
 # Pre-condition: Receives mission area, the buyer region, and the seller region
 # Post-condition: Returns the subtree that when kept by the seller region, leads to an ideal transaction,
 #                 otherwise if no trees are found that lead to an ideal transaction, -1 is returned (for now)
-def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances) :
+def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances, untradeablePairs) :
     print("Entering finding kept nodes")
     # Largest cell in the set of buyer that belongs to the seller is selected for candidate trade
     # AC
-    sellerNeighborsToBuyer = regionNeighborNodes[buyer].intersection(set(mission.vehicle_assignments[mission.vehicles[seller]]))
+    buyerNeighborsInSeller = regionNeighborNodes[buyer].intersection(set(mission.vehicle_assignments[mission.vehicles[seller]]))
 
-    if not sellerNeighborsToBuyer:
+    sellerRegionSubgraph = mission.grid_graph.graph.subgraph(set(mission.vehicle_assignments[mission.vehicles[seller]]))
+    buyerRegionSubgraph = mission.grid_graph.graph.subgraph(set(mission.vehicle_assignments[mission.vehicles[buyer]]))
+
+    if not buyerNeighborsInSeller:
         # return empty and mark the pair as untradable
-        return set()
+        print("Pairs are untradeable")
+        untradeablePairs[(buyer, seller)] = True
+        return set(mission.vehicle_assignments[mission.vehicles[seller]])
+    
     largest_weight = -1
-    
-    
-    for node_key in sellerNeighborsToBuyer:
+    for node_key in buyerNeighborsInSeller:
         node_data = mission.grid_graph.graph.nodes[node_key]
-        print("Weight of neighbor " + str(node_key) + "is " + str(node_data['weight']))
+        # print("Weight of neighbor " + str(node_key) + "is " + str(node_data['weight']))
         if node_data['weight'] > largest_weight:
             largest_weight = node_data['weight']
             largest_weight_node = node_key
 
     candidate = largest_weight_node
-    stack = [largest_weight_node]
+
+    # Determine if candidate is the cut point
+    isCutPoint = True
+    
+    for neighbor_key in sellerRegionSubgraph[candidate]:
+        neighbor_data = mission.grid_graph.graph.nodes[neighbor_key]
+        # Check if the neighbor's only connection to the rest of the region is through the cut point
+        for neighborNeighbor_key in mission.grid_graph.graph[neighbor_key]:
+            neighborNeighbor_data = node_data = mission.grid_graph.graph.nodes[neighborNeighbor_key]
+            if neighborNeighbor_data['region'] == neighbor_data['region'] and neighborNeighbor_key != neighbor_key:
+                isCutPoint = False 
+    
+    if isCutPoint:
+        print("Candidate is the cut point, searching q subtrees")
+        return find_q_subtrees(candidate, mission, buyer, seller, account_balances, sellerRegionSubgraph)
+    else:
+        print("Candidate is not the cut point, using candidate as trade")
+        print("Candidate weight: " + str(mission.grid_graph.graph.nodes[candidate]['weight']))
+        account_balances[buyer] = account_balances[buyer] - mission.grid_graph.graph.nodes[candidate]['weight']
+        account_balances[seller] = account_balances[seller] + mission.grid_graph.graph.nodes[candidate]['weight']
+        return set(mission.vehicle_assignments[mission.vehicles[seller]]) - {candidate}
+
+def find_q_subtrees(candidate, mission, buyer, seller, account_balances, sellerRegionSubgraph):
+    print("Node: " + str(candidate) + " is chosen as the root for q-subtrees checking")
+    stack = [candidate]
     visited = set()
     bestTradeIndex = float('inf') # Set to high number to start
 
@@ -80,6 +112,7 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
     # ** NOTE ** Avoids loops by using a visited node
     while stack:
         node = stack.pop()
+        print("Searching all subtrees from root node: " + str(node))
         # print("Visiting node: " + str(node))
         if node not in visited:
             visited.add(node)
@@ -89,13 +122,16 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
         currTradeIndex = max(abs(buyer - tradeSum), abs(seller + tradeSum))
         
         if currTradeIndex < bestTradeIndex:
+            print("The current trade index: " + str(currTradeIndex) + " is less than the best trade index: "
+            + str(bestTradeIndex))
+            print("Thus current trade is the new best trade.")
             bestTradeIndex = currTradeIndex
             bestTrade = candidateTrade
+        else:
+            print("Candidate trade is not better than best trade")
 
-        # \\//Casting assignments to the be a set during DFS is probably not best idea\\//
-        regionSubgraph = mission.grid_graph.graph.subgraph(set(mission.vehicle_assignments[mission.vehicles[seller]]))
         # print("Neighbor nodes: " + str(regionSubgraph[node]))
-        for neighbor in regionSubgraph[node]:
+        for neighbor in sellerRegionSubgraph[node]:
             # print("Appending node: " + str(neighbor))
             if neighbor not in visited:
                 stack.append(neighbor)
@@ -105,6 +141,8 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
     account_balances[seller] = account_balances[seller] + bestTradeIndex
     print("Leaving finding kept nodes")
     return bestTrade
+
+
 
 # Pre-condition: A mission area
 # Post-condtion: Returns a dictionary mapping an integer representing region to a set of nodes that neighbor that region

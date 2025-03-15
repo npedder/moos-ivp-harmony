@@ -87,17 +87,4 @@ if __name__ == "__main__":
     plt.title("Random Obstacles with Fully Connected Empty Space")
     plt.show()
 
-if __name__ == "__main__":
-    width, height = 50, 30
-    obstacle_density = 0.2  # 30% of the grid will be obstacles
-    seed = 42
-
-    grid = genConnectedGrid(width, height, obstacle_density, seed)
-
-    # Display the grid
-    plt.figure(figsize=(10, 6))
-    plt.imshow(grid, cmap="gray_r", interpolation="nearest")
-    plt.title("Random Obstacles with Fully Connected Empty Space")
-    plt.show()
-
 
