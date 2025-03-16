@@ -3,73 +3,49 @@ import MissionArea
 # Pre-condition: A mission area, the number of iterations the fine tuning should run for, and the account balances
 #                for the vehicles/regions
 # Post-condition: Updates mission area with new regions which should more closely reflect optimal vehicle assignments
-#
-# **NOTE** This implementation is derived from the CDM and EDM paper ("Exact and Heuristic Multi-Robot Dubins Coverage Path Planning for Known Environments")
-#          and is NOT derived from the psuedocode from the paper we used ("Complete Coverage Problem of Multiple Robots with Different Velocities".)
 def region_fine_tuning (mission, iterations, account_balances):
     print("Enter region fine tuning")
     i = iterations
     untradeablePairs = dict() # set of two regions to a value true
     while(i > 0):
         # Region with the highest balance is set to be the buyer
-        largestAccountBal = account_balances[0]
-        largestAccountBalIndex = 0
-
-        for j in range(len(account_balances) - 1):
-            if account_balances[j] > largestAccountBal:
-                largestAccountBal = account_balances[j]
-                largestAccountBalIndex = j
-        buyer = largestAccountBalIndex
-
         # Out of neighbors of the buyer, the one with the most debt will be the seller
+        buyer = max(range(len(account_balances)), key=lambda index: account_balances[index])
         regionNeighborNodes = find_neighbor_nodes(mission)
-    
-        count = 0
-        for node_key in regionNeighborNodes[buyer]:
-            node_data = mission.grid_graph.graph.nodes[node_key]
-            if count == 0:
-                smallestAccountBal = account_balances[node_data['region']]
-                smallestAccountBalNode = node_data
-            elif account_balances[node_data['region']] < smallestAccountBal and untradeablePairs[(buyer, seller)] == True:   
-                smallestAccountBal = account_balances[node_data['region']]
-                smallestAccountBalNode = node_data
-            count = count + 1
-        seller = smallestAccountBalNode['region']
-
-        print(str(account_balances))
-        print(str(buyer) + " is the buyer with a balance of: " + str(account_balances[buyer]))
-        print(str(seller) + " is the seller with a balance of: " + str(account_balances[seller]))
-
-        # Determine what is kept by the seller and what is sold to the buyer
-        # ** NOTE ** For now I am casting the vehicle lists to sets in order to perform set operations on them
-        # I think this might be causing performance issues so I think vehicle assignments should be lists anyways     
+        seller_key = min(regionNeighborNodes[buyer], key=lambda node_key: account_balances[mission.grid_graph.graph.nodes[node_key]['region']])
+        seller = mission.grid_graph.graph.nodes[seller_key]['region']
+  
+        # Find tasks to trade and update vehicle assignments
         keptNodes = find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances, untradeablePairs)
-        mission.vehicle_assignments[mission.vehicles[buyer]] =  set(mission.vehicle_assignments[mission.vehicles[buyer]]).union(set(mission.vehicle_assignments[mission.vehicles[seller]]) - keptNodes)
+        mission.vehicle_assignments[mission.vehicles[buyer]] =  mission.vehicle_assignments[mission.vehicles[buyer]].union(mission.vehicle_assignments[mission.vehicles[seller]]) - keptNodes
         mission.vehicle_assignments[mission.vehicles[seller]] = keptNodes
 
         print(str(account_balances))
         print(str(buyer) + " is the buyer with a balance of: " + str(account_balances[buyer]))
         print(str(seller) + " is the seller with a balance of: " + str(account_balances[seller]))
-
         i = i - 1
 
 # Pre-condition: Receives mission area, the buyer region, and the seller region
 # Post-condition: Returns the subtree that when kept by the seller region, leads to an ideal transaction,
-#                 otherwise if no trees are found that lead to an ideal transaction, -1 is returned (for now)
+#                 otherwise if no trees are found that lead to an ideal transaction, no trade occurs and pair is marked
+#                 untradeable for some amount of iterations
 def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances, untradeablePairs) :
     print("Entering finding kept nodes")
     # Largest cell in the set of buyer that belongs to the seller is selected for candidate trade
     # AC
-    buyerNeighborsInSeller = regionNeighborNodes[buyer].intersection(set(mission.vehicle_assignments[mission.vehicles[seller]]))
+    buyerNeighborsInSeller = regionNeighborNodes[buyer].intersection(mission.vehicle_assignments[mission.vehicles[seller]])
 
-    sellerRegionSubgraph = mission.grid_graph.graph.subgraph(set(mission.vehicle_assignments[mission.vehicles[seller]]))
-    buyerRegionSubgraph = mission.grid_graph.graph.subgraph(set(mission.vehicle_assignments[mission.vehicles[buyer]]))
+    sellerRegionSubgraph = mission.grid_graph.graph.subgraph(mission.vehicle_assignments[mission.vehicles[seller]])
+    buyerRegionSubgraph = mission.grid_graph.graph.subgraph(mission.vehicle_assignments[mission.vehicles[buyer]])
 
     if not buyerNeighborsInSeller:
         # return empty and mark the pair as untradable
         print("Pairs are untradeable")
+        # print("AC candidates in seller: " + str(buyerNeighborsInSeller))
+        # print("Buyer neigbors: " + str(regionNeighborNodes[buyer] ))
+        # print("Seller cells: " + str(set(mission.vehicle_assignments[mission.vehicles[seller]])))
         untradeablePairs[(buyer, seller)] = True
-        return set(mission.vehicle_assignments[mission.vehicles[seller]])
+        return mission.vehicle_assignments[mission.vehicles[seller]]
     
     largest_weight = -1
     for node_key in buyerNeighborsInSeller:
@@ -82,13 +58,15 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
     candidate = largest_weight_node
 
     # Determine if candidate is the cut point
-    isCutPoint = True
+    isCutPoint = False
     
     for neighbor_key in sellerRegionSubgraph[candidate]:
         neighbor_data = mission.grid_graph.graph.nodes[neighbor_key]
         # Check if the neighbor's only connection to the rest of the region is through the cut point
         for neighborNeighbor_key in mission.grid_graph.graph[neighbor_key]:
             neighborNeighbor_data = node_data = mission.grid_graph.graph.nodes[neighborNeighbor_key]
+            # If the neighbor does not have a have another neighbor in the seller region that isn't the candidate
+            # then the candidate is the cut point and turn is cut point to true
             if neighborNeighbor_data['region'] == neighbor_data['region'] and neighborNeighbor_key != neighbor_key:
                 isCutPoint = False 
     
@@ -100,7 +78,7 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
         print("Candidate weight: " + str(mission.grid_graph.graph.nodes[candidate]['weight']))
         account_balances[buyer] = account_balances[buyer] - mission.grid_graph.graph.nodes[candidate]['weight']
         account_balances[seller] = account_balances[seller] + mission.grid_graph.graph.nodes[candidate]['weight']
-        return set(mission.vehicle_assignments[mission.vehicles[seller]]) - {candidate}
+        return mission.vehicle_assignments[mission.vehicles[seller]] - {candidate}
 
 def find_q_subtrees(candidate, mission, buyer, seller, account_balances, sellerRegionSubgraph):
     print("Node: " + str(candidate) + " is chosen as the root for q-subtrees checking")
@@ -117,7 +95,7 @@ def find_q_subtrees(candidate, mission, buyer, seller, account_balances, sellerR
         if node not in visited:
             visited.add(node)
         
-        candidateTrade = set(mission.vehicle_assignments[mission.vehicles[seller]]) - visited
+        candidateTrade = mission.vehicle_assignments[mission.vehicles[seller]] - visited
         tradeSum = sum_weights(mission, candidateTrade)
         currTradeIndex = max(abs(buyer - tradeSum), abs(seller + tradeSum))
         
@@ -162,10 +140,5 @@ def find_neighbor_nodes (mission: MissionArea):
 # Pre-condition: Takes a mission graph, and set of nodes to sum in the graph
 # Post-condition: Sums nodes and returns sum
 def sum_weights(mission, graph):
-    weightSum = 0
-    for node_key in graph:
-        node_data = mission.grid_graph.graph.nodes[node_key]
-        weightSum += node_data['weight']
+    weightSum = sum(graph, key=lambda node_key: mission.grid_graph.graph.nodes[node_key]['weight'])
     return weightSum
-    
-

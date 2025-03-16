@@ -28,7 +28,7 @@ def cyclic_region_growth(mission: MissionArea):
                 # Assign nodes
                 if NV_k[k]: # Checks if list of NVs are empty
                     last_updated_cell =  list(NV_k[k])[0] # select a cell from NV_k
-                    mission.vehicle_assignments[mission.vehicles[k]].append(last_updated_cell)  # Assign selected cell
+                    mission.vehicle_assignments[mission.vehicles[k]].add(last_updated_cell)  # Assign selected cell
                     assigned_nodes.add(last_updated_cell)
                     mission.grid_graph.graph.nodes[last_updated_cell]['region'] = k
                     account_balances[k] = account_balances[k] - mission.grid_graph.graph.nodes[last_updated_cell]['weight']

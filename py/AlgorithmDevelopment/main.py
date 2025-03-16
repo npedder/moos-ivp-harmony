@@ -20,10 +20,6 @@ grid_data = genConnectedGrid(75, 50, .2, 5)
 # Create a MissionArea object to manage mission info
 mission_3 = MissionArea("Mission", grid_data, 10)
 
-
-
-
-
 # Add each vehicle to mission
 mission_3.add_vehicle_to_graph(uxv1)
 mission_3.add_vehicle_to_graph(uxv2)
@@ -35,7 +31,7 @@ mission_3.add_vehicle_to_graph(uxv4)
 cell_decomposition(mission_3)
 bals = cyclic_region_growth(mission_3)
 print("Balances post reigon growth: " + str(bals))
-region_fine_tuning(mission_3, 10, bals)
+region_fine_tuning(mission_3, 2, bals)
 
 # Display result pre-fine tuning
 mission_3.draw(show_neighbors=False)

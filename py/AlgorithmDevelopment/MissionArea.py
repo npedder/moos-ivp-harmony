@@ -19,6 +19,8 @@ class MissionArea:
         self.vehicles = []
         self.vehicle_assignments = {} # Key - vehicle as tuple: Value - assigned nodes as tuple
         self.grid_graph = gridGraph(nrows, ncols, cellDimension, scale="equal")
+        # for less verbosity
+        self.graph = self.grid_graph.graph
         self.neighbors = {}
         self.__remove_obstacle_nodes__()
 
@@ -91,7 +93,7 @@ class MissionArea:
                 self.grid_graph.graph.add_node(node_label)
 
             self.vehicles.append(node_label)
-            self.vehicle_assignments[node_label] = []
+            self.vehicle_assignments[node_label] = set()
             nx.set_node_attributes(self.grid_graph.graph,
                                        {node_label: {'name': node.name, 'type': node.type, "position": node.position,
                                                         "speed": node.speed, "sensorRange": node.sensorRange,
@@ -163,7 +165,7 @@ class MissionArea:
         cbar = self.grid_visualizer.fig.colorbar(c, ax=self.grid_visualizer.ax, ticks=range(max_value + 1))
         cbar.ax.set_yticklabels([f'Value {i}' for i in range(max_value + 1)])
 
-        print(self.grid_visualizer.scaledGrid)
+        # print(self.grid_visualizer.scaledGrid)
 
 
 
