@@ -27,13 +27,6 @@ mission_3.add_vehicle_to_graph(uxv3)
 mission_3.add_vehicle_to_graph(uxv4)
 
 # Apply algorithms to mission to determine task allocation
-<<<<<<< HEAD
-bals = cyclic_region_growth(mission_3)
-print("Starting bals: " + str(bals))
-region_fine_tuning(mission_3, 30, bals)
-=======
->>>>>>> f255cca4c4e9f5c33b7e721709ecd7f068b77560
-
 cell_decomposition(mission_3)
 bals = cyclic_region_growth(mission_3)
 print("Balances post reigon growth: " + str(bals))

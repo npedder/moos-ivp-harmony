@@ -20,7 +20,7 @@ def region_fine_tuning (mission, iterations, account_balances):
         mission.vehicle_assignments[mission.vehicles[buyer]] =  mission.vehicle_assignments[mission.vehicles[buyer]].union(mission.vehicle_assignments[mission.vehicles[seller]]) - keptNodes
         mission.vehicle_assignments[mission.vehicles[seller]] = keptNodes
 
-        # Update regions
+        # Update regions post trade
         for node_key in mission.vehicle_assignments[mission.vehicles[seller]]:
             graph.nodes[node_key]['region'] = seller
         for node_key in mission.vehicle_assignments[mission.vehicles[buyer]]:
