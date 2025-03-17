@@ -6,13 +6,14 @@ from cyclicRegionGrowth import cyclic_region_growth, calculate_optimal_tasks
 from regionFineTuning import findNeighborNodes
 from cellDecomposition import cell_decomposition
 from networkx.algorithms.approximation import traveling_salesman_problem
+from sensorRangeDecomposition import sensor_range_decomposition
 
 
 # Create UxV objects to be added as nodes
-uxv1 = UxV(name="alpha", position=(5,15), speed=(10), sensorRange=(10), type="UUV", endurance=200)
-uxv2 = UxV(name="bravo", position=(45,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
-uxv3 = UxV(name="charlie", position=(155,275), speed=(5), sensorRange=(15), type="UUV", endurance=100)
-uxv4 = UxV(name="delta", position=(315, 345), speed=(20), sensorRange=(15), type="UUV", endurance=100)
+uxv1 = UxV(name="alpha", position=(5,15), speed=(10), sensorRange=(20), type="UUV", endurance=200)
+uxv2 = UxV(name="bravo", position=(45,275), speed=(5), sensorRange=(30), type="UUV", endurance=100)
+uxv3 = UxV(name="charlie", position=(155,275), speed=(5), sensorRange=(40), type="UUV", endurance=100)
+uxv4 = UxV(name="delta", position=(315, 345), speed=(20), sensorRange=(50), type="UUV", endurance=100)
 
 # Generate a random 2D numpy array to represent mission area
 grid_data = genConnectedGrid(75, 50, .2, 5)
@@ -40,10 +41,13 @@ print(mission_3.neighbors)
 tsp = traveling_salesman_problem
 print(tsp(mission_3.grid_graph.graph, nodes=[uxv1.position, uxv2.position]))
 
+mission_3.redraw_grid_colormesh()
+
+sensor_range_decomposition(mission_3)
 
 # Display result
-mission_3.redraw_grid_colormesh()
-mission_3.draw(show_neighbors=False, node_color="dimgray")
+
+mission_3.draw(show_neighbors=False, node_color='white', edge_color="white")
 
 plt.show()
 

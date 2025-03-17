@@ -3,12 +3,9 @@ import networkx as nx
 
 
 
-# Performs a dfs to remove nodes between two endpoints
+# Performs a dfs to remove nodes between two endpoints. Replaces mission.grid.grid_graph with a list of nodes representing
+# the decomposed cells. Each cell has a  "top" and "bottom" attribute, keeping track of the endpoints.
 # Input: Mission Area
-def decomposed_vehicle_assignments():
-    pass
-
-
 
 
 def cell_decomposition(mission: MissionArea):
@@ -17,7 +14,6 @@ def cell_decomposition(mission: MissionArea):
     cell_graph = nx.Graph() # A new graph that will hold a node representing each decomposed cell
     cell_graph_pos = {}
     removed_nodes = set()
-    decomposed_vehicle_assignments = {} # Would replace vehicle assignments
     center_nodes_old_neighbors = {} # A dictionary with key center cell and value of neighbors before decomp. Cam be used to determine bordering nodes
 
     # for region in mission.vehicle_assignments:
@@ -35,7 +31,7 @@ def cell_decomposition(mission: MissionArea):
 
             # Add a node in new graph representing a decomposed cell
             center_node = (int((highest_node[0] + lowest_node[0]) / 2), int((highest_node[1] + lowest_node[1]) / 2))
-            add_node_and_update_pos(cell_graph, cell_graph_pos, center_node)
+            _add_node_and_update_pos(cell_graph, cell_graph_pos, center_node)
 
             center_nodes_old_neighbors[center_node] = set()
             # Track the neighbors of the nodes in to be combined. Add nodes to be removed/visited
@@ -68,8 +64,9 @@ def cell_decomposition(mission: MissionArea):
 
             # Add vehicle node and make an edge between the vehicle and the cell containing it
             for vehicle in vehicles_in_cell:
-                add_node_and_update_pos(cell_graph, cell_graph_pos, vehicle)
+                _add_node_and_update_pos(cell_graph, cell_graph_pos, vehicle)
                 cell_graph.nodes[vehicle].update(mission.grid_graph.graph.nodes[vehicle])  # Update attributes
+                cell_graph.add_edge(vehicle, center_node)
                 cell_graph.add_edge(vehicle, center_node)
 
 
@@ -97,7 +94,7 @@ def cell_decomposition(mission: MissionArea):
 
     # Replace mission graph with new decomposed graph
     for vehicle in mission.vehicles:
-        add_node_and_update_pos(cell_graph, cell_graph_pos, vehicle)
+        _add_node_and_update_pos(cell_graph, cell_graph_pos, vehicle)
 
     mission.grid_graph.graph = cell_graph
     mission.grid_graph.pos = cell_graph_pos
@@ -124,7 +121,7 @@ def cell_decomposition(mission: MissionArea):
 
 
 
-# DFC that returns the two endpoints for a cell. The nodes in between the endpoints will be removed.
+# DFS that returns the two endpoints for a cell. The nodes in between the endpoints will be removed.
 def _dfs_combine_nodes(graph, node, visited, nodes_to_combine, highest_node, lowest_node):
     if node not in visited:
         visited.add(node)
@@ -141,7 +138,7 @@ def _dfs_combine_nodes(graph, node, visited, nodes_to_combine, highest_node, low
     return highest_node, lowest_node
 
 
-def add_node_and_update_pos(cell_graph, pos, node):
+def _add_node_and_update_pos(cell_graph, pos, node):
     cell_graph.add_node(node)
     pos[node] = node
 

@@ -23,7 +23,7 @@ class MissionArea:
         self.__remove_obstacle_nodes__()
 
         
-    def draw(self, show_neighbors = False, node_color = False):
+    def draw(self, show_neighbors = False, node_color = False, edge_color = "dimgray"):
 
         pos = self.grid_graph.pos
 
@@ -57,7 +57,7 @@ class MissionArea:
                 with_labels=False,
                 node_color=node_colors,
                 # edge_color='black',
-                edge_color="dimgray",
+                edge_color= edge_color,
                 node_size=node_size,
                 font_color='yellow')
 
@@ -72,7 +72,7 @@ class MissionArea:
         labels = {}
         for node in self.vehicles:
             labels[node] = node
-        nx.draw_networkx_labels(self.grid_graph.graph, self.grid_graph.pos, labels, font_size=12, font_color='r')
+#        nx.draw_networkx_labels(self.grid_graph.graph, self.grid_graph.pos, labels, font_size=12, font_color='r')
 
         plt.show()
 
