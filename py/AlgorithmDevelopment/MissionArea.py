@@ -19,8 +19,6 @@ class MissionArea:
         self.vehicles = []
         self.vehicle_assignments = {} # Key - vehicle as tuple: Value - assigned nodes as tuple
         self.grid_graph = gridGraph(nrows, ncols, cellDimension, scale="equal")
-        # for less verbosity
-        self.graph = self.grid_graph.graph
         self.neighbors = {}
         self.__remove_obstacle_nodes__()
 
