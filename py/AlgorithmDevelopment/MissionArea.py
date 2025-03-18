@@ -128,14 +128,14 @@ class MissionArea:
     # Redraw colormesh after cell decomposition
     def redraw_grid_colormesh(self):
         colors = [
-            "black", "yellow", "purple", "green", "orange", "cyan", "magenta",
+            "black", "white", "yellow", "purple", "green", "orange", "cyan", "magenta",
             "lime", "pink", "brown", "gray", "olive", "teal",
             "navy", "maroon", "gold", "indigo", "violet", "turquoise"
         ]
         updated_grid = self.grid_visualizer.gridArray.copy()
 
         # Assign a color to each of the unit cells in grid.
-        color_index = 1
+        color_index = 2
         for vehicle_assignment in self.vehicle_assignments:
             for node in self.vehicle_assignments[vehicle_assignment]:
                 top_node = self.grid_graph.graph.nodes[node]["top"]
@@ -173,8 +173,8 @@ class MissionArea:
         c = self.grid_visualizer.ax.pcolormesh(x, y, self.grid_visualizer.scaledGrid, shading='flat', norm=norm, cmap=cmap, rasterized=True)
 
         # Add colorbar again
-        cbar = self.grid_visualizer.fig.colorbar(c, ax=self.grid_visualizer.ax, ticks=range(max_value + 1))
-        cbar.ax.set_yticklabels([f'Value {i}' for i in range(max_value + 1)])
+        cbar = self.grid_visualizer.fig.colorbar(c, ax=self.grid_visualizer.ax, ticks=range(max_value + 2))
+        cbar.ax.set_yticklabels([f'Value {i}' for i in range(max_value + 2)])
 
 
 

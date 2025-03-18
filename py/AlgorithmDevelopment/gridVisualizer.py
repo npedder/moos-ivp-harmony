@@ -27,7 +27,7 @@ class GridVisualizer:
         # Create a ListedColormap for our discrete colors:
         # Order: black (for 0), white (for 1),
         colors = [
-            "black", "white", "purple", "green", "orange", "cyan", "magenta",
+            "black", "white", "yellow", "purple", "green", "orange", "cyan", "magenta",
             "lime", "pink", "brown", "gray", "olive", "teal",
             "navy", "maroon", "gold", "indigo", "violet", "turquoise"
         ]
