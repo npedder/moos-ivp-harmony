@@ -37,19 +37,24 @@ def cyclic_region_growth(mission: MissionArea):
 
 
 def calculate_optimal_tasks(mission: MissionArea, vehicle):
-    velocity_r = mission.grid_graph.graph.nodes[vehicle]['speed']
-    summation_v_k = 0
+    vehicle_velocity = mission.grid_graph.graph.nodes[vehicle]['speed']
+    vehicle_sensor_range = mission.grid_graph.graph.nodes[vehicle]['sensorRange']
+    vehicle_coverage_rate = vehicle_velocity * vehicle_sensor_range
+
+    r_coverage_rate_summation = 0
     R = mission.vehicles
     for r in R:
-        velocity_k = mission.grid_graph.graph.nodes[r]['speed']
-        summation_v_k += velocity_k
+        r_velocity = mission.grid_graph.graph.nodes[r]['speed']
+        r_sensor_range = mission.grid_graph.graph.nodes[r]['sensorRange']
+        r_coverage_rate = r_velocity * r_sensor_range
+        r_coverage_rate_summation += r_coverage_rate
 
-    p_k = (velocity_r / summation_v_k) * w(mission)
+    optimal_tasks = (vehicle_coverage_rate / r_coverage_rate_summation) * mission_weight(mission)
 
-    return int(p_k)
+    return int(optimal_tasks)
 
 
-def w(mission: MissionArea):
+def mission_weight(mission: MissionArea):
     V = mission.grid_graph.graph.number_of_nodes()
     print("Total number of nodes: ", V)
     summation_node_weights = 0
@@ -61,6 +66,9 @@ def w(mission: MissionArea):
 
 
 def gcd_of_list(numList):
+    if len(numList) < 2:
+        return numList[0]
+
     gcd = math.gcd(numList[0], numList[1])
     for i in range(2, len(numList)):
         gcd = math.gcd(gcd, numList[i])

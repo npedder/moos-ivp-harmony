@@ -4,6 +4,8 @@ from gridGraph import gridGraph
 from gridVisualizer import GridVisualizer
 from gridArrayGenerator import genGrid
 from UxV import UxV
+import math
+from scipy.spatial import distance
 
 import numpy as np
 from matplotlib.colors import ListedColormap, BoundaryNorm
@@ -91,7 +93,7 @@ class MissionArea:
         if isinstance(node, UxV): # TODO: this may need to change with implementation of vehicles in algorithm
             node_label = node.position
             if self.grid_graph.graph.has_node(node_label) is False:
-                self.grid_graph.graph.add_node(node_label)
+                node_label = self._normalize_vehicle_to_graph(node_label)
 
             self.vehicles.append(node_label)
             self.vehicle_assignments[node_label] = []
@@ -103,10 +105,9 @@ class MissionArea:
             self.grid_graph.graph.nodes[node_label]['region'] = self.vehicles.index(node_label)
 
 
-    def add_vehicles_to_graph(self, nodesArray):
-        for node in nodesArray:
-            self.add_vehicle_to_graph(node)
-            self.vehicles.append(node)
+    def add_vehicles_to_graph(self, vehicles):
+        for vehicle in vehicles:
+            self.add_vehicle_to_graph(vehicle)
 
 
     def get_vehicle_attributes(self):
@@ -153,7 +154,7 @@ class MissionArea:
 
         # Add verticle lines to distinguish cells
         # Set every 10th column (0-based index) to 0
-        self.grid_visualizer.scaledGrid[:, 9::10] = 0  # 9::10 selects columns at index 9, 19, etc.
+        self.grid_visualizer.scaledGrid[:, self.cellDimension-1::self.cellDimension] = 0  # 9::10 selects columns at index 9, 19, etc.
 
 
         # Clear the previous plot
@@ -164,21 +165,53 @@ class MissionArea:
         y = np.arange(self.grid_visualizer.scaledGrid.shape[0] + 1)
         cmap = ListedColormap(colors)
 
-        # Generate dynamic boundaries for whole numbers from 0 to len(vehicle_assignments)
-        max_value = len(self.vehicle_assignments)
+        # Generate dynamic boundaries for whole numbers from 0 to len(vehicle_assignments), 0 and 1 are not vehicles
+        max_value = len(self.vehicle_assignments) + 2
         boundaries = [i - 0.5 for i in range(max_value + 2)]
 
-        norm = BoundaryNorm(boundaries, len(self.vehicle_assignments) + 1, clip=False)
+        norm = BoundaryNorm(boundaries, len(self.vehicle_assignments) + 3, clip=False)
 
         c = self.grid_visualizer.ax.pcolormesh(x, y, self.grid_visualizer.scaledGrid, shading='flat', norm=norm, cmap=cmap, rasterized=True)
 
         # Add colorbar again
-        cbar = self.grid_visualizer.fig.colorbar(c, ax=self.grid_visualizer.ax, ticks=range(max_value + 2))
-        cbar.ax.set_yticklabels([f'Value {i}' for i in range(max_value + 2)])
+        cbar = self.grid_visualizer.fig.colorbar(c, ax=self.grid_visualizer.ax, ticks=range(max_value))
+
+        # Generate labels
+        labels = [""] * max_value
+        labels[0] = "Dead space"
+        labels[1] = "Uncovered"
+        for i in range(2,max_value):
+            vehicle_speed = self.grid_graph.graph.nodes[self.vehicles[i - 2]]['speed']
+            vehicle_sensor_range = self.grid_graph.graph.nodes[self.vehicles[i - 2]]['sensorRange']
+            labels[i] = f"Speed: {vehicle_speed}, Sensor Radius: {vehicle_sensor_range}"
+
+        cbar.ax.set_yticklabels(labels)
+
+        self.grid_visualizer.ax.text(1, -20, f"Cell Width: {self.cellDimension}", ha="left", fontsize=12)
+
+
+    # Vehicle position will be set inside the grid graph. Stores original position and distance from original position
+    def _normalize_vehicle_to_graph(self, vehiclePos):  # TODO: This could be made more efficient
+            closest_node = min(list(self.grid_graph.graph.nodes()), key=lambda n: distance.euclidean(vehiclePos, n))
+            distance_from_graph = distance.euclidean(vehiclePos,closest_node)
+            self.grid_graph.graph.nodes[closest_node]["displacement"] = distance_from_graph
+            self.grid_graph.graph.nodes[closest_node]["originalPos"] = vehiclePos
+
+            return closest_node
 
 
 
 
+def calculate_sensor_range_gcd(vehicles):
+    if len(vehicles) < 2:
+        return vehicles[0].sensorRange
+
+    gcd = math.gcd(vehicles[0].sensorRange, vehicles[1].sensorRange)
+    for i in range(2, len(vehicles)):
+        gcd = math.gcd(gcd, vehicles[i].sensorRange)
+        print("GCD: ", gcd)
+
+    return gcd
 
 if __name__ == '__main__':
 

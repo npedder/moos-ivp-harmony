@@ -12,6 +12,6 @@ def findNeighborNodes (mission: MissionArea):
         node_data = mission.grid_graph.graph.nodes[node_key]
         for neighbor_key in dict(mission.grid_graph.graph[node_key]).keys():
             neighbor_data = mission.grid_graph.graph.nodes[neighbor_key]
-            if neighbor_data['region'] != node_data['region']:
+            if neighbor_data not in mission.vehicles and neighbor_data['region'] != node_data['region']:
                  regionNeighborNodes[node_data['region']].add(neighbor_key)
     return regionNeighborNodes

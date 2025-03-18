@@ -40,9 +40,13 @@ def cell_decomposition(mission: MissionArea):
                 weight += 1     # The amount of nodes to be combined will be the weight of the cell
                 if cell_node in mission.vehicles:
                     vehicles_in_cell.append(cell_node)
+
+                # Check if a vehicle is attached but x is not normalized to grid
+                # for neighbor in list(mission.grid_graph.graph[cell_node]):
+                #     if neighbor in mission.vehicles and mission.grid_graph.graph.nodes[neighbor]["displacement"] != 0:
+                #         vehicles_in_cell.append(neighbor)
+
                 center_nodes_old_neighbors[center_node].update(set(mission.grid_graph.graph[cell_node]))
-                #if cell_node != highest_node and cell_node != lowest_node and cell_node not in mission.vehicles:
-                    #mission.grid_graph.graph.remove_node(cell_node)
                 removed_nodes.add(cell_node)
 
             # Assign weight of cell

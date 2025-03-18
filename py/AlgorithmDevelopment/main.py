@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 import missionLayouts
-from MissionArea import MissionArea
+from MissionArea import MissionArea, calculate_sensor_range_gcd
 from gridArrayGenerator import genConnectedGrid
 from UxV import UxV
 from cyclicRegionGrowth import cyclic_region_growth, calculate_optimal_tasks
@@ -11,11 +11,12 @@ from networkx.algorithms.approximation import traveling_salesman_problem
 from sensorRangeDecomposition import sensor_range_decomposition
 from missionLayouts import *
 
-# Create UxV objects to be added as nodes
-uxv1 = UxV(name="alpha", position=(5,15), speed=(10), sensorRange=(20), type="UUV", endurance=200)
-uxv2 = UxV(name="bravo", position=(45,275), speed=(5), sensorRange=(30), type="UUV", endurance=100)
-uxv3 = UxV(name="charlie", position=(155,275), speed=(5), sensorRange=(40), type="UUV", endurance=100)
-uxv4 = UxV(name="delta", position=(315, 345), speed=(20), sensorRange=(50), type="UUV", endurance=100)
+# Create a list of UxV objects to be added as nodes
+uxvs = []
+uxvs.append(UxV(name="alpha", position=(5,15), speed=(10), sensorRange=(5), type="UUV", endurance=200))
+uxvs.append(UxV(name="bravo", position=(45,111), speed=(5), sensorRange=(10), type="UUV", endurance=100))
+uxvs.append(UxV(name="charlie", position=(155,275), speed=(5), sensorRange=(15), type="UUV", endurance=100))
+uxvs.append(UxV(name="delta", position=(315, 345), speed=(20), sensorRange=(20), type="UUV", endurance=100))
 
 # Generate a random 2D numpy array to represent mission area
 #grid_data = genConnectedGrid(75, 50, .2, 5)
@@ -23,14 +24,12 @@ grid_data = missionLayouts.mission_area_1_upscaled
 
 
 # Create a MissionArea object to manage mission info
-mission_3 = MissionArea("Mission", grid_data, 10)
+cellDimension = calculate_sensor_range_gcd(uxvs)
+mission_3 = MissionArea("Mission", grid_data, cellDimension)
 
 
 # Add each vehicle to mission
-mission_3.add_vehicle_to_graph(uxv1)
-mission_3.add_vehicle_to_graph(uxv2)
-mission_3.add_vehicle_to_graph(uxv3)
-mission_3.add_vehicle_to_graph(uxv4)
+mission_3.add_vehicles_to_graph(uxvs)
 
 # Apply algorithms to mission to determine task allocation
 

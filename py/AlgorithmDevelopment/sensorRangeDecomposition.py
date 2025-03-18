@@ -1,8 +1,8 @@
 from MissionArea import MissionArea
 import networkx as nx
 from collections import deque
-
 from cellDecomposition import group_by_x, _add_node_and_update_pos
+
 # Input: MissionArea
 # Combines cells to account for the sensor range of a vehicle. Done after assignments and cell decomposition
 def sensor_range_decomposition(mission: MissionArea):
@@ -16,12 +16,13 @@ def sensor_range_decomposition(mission: MissionArea):
                 while remaining_nodes:
                         start_node = _find_leftmost_node(remaining_nodes)
                         # Find the extremes. The average of the x vals and extremes of y vals will be used for new top and bottom
-                        visited = set()
                         largest_x, smallest_x, largest_y, smallest_y, combined_nodes = _bfs_combine_bordering_cells(mission, vehicle, start_node, combined_nodes)
 
                         new_x = int((largest_x + smallest_x)/2)
+
                         top_cell = (new_x, largest_y)
                         bottom_cell = (new_x, smallest_y)
+
 
                         _add_node_and_update_pos(new_graph, new_pos, top_cell)
                         _add_node_and_update_pos(new_graph, new_pos, bottom_cell)
@@ -52,9 +53,7 @@ def sensor_range_decomposition(mission: MissionArea):
 # Only combines nodes to the right.
 def _bfs_combine_bordering_cells(mission: MissionArea, region, start_node, combined_cells):
         graph = mission.grid_graph.graph
-        sensor_diameter = graph.nodes[region]["sensorRange"]  # Gets sensor range of the vehicle assigned to the region
-        baseCellDimension = mission.cellDimension  # The GCD
-        max_cell_width = (sensor_diameter)/baseCellDimension
+        sensor_radius = graph.nodes[region]["sensorRange"]  # Gets sensor range of the vehicle assigned to the region
         queue = deque([start_node])
 
         largest_x = start_node[0]
@@ -63,7 +62,6 @@ def _bfs_combine_bordering_cells(mission: MissionArea, region, start_node, combi
         smallest_y = graph.nodes[start_node]["bottom"][1]
         combined_cells = combined_cells # The cells that are visited that wont be visited again
         visited = set()
-        combined_width = 1  # Keep track of how many cells were combined width wise. If greater than sensor_range/gcd, stop
 
         while queue:
                 node = queue.popleft()
@@ -75,7 +73,7 @@ def _bfs_combine_bordering_cells(mission: MissionArea, region, start_node, combi
                 if node not in visited:
                         visited.add(node)
                         # Track width of cell
-                        if node[0] - start_node[0] >= sensor_diameter:  # cell is out of sensor range
+                        if node[0] - start_node[0] >= sensor_radius * 2:  # cell is out of sensor range
                                 cellTooLarge = True
                         else: cellTooLarge = False
 
