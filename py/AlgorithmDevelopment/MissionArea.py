@@ -80,17 +80,7 @@ class MissionArea:
 
 
     def add_vehicle_to_graph(self, node):
-        # Input node as a tuple or vehicle object. Must be consistent throughout graph
-        if isinstance(node, tuple):
-            # self.grid_graph.__add_vehicle_to_graph__(node)
-            if self.grid_graph.graph.has_node(node) is False:
-                self.grid_graph.graph.add_node(node)
-
-            self.vehicles.append(node)
-            self.grid_graph.__update_pos__(node)
-
-
-        if isinstance(node, UxV): # TODO: this may need to change with implementation of vehicles in algorithm
+        if isinstance(node, UxV):
             node_label = node.position
             if self.grid_graph.graph.has_node(node_label) is False:
                 node_label = self._normalize_vehicle_to_graph(node_label)

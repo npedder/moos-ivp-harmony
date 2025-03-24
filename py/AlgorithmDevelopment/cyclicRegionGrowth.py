@@ -37,21 +37,39 @@ def cyclic_region_growth(mission: MissionArea):
 
 
 def calculate_optimal_tasks(mission: MissionArea, vehicle):
+    mission_numTasks = mission_weight(mission)  # The number of tasks before cell decomposition
+
+    vehicle_displacement = mission.grid_graph.graph.nodes[vehicle]['displacement']
+    vehicle_extra_tasks = vehicle_displacement/mission.cellDimension  #  Extra tasks added to total survey, outside the survey
     vehicle_velocity = mission.grid_graph.graph.nodes[vehicle]['speed']
     vehicle_sensor_range = mission.grid_graph.graph.nodes[vehicle]['sensorRange']
     vehicle_coverage_rate = vehicle_velocity * vehicle_sensor_range
 
     r_coverage_rate_summation = 0
+    r_velocity_summation = 0
+    total_extra_tasks = 0
     R = mission.vehicles
     for r in R:
+        r_displacement = mission.grid_graph.graph.nodes[vehicle]['displacement']
+        r_extra_tasks = vehicle_displacement / mission.cellDimension
         r_velocity = mission.grid_graph.graph.nodes[r]['speed']
         r_sensor_range = mission.grid_graph.graph.nodes[r]['sensorRange']
+        r_velocity_summation += r_velocity
         r_coverage_rate = r_velocity * r_sensor_range
+        total_extra_tasks += r_extra_tasks
         r_coverage_rate_summation += r_coverage_rate
 
-    optimal_tasks = (vehicle_coverage_rate / r_coverage_rate_summation) * mission_weight(mission)
 
-    return int(optimal_tasks)
+    if total_extra_tasks == 0:
+        final_optimal_tasks = (vehicle_coverage_rate / r_coverage_rate_summation) * mission_weight(mission)
+    else:
+        new_mission_numTasks = mission_numTasks + total_extra_tasks
+        extra_included_optimal_tasks = ((vehicle_coverage_rate / r_coverage_rate_summation) * mission_numTasks
+                                        + (vehicle_velocity/r_velocity_summation) * new_mission_numTasks)
+        final_optimal_tasks = extra_included_optimal_tasks - vehicle_extra_tasks  # Removes the distance needed to reach SA
+
+
+    return int(final_optimal_tasks)
 
 
 def mission_weight(mission: MissionArea):
