@@ -24,17 +24,21 @@ class MissionArea:
         self.neighbors = {}
         self.__remove_obstacle_nodes__()
 
-        
-    def draw(self, show_neighbors = False, node_color = False, edge_color = "dimgray"):
+    def draw(self, show_neighbors=False, node_color=False, edge_color="dimgray", vehicles_colored=False):
 
         pos = self.grid_graph.pos
 
-        node_colors = ['red' if node in self.vehicles else 'blue' for node in self.grid_graph.graph.nodes()] # Init vehicles as red and empty space as blue
+        node_colors = ['red' if node in self.vehicles else 'blue' for node in
+                       self.grid_graph.graph.nodes()]  # Init vehicles as red and empty space as blue
         colors = [
-            "yellow", "purple","green", "orange", "cyan", "magenta",
+            "yellow", "purple", "green", "orange", "cyan", "magenta",
             "lime", "pink", "brown", "gray", "olive", "teal",
             "navy", "maroon", "gold", "indigo", "violet", "turquoise"
         ]
+
+        if vehicles_colored is True:
+            node_colors = [colors[self.vehicles.index(node)] if node in self.vehicles else 'blue' for node in
+                           self.grid_graph.graph.nodes()]  # Init vehicles as red and empty space as blue
 
         # Assign region colors
         if node_color is False:
@@ -54,12 +58,12 @@ class MissionArea:
                     index = list(self.grid_graph.graph.nodes()).index(neighbor)
                     node_colors[index] = "turquoise"
 
-        node_size = [50 if node in self.vehicles else 25 for node in self.grid_graph.graph.nodes()]
+        node_size = [80 if node in self.vehicles else 10 for node in self.grid_graph.graph.nodes()]
         nx.draw(self.grid_graph.graph, pos=pos, ax=self.grid_visualizer.ax,
                 with_labels=False,
                 node_color=node_colors,
                 # edge_color='black',
-                edge_color= edge_color,
+                edge_color=edge_color,
                 node_size=node_size,
                 font_color='yellow')
 
@@ -74,10 +78,11 @@ class MissionArea:
         labels = {}
         for node in self.vehicles:
             labels[node] = node
-#        nx.draw_networkx_labels(self.grid_graph.graph, self.grid_graph.pos, labels, font_size=12, font_color='r')
+
+        label_pos = {k: (v[0], v[1] + 5) for k, v in pos.items()}  # Adjust the y-coordinate
+        #        nx.draw_networkx_labels(self.grid_graph.graph, label_pos, labels, font_size=12, font_color='r')
 
         plt.show()
-
 
     def add_vehicle_to_graph(self, node):
         if isinstance(node, UxV):
