@@ -4,7 +4,38 @@ import math
 
 def cyclic_region_growth(mission: MissionArea):
     R = mission.vehicles
-    OptimalTasks = [calculate_optimal_tasks(mission, r) for r in R]  # p_k
+
+    # Calculate number of optimal tasks for each vehicle. Determines rate of region growth
+    OptimalTasks = [0] * len(R) # pk
+    removed_vehicles = set()
+    # If any vehicles have negative or 0 tasks, then they cant reach survey area, so remove them and recalculate OT
+    hasNonPositiveTasks = True
+    while (hasNonPositiveTasks):
+        for i in range(len(R)):
+            r = R[i]
+            rNumTasks = calculate_optimal_tasks(mission, r)
+            if rNumTasks <= 0 and r not in removed_vehicles:
+                # Softly remove r from mission by giving 0 capabilities.
+                # mission.grid_graph.graph.nodes[r]['speed'] = 0
+                # mission.grid_graph.graph.nodes[r]['sensorRange'] = 0
+                # mission.grid_graph.graph.nodes[r]['displacement'] = 0
+                # mission.grid_graph.graph.nodes[r]['originalPos'] = None
+                # mission.grid_graph.graph.nodes[r]['region'] = -1
+                mission.grid_graph.graph.remove_node(r)
+                mission.vehicle_assignments.pop(r)
+                mission.vehicles.remove(r)
+                R = mission.vehicles
+                OptimalTasks = [0] * len(R)
+                hasNonPositiveTasks = True
+                removed_vehicles.add(r)
+                break;
+            OptimalTasks[i] = rNumTasks
+            hasNonPositiveTasks = False
+
+        # OptimalTasks = [calculate_optimal_tasks(mission, r) for r in R]  # p_k
+
+
+
     assigned_nodes = set()
     N = mission.grid_graph.graph.number_of_nodes()
     rate = [0] * len(R) # How many times a region will grow before switching off
@@ -28,7 +59,7 @@ def cyclic_region_growth(mission: MissionArea):
                     last_updated_cell =  list(NV_k[k])[0] # select a cell from NV_k
                     mission.vehicle_assignments[mission.vehicles[k]].append(last_updated_cell)  # Assign selected cell
                     assigned_nodes.add(last_updated_cell)
-                    mission.grid_graph.graph.nodes[last_updated_cell]['region'] = k
+                    mission.grid_graph.graph.nodes[last_updated_cell]['region'] = mission.vehicles[k]
                     account_balances[k] = account_balances[k] - mission.grid_graph.graph.nodes[last_updated_cell]["weight"]
                     N = N - 1
                     print("Remaining Nodes: ", N - 4)
@@ -50,8 +81,8 @@ def calculate_optimal_tasks(mission: MissionArea, vehicle):
     total_extra_tasks = 0
     R = mission.vehicles
     for r in R:
-        r_displacement = mission.grid_graph.graph.nodes[vehicle]['displacement']
-        r_extra_tasks = vehicle_displacement / mission.cellDimension
+        r_displacement = mission.grid_graph.graph.nodes[r]['displacement']
+        r_extra_tasks = r_displacement / mission.cellDimension
         r_velocity = mission.grid_graph.graph.nodes[r]['speed']
         r_sensor_range = mission.grid_graph.graph.nodes[r]['sensorRange']
         r_velocity_summation += r_velocity
@@ -65,7 +96,7 @@ def calculate_optimal_tasks(mission: MissionArea, vehicle):
     else:
         new_mission_numTasks = mission_numTasks + total_extra_tasks
         extra_included_optimal_tasks = ((vehicle_coverage_rate / r_coverage_rate_summation) * mission_numTasks
-                                        + (vehicle_velocity/r_velocity_summation) * new_mission_numTasks)
+                                        + (vehicle_velocity/r_velocity_summation) * total_extra_tasks)
         final_optimal_tasks = extra_included_optimal_tasks - vehicle_extra_tasks  # Removes the distance needed to reach SA
 
 

@@ -5,7 +5,7 @@ import MissionArea
 def findNeighborNodes (mission: MissionArea):
     print("Entering findNeighborNodes")
     # initalize a dictionary of empty sets for holding the neighbors of each region
-    regionNeighborNodes = {key: set() for key in range(len(mission.vehicles))}
+    regionNeighborNodes = {key: set() for key in mission.vehicles}
 
     # Iterate through the keys of each node and then the keys of that node's neighbors
     for node_key in dict(mission.grid_graph.graph.nodes).keys():

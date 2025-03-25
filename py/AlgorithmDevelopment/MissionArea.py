@@ -92,7 +92,7 @@ class MissionArea:
                                                         "speed": node.speed, "sensorRange": node.sensorRange,
                                                         "endurance": node.endurance, "color": node.color}})
             self.grid_graph.__update_pos__(node_label)
-            self.grid_graph.graph.nodes[node_label]['region'] = self.vehicles.index(node_label)
+            self.grid_graph.graph.nodes[node_label]['region'] = node_label
 
 
     def add_vehicles_to_graph(self, vehicles):
@@ -129,13 +129,14 @@ class MissionArea:
         color_index = 2
         for vehicle_assignment in self.vehicle_assignments:
             for node in self.vehicle_assignments[vehicle_assignment]:
-                top_node = self.grid_graph.graph.nodes[node]["top"]
-                bottom_node = self.grid_graph.graph.nodes[node]["bottom"]
-                num_cells_between = int((top_node[1] - bottom_node[1]) / self.cellDimension)
-                for i in range(0, num_cells_between + 1):
-                    cell_to_change = (top_node[0], top_node[1] - self.cellDimension * i)
-                    index_tuple = (int((cell_to_change[0] - .5 * self.cellDimension) / self.cellDimension), int((cell_to_change[1] - .5 * self.cellDimension) / self.cellDimension))
-                    updated_grid[index_tuple[1], index_tuple[0]] = color_index
+                if node not in self.vehicles:
+                    top_node = self.grid_graph.graph.nodes[node]["top"]
+                    bottom_node = self.grid_graph.graph.nodes[node]["bottom"]
+                    num_cells_between = int((top_node[1] - bottom_node[1]) / self.cellDimension)
+                    for i in range(0, num_cells_between + 1):
+                        cell_to_change = (top_node[0], top_node[1] - self.cellDimension * i)
+                        index_tuple = (int((cell_to_change[0] - .5 * self.cellDimension) / self.cellDimension), int((cell_to_change[1] - .5 * self.cellDimension) / self.cellDimension))
+                        updated_grid[index_tuple[1], index_tuple[0]] = color_index
             color_index += 1
 
         # Rescale the updated grid
