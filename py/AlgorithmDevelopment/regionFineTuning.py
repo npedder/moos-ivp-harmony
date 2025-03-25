@@ -36,8 +36,8 @@ def region_fine_tuning (mission, iterations, account_balances):
             for neighbor_key in graph[node_key]:
                 neighbor_data = graph.nodes[neighbor_key]
                 if neighbor_data['region'] != node_data['region']:
-                    if neighbor_key not in regionNeighborNodes[buyer]:
-                        print("New region neighbor found: " + str(neighbor_key))
+                    # if neighbor_key not in regionNeighborNodes[buyer]:
+                    #     print("New region neighbor found: " + str(neighbor_key))
                     regionNeighborNodes[node_data['region']].add(neighbor_key)
 
         sellerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[mission.vehicles[seller]])
@@ -63,7 +63,7 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
     # Largest cell in the set of buyer that belongs to the seller is selected for candidate trade
     # AC
     buyerNeighborsInSeller = regionNeighborNodes[buyer].intersection(mission.vehicle_assignments[mission.vehicles[seller]])
-    print("Buyer's neighbor nodes: " + str(regionNeighborNodes[buyer]))
+    # print("Buyer's neighbor nodes: " + str(regionNeighborNodes[buyer]))
 
     sellerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[mission.vehicles[seller]])
     buyerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[mission.vehicles[buyer]])
@@ -78,17 +78,34 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
     candidate = largest_weight_node
 
     # Determine if candidate is the cut point
-    isCutPoint = True
-    
-    for neighbor_key in sellerRegionSubgraph[candidate]:
-        neighbor_data = graph.nodes[neighbor_key]
-        # Check if the neighbor's only connection to the rest of the region is through the cut point
-        for neighborNeighbor_key in graph[neighbor_key]:
-            neighborNeighbor_data = node_data = graph.nodes[neighborNeighbor_key]
-            # If the neighbor does not have a have another neighbor in the seller region that isn't the candidate
-            # then the candidate is the cut point and turn is cut point to true
-            if neighborNeighbor_data['region'] == neighbor_data['region'] and neighborNeighbor_key != neighbor_key:
-                isCutPoint = False 
+    # Pick a neighbor of the candidate that is in the seller's region. Treat candidate as traded, then search all nodes in the region, if visited
+    # matches seller - candidate, then it's not a cut point, otherwise it is
+
+    # grab candidate neighbor in the sell graph
+    start = None
+    for e in sellerRegionSubgraph[candidate]:
+        start = e
+        break
+
+    print("Starting point: " + str(start))
+    print("Candidate: " + str(candidate))
+
+    stack = [start]
+    visited = set()
+    while stack:
+        node = stack.pop()
+        visited.add(node)
+        for neighbor in sellerRegionSubgraph[node]:
+            if neighbor not in visited and neighbor != candidate:
+                stack.append(neighbor)
+
+    print("Nodes visited: " + str(visited))
+    print("Seller assignments " + str(mission.vehicle_assignments[mission.vehicles[seller]]))
+
+    if mission.vehicle_assignments[mission.vehicles[seller]] - {candidate} == visited:
+        isCutPoint = False
+    else:
+        isCutPoint = True
     
     if isCutPoint:
         print("Candidate is the cut point, searching q subtrees")
@@ -101,8 +118,7 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
         return mission.vehicle_assignments[mission.vehicles[seller]] - {candidate}
 
 def find_q_subtrees(candidate, mission, buyer, seller, account_balances, sellerRegionSubgraph):
-    print("Node: " + str(candidate) + " is chosen as the root for q-subtrees checking")
-    graph = mission.grid_graph.graph
+    print("========================================================")
     stack = [candidate]
     visited = set()
     bestTradeIndex = float('inf') # Set to high number to start
@@ -111,6 +127,7 @@ def find_q_subtrees(candidate, mission, buyer, seller, account_balances, sellerR
     # ** NOTE ** Avoids loops by using a visited node
     while stack:
         node = stack.pop()
+        print("========================================================")
         print("Searching all subtrees from root node: " + str(node))
         # print("Visiting node: " + str(node))
         if node not in visited:
@@ -118,16 +135,22 @@ def find_q_subtrees(candidate, mission, buyer, seller, account_balances, sellerR
         
         candidateTrade = mission.vehicle_assignments[mission.vehicles[seller]] - visited
         tradeSum = sum_weights(mission, candidateTrade)
-        currTradeIndex = max(abs(buyer - tradeSum), abs(seller + tradeSum))
+        currTradeIndex = max(abs(account_balances[buyer] - tradeSum), abs(account_balances[seller] + tradeSum))
         
         if currTradeIndex < bestTradeIndex:
             print("The current trade index: " + str(currTradeIndex) + " is less than the best trade index: "
             + str(bestTradeIndex))
             print("Thus current trade is the new best trade.")
+            print("Buyer's balance: " + str(account_balances[buyer] - tradeSum))
+            print("Seller's balance: " + str(account_balances[seller] - tradeSum))
+            print("Trade sum: " + str(tradeSum))
             bestTradeIndex = currTradeIndex
-            bestTrade = candidateTrade
+            bestTradeSum = tradeSum
+            bestTrade = visited.copy()
         else:
             print("Candidate trade is not better than best trade")
+            print("Buyer's balance: " + str(account_balances[buyer] - bestTradeSum))
+            print("Seller's balance: " + str(account_balances[seller] - bestTradeSum))
 
         # print("Neighbor nodes: " + str(regionSubgraph[node]))
         for neighbor in sellerRegionSubgraph[node]:
@@ -136,9 +159,9 @@ def find_q_subtrees(candidate, mission, buyer, seller, account_balances, sellerR
                 stack.append(neighbor)
         # print("Seller nodes: " + str(set(mission.vehicle_assignments[mission.vehicles[seller]])))
 
-    account_balances[buyer] = account_balances[buyer] - bestTradeIndex
-    account_balances[seller] = account_balances[seller] + bestTradeIndex
-    print("Leaving finding kept nodes")
+    account_balances[buyer] = account_balances[buyer] - bestTradeSum
+    account_balances[seller] = account_balances[seller] + bestTradeSum
+    print("Trading " + str(bestTradeSum) + " from the seller to the buyer")
     return bestTrade
 
 
@@ -160,9 +183,12 @@ def find_neighbor_nodes (mission: MissionArea):
     return regionNeighborNodes
 
 def sum_weights(mission, subgraph):
+    print("\tCalculating weight sum...")
     graph = mission.grid_graph.graph
     weightSum = 0
     for node_key in subgraph:
         node_data = graph.nodes[node_key]
         weightSum += node_data['weight']
+        print("\t" + str(node_data['weight']) + " + ", end="")
+    print("\n\t" + str(weightSum))
     return weightSum
