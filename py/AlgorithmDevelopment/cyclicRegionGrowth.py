@@ -21,7 +21,7 @@ def cyclic_region_growth(mission: MissionArea):
                 # mission.grid_graph.graph.nodes[r]['displacement'] = 0
                 # mission.grid_graph.graph.nodes[r]['originalPos'] = None
                 # mission.grid_graph.graph.nodes[r]['region'] = -1
-                mission.grid_graph.graph.remove_node(r)
+                # mission.grid_graph.graph.remove_node(r)
                 mission.vehicle_assignments.pop(r)
                 mission.vehicles.remove(r)
                 R = mission.vehicles
@@ -48,7 +48,7 @@ def cyclic_region_growth(mission: MissionArea):
         NV_k[i] = set((mission.grid_graph.graph[R[i]].keys()))
 
     last_updated_cell = 0;
-    while (N > (len(R))):  # This is len R because the once the last nodes are updated, if statement doesn't N-1 again.
+    while (N > len(R)):  # This is len R because the once the last nodes are updated, if statement doesn't N-1 again.
         for k in range(0, len(R)):
             for j in range(0, rate[k]):
                 # Update NV_K:
@@ -71,7 +71,7 @@ def calculate_optimal_tasks(mission: MissionArea, vehicle):
     mission_numTasks = mission_weight(mission)  # The number of tasks before cell decomposition
 
     vehicle_displacement = mission.grid_graph.graph.nodes[vehicle]['displacement']
-    vehicle_extra_tasks = vehicle_displacement/mission.cellDimension  #  Extra tasks added to total survey, outside the survey
+    vehicle_extra_tasks = int(vehicle_displacement/mission.cellDimension)  #  Extra tasks added to total survey, outside the survey
     vehicle_velocity = mission.grid_graph.graph.nodes[vehicle]['speed']
     vehicle_sensor_range = mission.grid_graph.graph.nodes[vehicle]['sensorRange']
     vehicle_coverage_rate = vehicle_velocity * vehicle_sensor_range
@@ -82,7 +82,7 @@ def calculate_optimal_tasks(mission: MissionArea, vehicle):
     R = mission.vehicles
     for r in R:
         r_displacement = mission.grid_graph.graph.nodes[r]['displacement']
-        r_extra_tasks = r_displacement / mission.cellDimension
+        r_extra_tasks = int(r_displacement / mission.cellDimension)
         r_velocity = mission.grid_graph.graph.nodes[r]['speed']
         r_sensor_range = mission.grid_graph.graph.nodes[r]['sensorRange']
         r_velocity_summation += r_velocity

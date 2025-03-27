@@ -21,6 +21,7 @@ class gridGraph:
         nx.set_edge_attributes(self.graph, values=distanceBetweenNodes, name='weight')
         nx.set_node_attributes(self.graph,values=1, name='weight')
         nx.set_node_attributes(self.graph, values=-1, name='region')
+        nx.set_node_attributes(self.graph, values=0, name='displacement')
 
     def drawGraph(self):
         edge_labels = nx.get_edge_attributes(self.graph, 'weight')

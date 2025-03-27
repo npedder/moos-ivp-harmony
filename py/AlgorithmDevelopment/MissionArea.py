@@ -18,7 +18,7 @@ class MissionArea:
         self.cellDimension = cellDimension
         nrows = self.grid_visualizer.nrows
         ncols = self.grid_visualizer.ncols
-        self.vehicles = []
+        self.vehicles = [] # Used to represent vehicle start locations
         self.vehicle_assignments = {} # Key - vehicle as tuple: Value - assigned nodes as tuple
         self.grid_graph = gridGraph(nrows, ncols, cellDimension, scale="equal")
         self.neighbors = {}
@@ -87,17 +87,20 @@ class MissionArea:
     def add_vehicle_to_graph(self, node):
         if isinstance(node, UxV):
             node_label = node.position
+            node_orignal_pos = node.position
             if self.grid_graph.graph.has_node(node_label) is False:
                 node_label = self._normalize_vehicle_to_graph(node_label)
 
-            self.vehicles.append(node_label)
-            self.vehicle_assignments[node_label] = []
             nx.set_node_attributes(self.grid_graph.graph,
                                        {node_label: {'name': node.name, 'type': node.type, "position": node.position,
                                                         "speed": node.speed, "sensorRange": node.sensorRange,
                                                         "endurance": node.endurance, "color": node.color}})
             self.grid_graph.__update_pos__(node_label)
             self.grid_graph.graph.nodes[node_label]['region'] = node_label
+            self.grid_graph.graph.nodes[node_label]["originalPos"] = node_orignal_pos
+
+            self.vehicles.append(node_label)
+            self.vehicle_assignments[node_label] = []
 
 
     def add_vehicles_to_graph(self, vehicles):
@@ -134,14 +137,13 @@ class MissionArea:
         color_index = 2
         for vehicle_assignment in self.vehicle_assignments:
             for node in self.vehicle_assignments[vehicle_assignment]:
-                if node not in self.vehicles:
-                    top_node = self.grid_graph.graph.nodes[node]["top"]
-                    bottom_node = self.grid_graph.graph.nodes[node]["bottom"]
-                    num_cells_between = int((top_node[1] - bottom_node[1]) / self.cellDimension)
-                    for i in range(0, num_cells_between + 1):
-                        cell_to_change = (top_node[0], top_node[1] - self.cellDimension * i)
-                        index_tuple = (int((cell_to_change[0] - .5 * self.cellDimension) / self.cellDimension), int((cell_to_change[1] - .5 * self.cellDimension) / self.cellDimension))
-                        updated_grid[index_tuple[1], index_tuple[0]] = color_index
+                top_node = self.grid_graph.graph.nodes[node]["top"]
+                bottom_node = self.grid_graph.graph.nodes[node]["bottom"]
+                num_cells_between = int((top_node[1] - bottom_node[1]) / self.cellDimension)
+                for i in range(0, num_cells_between + 1):
+                    cell_to_change = (top_node[0], top_node[1] - self.cellDimension * i)
+                    index_tuple = (int((cell_to_change[0] - .5 * self.cellDimension) / self.cellDimension), int((cell_to_change[1] - .5 * self.cellDimension) / self.cellDimension))
+                    updated_grid[index_tuple[1], index_tuple[0]] = color_index
             color_index += 1
 
         # Rescale the updated grid
@@ -191,9 +193,9 @@ class MissionArea:
             closest_node = min(list(self.grid_graph.graph.nodes()), key=lambda n: distance.euclidean(vehiclePos, n))
             distance_from_graph = distance.euclidean(vehiclePos,closest_node)
             self.grid_graph.graph.nodes[closest_node]["displacement"] = distance_from_graph
-            self.grid_graph.graph.nodes[closest_node]["originalPos"] = vehiclePos
-
             return closest_node
+
+    # def number_of_vehicles_offset_from_node
 
 
 

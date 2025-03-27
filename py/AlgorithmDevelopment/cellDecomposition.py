@@ -14,7 +14,7 @@ def cell_decomposition(mission: MissionArea):
     cell_graph = nx.Graph() # A new graph that will hold a node representing each decomposed cell
     cell_graph_pos = {}
     removed_nodes = set()
-    center_nodes_old_neighbors = {} # A dictionary with key center cell and value of neighbors before decomp. Cam be used to determine bordering nodes
+    center_nodes_old_neighbors = {} # A dictionary with key center cell and value of neighbors before decomp. Can be used to determine bordering nodes
 
     # for region in mission.vehicle_assignments:
     #     decomposed_vehicle_assignments[region] = []
@@ -68,10 +68,13 @@ def cell_decomposition(mission: MissionArea):
 
             # Add vehicle node and make an edge between the vehicle and the cell containing it
             for vehicle in vehicles_in_cell:
-                _add_node_and_update_pos(cell_graph, cell_graph_pos, vehicle)
-                cell_graph.nodes[vehicle].update(mission.grid_graph.graph.nodes[vehicle])  # Update attributes
-                cell_graph.add_edge(vehicle, center_node)
-                cell_graph.add_edge(vehicle, center_node)
+                #_add_node_and_update_pos(cell_graph, cell_graph_pos, vehicle)
+                # Center node becomes new vehicle start location
+                cell_graph.nodes[center_node].update(mission.grid_graph.graph.nodes[vehicle])  # Transfer attributes to center node
+                cell_graph.nodes[center_node]['region'] = center_node
+                mission.vehicles[mission.vehicles.index(vehicle)] = center_node
+                mission.vehicle_assignments[center_node] = mission.vehicle_assignments.pop(vehicle)
+                mission.vehicle_assignments[center_node].append(center_node)
 
 
     center_nodes_grouped_by_x = group_by_x(set(cell_graph.nodes).difference(set(mission.vehicles))) # Makes it easier to find bordering cells
@@ -97,28 +100,12 @@ def cell_decomposition(mission: MissionArea):
 
 
     # Replace mission graph with new decomposed graph
-    for vehicle in mission.vehicles:
-        _add_node_and_update_pos(cell_graph, cell_graph_pos, vehicle)
-
     mission.grid_graph.graph = cell_graph
     mission.grid_graph.pos = cell_graph_pos
+
+    # for vehicle in mission.vehicles:
+    #     _add_node_and_update_pos(cell_graph, cell_graph_pos, normalized_vehicle)
     #mission.vehicle_assignments = decomposed_vehicle_assignments
-
-
-
-
-
-
-
-
-
-    # nx.draw(cell_graph, pos=cell_graph_pos,
-    #         with_labels=False,
-    #         node_color= 'pink',
-    #         edge_color="black",
-    #         node_size= 50,
-    #         font_color='yellow')
-
 
 
 
