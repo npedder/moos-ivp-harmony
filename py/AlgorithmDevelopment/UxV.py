@@ -17,5 +17,7 @@ class UxV:
         self.endurance = endurance # Maximum distance the vehicle can travel (e.g., miles or km)
         self.color = color # Vehicle color
 
+        if(speed < 0 or endurance < 0 or sensorRange < 0):
+            raise Exception("Speed endurance and sensor range cannot be negative, please reinput values.")
     def __repr__(self):
         return f"UxV(name={self.name}, type={self.type}, position={self.position}, speed={self.speed}, sensorRange={self.sensorRange}, endurance={self.endurance}, color={self.color})"
