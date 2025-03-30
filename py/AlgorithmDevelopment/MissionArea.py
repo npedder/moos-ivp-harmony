@@ -18,13 +18,14 @@ class MissionArea:
         self.cellDimension = cellDimension
         nrows = self.grid_visualizer.nrows
         ncols = self.grid_visualizer.ncols
-        self.vehicles = [] # Used to represent vehicle start locations
-        self.vehicle_assignments = {} # Key - vehicle as tuple: Value - assigned nodes as tuple
+        self.vehicles = []  # Used to represent vehicle start locations after translations
+        self.original_positions = {}  # Key - vehicle name: Value - original positions
+        self.vehicle_assignments = {}  # Key - vehicle as tuple: Value - assigned nodes as tuple
         self.grid_graph = gridGraph(nrows, ncols, cellDimension, scale="equal")
         self.neighbors = {}
         self.__remove_obstacle_nodes__()
 
-    def draw(self, show_neighbors=False, node_color=False, edge_color="dimgray", vehicles_colored=False):
+    def draw(self, show_neighbors=False, node_color=False, edge_color="dimgray", vehicles_colored=False, vehicle_paths={}):
 
         pos = self.grid_graph.pos
 
@@ -58,7 +59,18 @@ class MissionArea:
                     index = list(self.grid_graph.graph.nodes()).index(neighbor)
                     node_colors[index] = "turquoise"
 
+        if vehicle_paths:
+            self.grid_graph.graph.clear_edges()
+            for path in vehicle_paths:
+                nodes = vehicle_paths[path]
+                for i in range(len(nodes) - 1):
+                     self.grid_graph.graph.add_edge(nodes[i], nodes[i+1])
+            for i in range(len(self.vehicles)):
+                self.vehicles[i] = self.original_positions[self.vehicles[i]]
+
         node_size = [80 if node in self.vehicles else 10 for node in self.grid_graph.graph.nodes()]
+
+
         nx.draw(self.grid_graph.graph, pos=pos, ax=self.grid_visualizer.ax,
                 with_labels=False,
                 node_color=node_colors,
@@ -87,7 +99,7 @@ class MissionArea:
     def add_vehicle_to_graph(self, node):
         if isinstance(node, UxV):
             node_label = node.position
-            node_orignal_pos = node.position
+            node_original_pos = node.position
             if self.grid_graph.graph.has_node(node_label) is False:
                 node_label = self._normalize_vehicle_to_graph(node_label)
 
@@ -97,10 +109,11 @@ class MissionArea:
                                                         "endurance": node.endurance, "color": node.color}})
             self.grid_graph.__update_pos__(node_label)
             self.grid_graph.graph.nodes[node_label]['region'] = node_label
-            self.grid_graph.graph.nodes[node_label]["originalPos"] = node_orignal_pos
+            self.grid_graph.graph.nodes[node_label]["originalPos"] = node_original_pos
 
             self.vehicles.append(node_label)
             self.vehicle_assignments[node_label] = []
+            self.original_positions[node.name] = node_original_pos
 
 
     def add_vehicles_to_graph(self, vehicles):

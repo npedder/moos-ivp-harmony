@@ -75,6 +75,7 @@ def cell_decomposition(mission: MissionArea):
                 mission.vehicles[mission.vehicles.index(vehicle)] = center_node
                 mission.vehicle_assignments[center_node] = mission.vehicle_assignments.pop(vehicle)
                 mission.vehicle_assignments[center_node].append(center_node)
+                mission.original_positions[center_node] = cell_graph.nodes[center_node]["originalPos"]
 
 
     center_nodes_grouped_by_x = group_by_x(set(cell_graph.nodes).difference(set(mission.vehicles))) # Makes it easier to find bordering cells

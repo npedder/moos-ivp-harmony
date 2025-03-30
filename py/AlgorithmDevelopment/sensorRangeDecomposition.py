@@ -5,6 +5,7 @@ from cellDecomposition import group_by_x, _add_node_and_update_pos
 
 # Input: MissionArea
 # Combines cells to account for the sensor range of a vehicle. Done after assignments and cell decomposition
+# TODO: Sometimes a pass can have 3 nodes connected
 def sensor_range_decomposition(mission: MissionArea):
         new_graph = nx.Graph()
         new_pos = {}
@@ -41,6 +42,9 @@ def sensor_range_decomposition(mission: MissionArea):
         mission.grid_graph.pos = new_pos
         mission.vehicle_assignments = new_vehicle_assignments
 
+        for vehicle in mission.vehicles:
+                _add_node_and_update_pos(mission.grid_graph.graph, mission.grid_graph.pos, mission.original_positions[vehicle])
+
 
 
 
@@ -66,7 +70,7 @@ def _bfs_combine_bordering_cells(mission: MissionArea, region, start_node, combi
         while queue:
                 node = queue.popleft()
 
-                if node in mission.vehicles: visited.add(node)  # Ignore vehicles TODO: This may not work if vehicle is in center of cell
+                # if node in mission.vehicles: visited.add(node)  # Ignore vehicles TODO: This may not work if vehicle is in center of cell
                 if node not in mission.vehicle_assignments[region]: visited.add(node)  # ignore if not in same region
                 if node in combined_cells: visited.add(node)
 
