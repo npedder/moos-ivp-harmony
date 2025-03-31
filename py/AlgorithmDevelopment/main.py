@@ -53,7 +53,7 @@ vehicle_paths = calculate_vehicle_paths(mission_3)
 
 # Display result
 
-mission_3.draw(show_neighbors=False, node_color="white", vehicle_paths=vehicle_paths)
+mission_3.draw(show_neighbors=False, node_color="blue", edge_color="white", vehicle_paths=vehicle_paths)
 plt.show()
 
 

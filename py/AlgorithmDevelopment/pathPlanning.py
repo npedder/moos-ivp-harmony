@@ -14,12 +14,13 @@ def calculate_vehicle_paths(mission: MissionArea):
     for vehicle in mission.vehicles:
         vehicle_sorted_nodes = sort_by_x_then_y(list(mission.vehicle_assignments[vehicle]))
         vehicle_entrance_exit_pairs = {}  # Each entry node has a corresponding exit node
-        vehicle_graph = nx.Graph()
+        vehicle_graph = nx.DiGraph()
 
         vehicle_graph.add_node(mission.original_positions[vehicle])
         vehicle_entrance_exit_pairs[mission.original_positions[vehicle]] = mission.original_positions[vehicle]
 
         # Loop to determine whether pass is up or down
+        last_x = None
         topIsEntrance = True # A flag that will determine if node is entrance or exit. Alternates for each pass
         for i, node in enumerate(vehicle_sorted_nodes):
             if node != 0:  # 0 if pose is already determined:
@@ -39,13 +40,18 @@ def calculate_vehicle_paths(mission: MissionArea):
                         top_cell = neighbor
                         bottom_cell = node
 
+                    if last_x == node[0]:
+                        topIsEntrance = not topIsEntrance
+
                     if topIsEntrance:
                         vehicle_entrance_exit_pairs[top_cell] = bottom_cell
                     else:
                         vehicle_entrance_exit_pairs[bottom_cell] = top_cell
 
+
                     topIsEntrance = not topIsEntrance
 
+                    last_x = vehicle_sorted_nodes[i][0]
                     vehicle_sorted_nodes[i] = 0
                     vehicle_sorted_nodes[vehicle_sorted_nodes.index(neighbor)] = 0
 
@@ -53,7 +59,7 @@ def calculate_vehicle_paths(mission: MissionArea):
         for key in vehicle_entrance_exit_pairs.keys():
             vehicle_graph.add_node(key)
 
-        connect_nodes_in_graph_with_distances(vehicle_graph)
+        connect_nodes_in_graph_with_distances(vehicle_graph, vehicle_entrance_exit_pairs)
 
         # Find the order of traversal
         vehicle_paths[vehicle] = approx.simulated_annealing_tsp(vehicle_graph, "greedy", source=mission.original_positions[vehicle])
@@ -62,7 +68,7 @@ def calculate_vehicle_paths(mission: MissionArea):
 
         # Add exit nodes back in between each entrance node
         # Iterate over the vehicle paths
-        index = 0
+        index = 1
         while index < len(vehicle_paths[vehicle]) - 1:  # Ensure there's always an entrance node to pair with
             entrance_node = vehicle_paths[vehicle][index]
 
@@ -72,13 +78,15 @@ def calculate_vehicle_paths(mission: MissionArea):
             # Move index forward by 2 (because we just added an exit node after the entrance node)
             index += 2
 
-        del vehicle_paths[vehicle][0]
+        # del vehicle_paths[vehicle][0]
         print("Path")
         print(vehicle_paths[vehicle])
         print("Cost")
         print(cost)
 
+
     return vehicle_paths
+
 
 
 
@@ -103,13 +111,21 @@ def sort_by_x_then_y(tuples):
     return result
 
 
-def connect_nodes_in_graph_with_distances(G):
+def connect_nodes_in_graph_with_distances(G, entrance_exit_pairs):
     nodes = list(G.nodes())  # Get all nodes (which are tuples representing positions)
     num_nodes = len(nodes)
 
+    # Iterate twice, once for exit and entrance directions
     for i in range(num_nodes):
         for j in range(i + 1, num_nodes):  # Ensure each pair is processed only once
             x1, y1 = nodes[i]
-            x2, y2 = nodes[j]
+            x2, y2 = entrance_exit_pairs[nodes[j]]
+            distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)  # Euclidean distance
+            G.add_edge(nodes[i], nodes[j], weight=distance)
+
+    for i in range(num_nodes- 1, -1, -1):
+        for j in range(num_nodes -1, -1, -1):  # Ensure each pair is processed only once
+            x1, y1 = nodes[i]
+            x2, y2 = entrance_exit_pairs[nodes[j]]
             distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)  # Euclidean distance
             G.add_edge(nodes[i], nodes[j], weight=distance)
