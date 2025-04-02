@@ -1,14 +1,13 @@
 import matplotlib.pyplot as plt
 
-import missionLayouts
-from MissionArea import MissionArea, calculate_sensor_range_gcd
+from .MissionArea import MissionArea, calculate_sensor_range_gcd
 
-from cyclicRegionGrowth import cyclic_region_growth, calculate_optimal_tasks
+from .cyclicRegionGrowth import cyclic_region_growth, calculate_optimal_tasks
 # from region_fine_tuning
-from cellDecomposition import cell_decomposition
-from sensorRangeDecomposition import sensor_range_decomposition
-from pathPlanning import calculate_vehicle_paths
-from missionLayouts import *
+from .cellDecomposition import cell_decomposition
+from .sensorRangeDecomposition import sensor_range_decomposition
+from .pathPlanning import calculate_vehicle_paths
+from .missionLayouts import *
 
 # All the portions of the algorithm, condensed into a single method
 # Input: list of UxV objects, binary grid data, 0 is dead space, 1 is uncovered
@@ -16,7 +15,7 @@ from missionLayouts import *
 def generate_assignments(UxVs, grid_data, show_graph=False, mission_name="Mission"):
 
     # Create mission object containing graph information to be manipulated
-    cellDimension = calculate_sensor_range_gcd(uxvs) * 2
+    cellDimension = int(calculate_sensor_range_gcd(UxVs) * 2)
     mission = MissionArea(mission_name, grid_data, cellDimension)
     mission.add_vehicles_to_graph(UxVs)
 

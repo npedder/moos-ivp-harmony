@@ -1,9 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import networkx as nx
 from matplotlib.colors import ListedColormap, BoundaryNorm
-from gridGraph import gridGraph
-from gridArrayGenerator import genGrid
+
 
 
 class GridVisualizer:

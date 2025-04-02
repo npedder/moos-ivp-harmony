@@ -1,8 +1,8 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-from gridGraph import gridGraph
-from gridVisualizer import GridVisualizer
-from gridArrayGenerator import genGrid
+from .gridGraph import gridGraph
+from .gridVisualizer import GridVisualizer
+from .gridArrayGenerator import genGrid
 from UxV import UxV
 import math
 from scipy.spatial import distance
@@ -216,11 +216,11 @@ class MissionArea:
 
 def calculate_sensor_range_gcd(vehicles):
     if len(vehicles) < 2:
-        return vehicles[0].sensorRange
+        return int(vehicles[0].sensorRange)
 
-    gcd = math.gcd(vehicles[0].sensorRange, vehicles[1].sensorRange)
+    gcd = math.gcd(int(vehicles[0].sensorRange), int(vehicles[1].sensorRange))
     for i in range(2, len(vehicles)):
-        gcd = math.gcd(gcd, vehicles[i].sensorRange)
+        gcd = math.gcd(gcd, int(vehicles[i].sensorRange))
         print("GCD: ", gcd)
 
     return gcd

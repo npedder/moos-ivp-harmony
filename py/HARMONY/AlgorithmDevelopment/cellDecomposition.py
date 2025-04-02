@@ -1,4 +1,4 @@
-from MissionArea import MissionArea
+from .MissionArea import MissionArea
 import networkx as nx
 
 

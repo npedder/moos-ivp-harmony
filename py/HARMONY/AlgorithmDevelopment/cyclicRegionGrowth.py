@@ -1,4 +1,4 @@
-import MissionArea
+from .MissionArea import MissionArea
 import math
 
 

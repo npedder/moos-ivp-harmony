@@ -1,7 +1,7 @@
-from MissionArea import MissionArea
+from .MissionArea import MissionArea
 import networkx as nx
 from collections import deque
-from cellDecomposition import group_by_x, _add_node_and_update_pos
+from .cellDecomposition import group_by_x, _add_node_and_update_pos
 
 # Input: MissionArea
 # Combines cells to account for the sensor range of a vehicle. Done after assignments and cell decomposition
