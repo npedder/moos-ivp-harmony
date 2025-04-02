@@ -64,5 +64,5 @@ venv*/
 
 # Buildable vehicle files 
 vehicle_*.*
-
+uav_*.*
 
