@@ -72,16 +72,18 @@ class MOOSHandler:
             match msg.key():
                 case "HARMONY_REPORT":
                     vehicle = utils.parseHarmonyReportAndCreateVehicle(msg.string())
-                    if vehicle.type == 'UUV' or 'glider':
+                    if vehicle.type == 'UUV':
                         if vehicle and vehicle.name not in self.available_vehicles:
                             self.available_vehicles[vehicle.name] = vehicle
                             print("Updated vehicles:", self.available_vehicles)
                         if vehicle.sensorRange not in self.sensor_ranges:
                             self.sensor_ranges.append(int(vehicle.sensorRange))
-                    # if vehicle.type == 'glider':
-                    #     if vehicle and vehicle.name not in self.available_uavs:
-                    #         self.available_uavs[vehicle.name] = vehicle
-                    #         print("Updated UAVs:", self.available_uavs)
+                    if vehicle.type == 'glider':
+                        if vehicle and vehicle.name not in self.available_uavs:
+                             self.available_uavs[vehicle.name] = vehicle
+                             print("Updated UAVs:", self.available_uavs)
+                        if vehicle.sensorRange not in self.sensor_ranges:
+                            self.sensor_ranges.append(int(vehicle.sensorRange))
 
                     # TO-DO: SET UAVS AND UUVS TO SEPARATE LISTS
 
@@ -107,6 +109,11 @@ class MOOSHandler:
                         self.available_vehicles[vehicle.name].y = vehicle.position[1]
                         self.available_vehicles[vehicle.name].color = vehicle.color
                         #print("Updated vehicles:", self.available_vehicles)
+                    if vehicle and vehicle.name in self.available_uavs:
+                        self.available_uavs[vehicle.name].x = vehicle.position[0]
+                        self.available_uavs[vehicle.name].y = vehicle.position[1]
+                        self.available_uavs[vehicle.name].color = vehicle.color
+                        #print("Updated vehicles:", self.available_vehicles)
 
                 case "STATUS":
                     uav_complete = utils.parseStatusAndCreateObject(msg.string())
@@ -114,7 +121,7 @@ class MOOSHandler:
                         if int(uav_complete.status) > 2:
                             print(uav_complete.name, " Completed!")
                             self.completed_uavs[uav_complete.name] = uav_complete
-                    if len(self.completed_uavs) == 3:
+                    if len(self.completed_uavs) == len(self.available_uavs):
                         print("All UAVs finished")
                         # This is where we would run the UUV algorithm 
 
