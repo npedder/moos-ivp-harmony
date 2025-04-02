@@ -62,25 +62,27 @@ def calculate_vehicle_paths(mission: MissionArea):
         connect_nodes_in_graph_with_distances(vehicle_graph, vehicle_entrance_exit_pairs)
 
         # Find the order of traversal
-        vehicle_paths[vehicle] = approx.simulated_annealing_tsp(vehicle_graph, "greedy", source=mission.original_positions[vehicle])
-        cost = sum(vehicle_graph[n][nbr]["weight"] for n, nbr in nx.utils.pairwise(vehicle_paths[vehicle]))
+        name_key = [key for key, val in mission.original_positions.items() if isinstance(key, str) and val == mission.original_positions[vehicle]]
+        vehicle_paths[name_key[0]] = approx.simulated_annealing_tsp(vehicle_graph, "greedy", source=mission.original_positions[vehicle])
+        cost = sum(vehicle_graph[n][nbr]["weight"] for n, nbr in nx.utils.pairwise(vehicle_paths[name_key[0]]))
 
 
         # Add exit nodes back in between each entrance node
         # Iterate over the vehicle paths
         index = 1
-        while index < len(vehicle_paths[vehicle]) - 1:  # Ensure there's always an entrance node to pair with
-            entrance_node = vehicle_paths[vehicle][index]
+        while index < len(vehicle_paths[name_key[0]]) - 1:  # Ensure there's always an entrance node to pair with
+            entrance_node = vehicle_paths[name_key[0]][index]
 
             # Insert the exit node after the entrance node
-            vehicle_paths[vehicle].insert(index + 1, vehicle_entrance_exit_pairs[entrance_node])
+            # TODO: Messy fix, data type changes are required to truly fix
+            vehicle_paths[name_key[0]].insert(index + 1, vehicle_entrance_exit_pairs[entrance_node])
 
             # Move index forward by 2 (because we just added an exit node after the entrance node)
             index += 2
 
         # del vehicle_paths[vehicle][0]
         print("Path")
-        print(vehicle_paths[vehicle])
+        print(vehicle_paths[name_key[0]])
         print("Cost")
         print(cost)
 

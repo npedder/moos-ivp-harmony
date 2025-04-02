@@ -19,6 +19,7 @@ class MissionArea:
         nrows = self.grid_visualizer.nrows
         ncols = self.grid_visualizer.ncols
         self.vehicles = []  # Used to represent vehicle start locations after translations
+        self.names_to_current_positions = {}    # TODO: A bandaid fix to losing track of vehicle names. needed for path planning
         self.original_positions = {}  # Key - vehicle name: Value - original positions
         self.vehicle_assignments = {}  # Key - vehicle as tuple: Value - assigned nodes as tuple
         self.grid_graph = gridGraph(nrows, ncols, cellDimension, scale="equal")
@@ -223,6 +224,8 @@ def calculate_sensor_range_gcd(vehicles):
         print("GCD: ", gcd)
 
     return gcd
+
+
 
 if __name__ == '__main__':
 
