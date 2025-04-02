@@ -229,7 +229,7 @@ class MOOSHandler:
                 else:
                     self.notify("VIEW_SEGLIST",
                                 f'{points.string()},label={name}_wpt_survey, edge_color={color}, edge_size=2')  # Displays waypoints before deployment
-                    self.notify(wpt_var, assignment)
+                    self.notify(wpt_var, waypoints_str)
 
 
 

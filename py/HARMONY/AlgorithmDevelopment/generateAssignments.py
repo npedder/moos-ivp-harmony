@@ -17,8 +17,9 @@ def generate_assignments(UxVs, grid_data, show_graph=False, mission_name="Missio
     # Create mission object containing graph information to be manipulated
     cellDimension = int(calculate_sensor_range_gcd(UxVs) * 2)
     mission = MissionArea(mission_name, grid_data, cellDimension)
-    mission.add_vehicles_to_graph(UxVs)
 
+    mission.add_vehicles_to_graph(UxVs)
+    mission.draw()
     cell_decomposition(mission)
 
     cyclic_region_growth(mission)
