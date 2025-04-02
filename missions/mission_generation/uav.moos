@@ -84,6 +84,7 @@ ProcessConfig = uProcessWatch
 	nowatch   = uQueryDB*
 	nowatch   = uXMS*
 	nowatch   = uMAC*
+
 }
 
 //----------------------------------------------------------------------------
@@ -114,7 +115,7 @@ ProcessConfig = pHelmIvP
 
   behaviors  = $(BHV)
   domain     = course:0:359:360
-  domain     = speed:0:$(SPEED):50
+  domain     = speed:0:$(SPEED):50S
   //ok_skew=any
 }
 
@@ -179,6 +180,7 @@ ProcessConfig = uFldNodeBroker
     bridge = src=APPCAST
     bridge = src=HARMONY_REPORT
     bridge = src=NODE_REPORT_LOCAL, alias=NODE_REPORT
+    bridge = src=STATUS
   }
 //------------
 
@@ -200,7 +202,10 @@ ProcessConfig = pShare
    CommsTick  = 4
    
    paused = false
-   reset_time = 1
-   event = var =HARMONY_REPORT, val = "NAME=$(VNAME),TYPE=glider,X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
+   reset_time = none
+   reset_var = RETURN
 
+   event = var = HARMONY_REPORT, val = "NAME=$(VNAME),TYPE=glider,X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
+   event = var = STATUS, val = "NAME=$(VNAME), STATUS=$[TCOUNT]"
  }
+

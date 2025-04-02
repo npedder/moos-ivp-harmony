@@ -27,7 +27,7 @@ Behavior = BHV_Waypoint
 	wptflag = TEST=$(X),$(Y)
 	wptflag = OSPOS=$(OSX),$(OSY)
 	wptflag_on_start = true
-
+  
   updates    = WPT_UPDATE
   perpetual  = true
 
@@ -42,15 +42,17 @@ Behavior = BHV_Waypoint
          slip_radius = 15.0
 	efficiency_measure = all
 	         //  polygon = 60,-40:60,-160:150,-160:180,-100:150,-40
-		//points = WPT_UPDATES
-			
+	//points = WPT_UPDATE
+	//points = 10,10 : 20,20 : 30,10 : 40,0
                order = normal
              repeat  = 0
 
     visual_hints = nextpt_color=yellow
     visual_hints = nextpt_vertex_size=8
     visual_hints = nextpt_lcolor=gray70
-    visual_hints = vertex_color=dodger_blue, edge_color=white
+    //visual_hints = vertex_color=dodger_blue, edge_color=white
+    visual_hints = vertex_color = crimson
+    visual_hints = edge_color = crimson
     visual_hints = vertex_size=5, edge_size=1
 }
 

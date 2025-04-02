@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.patches as patches
 import random
-
+import math
+from Status import Status
 
 
 def parseNodeReportAndCreateVehicle(nodeReport):
@@ -33,6 +34,7 @@ def parseNodeReportAndCreateVehicle(nodeReport):
 
 def parseHarmonyReportAndCreateVehicle(nodeReport):
     # Regular expression to extract NAME, LAT, and LON
+    print("HARMONY REPORT: ", nodeReport)
     pattern = r"NAME=([^,]+),.*TYPE=([^,]+),.*X=([-\d.]+),.*Y=([-\d.]+),.*SPD=([-\d.]+),.*ENDURANCE=([-\d.]+),.*SENSOR_RANGE=([-\d.]+)"
 
     # Search for the match
@@ -57,10 +59,9 @@ def parseHarmonyReportAndCreateVehicle(nodeReport):
         print("Pattern not found in the string.")
         return None
 
-def parseSurveyAreaAndCreateObject(survey_msg):
+def parseSurveyAreaAndCreateObject(survey_msg, gcd):
     # Regular expression to extract NAME, LAT, and LON
     pattern = r"WIDTH=([^,]+),.*HEIGHT=([-\d.]+),.*X_POS=([-\d.]+),.*Y_POS=([-\d.]+)"
-
 
     # Search for the match
     match = re.search(pattern, survey_msg)
@@ -71,8 +72,12 @@ def parseSurveyAreaAndCreateObject(survey_msg):
         x_pos = float(match.group(3))
         y_pos = float(match.group(4))
 
-        # print(f"Height: {height}")
-        # print(f"Width: {width}")
+        # rounding width and height to match sensor range
+        width = math.ceil(width / gcd) * gcd
+        height = width = math.ceil(width / gcd) * gcd
+
+        print(f"Height: {height}")
+        print(f"Width: {width}")
         # print(f"X_pos: {x_pos}")
         # print(f"Y_pos: {y_pos}")
 
@@ -142,3 +147,26 @@ def plotAssignments(vehicleAssignments: dict, vehicles: dict, totalSurvey: Surve
     ax.set_title("Vehicle Assignments")
 
     plt.show()
+
+def gcd_of_list(numList):
+    gcd = math.gcd(numList[0], numList[1])
+    for i in range(2, len(numList)):
+        gcd = math.gcd(gcd, numList[i])
+        print("GCD: ", gcd)
+    return gcd
+
+
+def parseStatusAndCreateObject(status_msg):
+    pattern = r"NAME=([^,]+),.*STATUS=([^,]+)"
+
+    match = re.search(pattern, status_msg)
+    if match:
+        name = match.group(1)
+        status = match.group(2)
+
+        vehicleStatus = Status(name, status)
+        return vehicleStatus
+    else:
+        print("Pattern not found in the string.")
+        return None
+
