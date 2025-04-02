@@ -1,6 +1,6 @@
 initialize   DEPLOY = false
 initialize   RETURN = false
-	
+
 //----------------------------------------------
 Behavior = BHV_Waypoint
 { 
@@ -9,6 +9,7 @@ Behavior = BHV_Waypoint
   condition = RETURN = false
   condition = DEPLOY = true
   endflag   = RETURN = true
+  endflag = SURVEY_DONE = true
 
 	//endflag   = SUMMARY=speed=$[SPEED],time=$[DUR_RUN_TIME]
 	
@@ -69,13 +70,13 @@ Behavior=BHV_Waypoint
 {
   name      = waypt_return
   pwt       = 100
-  condition = RETURN = true
-  condition = DEPLOY = true
+  condition = RETURN           = true
+  condition = DEPLOY           = true
   perpetual = true
   updates   = RETURN_UPDATE
-  endflag   = RETURN = false
-  endflag   = DEPLOY = false
-  endflag   = MISSION = complete
+  endflag   = RETURN           = false
+  endflag   = DEPLOY           = false
+  endflag   = MISSION          = complete
 	
            speed = 2.0
   capture_radius = 2.0

@@ -9,7 +9,6 @@ Behavior = BHV_Waypoint
   condition = RETURN = false
   condition = DEPLOY = true
   endflag   = RETURN = true
-
 	//endflag   = SUMMARY=speed=$[SPEED],time=$[DUR_RUN_TIME]
 	
 	//configflag = CRUISE_SPD = $[SPEED]
@@ -82,8 +81,7 @@ Behavior=BHV_ConstantSpeed
   updates   = SPEED_UPDATE
   endflag   = SPD = false
 
-           speed = 0.5
+           speed = $(SPEED)
 		    duration = 10
 	duration_reset = CONST_SPD_RESET=true
-	
 }

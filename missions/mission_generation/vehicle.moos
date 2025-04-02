@@ -100,8 +100,10 @@ ProcessConfig = uSimMarineV22
   start_pos     = $(START_X), $(START_Y), $(HEADING), 0
   prefix        = NAV
   turn_rate     = 95
-  thrust_map    = 0:0, 20:1, 100:$(SPEED)
+  thrust_map    = 100:$(SPEED)
+  //thrust_map    = 0:0, 20:1, 100:$(SPEED)
 	turn_spd_loss = 0.4
+  //NAV_SPEED     = $(SPEED)
 }
 
 //------------------------------------------
@@ -179,6 +181,7 @@ ProcessConfig = uFldNodeBroker
     bridge = src=APPCAST
     bridge = src=HARMONY_REPORT
     bridge = src=NODE_REPORT_LOCAL, alias=NODE_REPORT
+    bridge = src=STATUS
   }
 //------------
 
@@ -199,8 +202,10 @@ ProcessConfig = pShare
    AppTick    = 4
    CommsTick  = 4
    
-   paused = false
-   reset_time = 1
+   paused     = false
+   reset_time = none
+   reset_var  = RETURN
    event = var =HARMONY_REPORT, val = "NAME=$(VNAME),TYPE=UUV,X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
 
  }
+
