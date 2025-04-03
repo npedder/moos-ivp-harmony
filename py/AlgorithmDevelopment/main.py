@@ -30,12 +30,10 @@ mission_3.add_vehicle_to_graph(uxv4)
 cell_decomposition(mission_3)
 bals = cyclic_region_growth(mission_3)
 print("Balances post reigon growth: " + str(bals))
-region_fine_tuning(mission_3, 0, bals)
+region_fine_tuning(mission_3, 300, bals)
 
 # Display result pre-fine tuning
 mission_3.draw(show_neighbors=True)
-plt.show()
-
 
 
 

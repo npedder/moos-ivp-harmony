@@ -1,4 +1,6 @@
 import MissionArea
+from collections import defaultdict
+import heapq
 
 # Pre-condition: A mission area, the number of iterations the fine tuning should run for, and the account balances
 #                for the vehicles/regions
@@ -6,17 +8,42 @@ import MissionArea
 def region_fine_tuning (mission, iterations, account_balances):
     graph = mission.grid_graph.graph
     i = iterations
-    untradeablePairs = dict() # set of two regions to a value true
+    pairsTimeOut = dict() # frozen set of two regions to a counter for how many turns they are in time out (if untradeable)
+
     regionNeighborNodes = find_neighbor_nodes(mission)
     while(i > 0):
-        # Region with the highest balance is set to be the buyer
-        # Out of neighbors of the buyer, the one with the most debt will be the seller
-        buyer = max(range(len(account_balances)), key=lambda index: account_balances[index])
-        seller_key = min(regionNeighborNodes[buyer], key=lambda node_key: account_balances[graph.nodes[node_key]['region']])
-        seller = graph.nodes[seller_key]['region']
-  
+        # Select buyer and seller
+        pairFound = False
+        kthBestBuyer = 1 # Increase to get next largest
+        kthBestSeller = 1 # Increase to get next smallest
+
+        # Update timeouts each iteration
+        for pair in pairsTimeOut.keys():
+            if pairsTimeOut[pair] > 0:
+                pairsTimeOut[pair] -= 1
+
+        print("Selecting seller and buyer...")
+        while pairFound == False:
+            buyer = heapq.nlargest(kthBestBuyer, range(len(account_balances)), key=lambda i: account_balances[i])[-1]
+            sellerKey = heapq.nsmallest(kthBestSeller, regionNeighborNodes[buyer], key=lambda node_key: account_balances[graph.nodes[node_key]['region']])[-1]
+            seller = graph.nodes[sellerKey]['region']
+            try:
+                tradeable = pairsTimeOut[frozenset({buyer, seller})] == 0
+            except KeyError:
+                tradeable = True
+            if tradeable == False:
+                print("Pair is on timeout, searhcing for next best pair")
+            if tradeable:
+                pairFound = True
+                print("Seller and buyer successfully found")
+            else: 
+                if kthBestBuyer == kthBestSeller:
+                    kthBestBuyer += 1
+                else: 
+                    kthBestSeller += 1
+        print("================================================")
         # Find tasks to trade and update vehicle assignments
-        keptNodes = find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances, untradeablePairs)
+        keptNodes = find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances, pairsTimeOut)
         mission.vehicle_assignments[mission.vehicles[buyer]] =  mission.vehicle_assignments[mission.vehicles[buyer]].union(mission.vehicle_assignments[mission.vehicles[seller]]) - keptNodes
         mission.vehicle_assignments[mission.vehicles[seller]] = keptNodes
 
@@ -57,7 +84,7 @@ def region_fine_tuning (mission, iterations, account_balances):
 # Post-condition: Returns the subtree that when kept by the seller region, leads to an ideal transaction,
 #                 otherwise if no trees are found that lead to an ideal transaction, no trade occurs and pair is marked
 #                 untradeable for some amount of iterations
-def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances, untradeablePairs) :
+def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances, pairsTimeOut) :
     graph = mission.grid_graph.graph
     print("Entering finding kept nodes")
     # Largest cell in the set of buyer that belongs to the seller is selected for candidate trade
@@ -71,7 +98,7 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
     if not buyerNeighborsInSeller:
         # return empty and mark the pair as untradable
         print("Pairs are untradeable")
-        untradeablePairs[(buyer, seller)] = True
+        pairsTimeOut[frozenset({buyer, seller})] = 3
         return mission.vehicle_assignments[mission.vehicles[seller]]
     
     largest_weight_node = max(buyerNeighborsInSeller, key=lambda node_key: graph.nodes[node_key]['weight'])
@@ -99,8 +126,8 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
             if neighbor not in visited and neighbor != candidate:
                 stack.append(neighbor)
 
-    print("Nodes visited: " + str(visited))
-    print("Seller assignments " + str(mission.vehicle_assignments[mission.vehicles[seller]]))
+    # print("Nodes visited: " + str(visited))
+    # print("Seller assignments " + str(mission.vehicle_assignments[mission.vehicles[seller]]))
 
     if mission.vehicle_assignments[mission.vehicles[seller]] - {candidate} == visited:
         isCutPoint = False
@@ -109,7 +136,7 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
     
     if isCutPoint:
         print("Candidate is the cut point, searching q subtrees")
-        return find_q_subtrees(candidate, mission, buyer, seller, account_balances, sellerRegionSubgraph)
+        return find_q_subtrees(candidate, mission, buyer, seller, account_balances, sellerRegionSubgraph, pairsTimeOut)
     else:
         print("Candidate is not the cut point, using candidate as trade")
         print("Candidate weight: " + str(graph.nodes[candidate]['weight']))
@@ -117,51 +144,57 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
         account_balances[seller] = account_balances[seller] + graph.nodes[candidate]['weight']
         return mission.vehicle_assignments[mission.vehicles[seller]] - {candidate}
 
-def find_q_subtrees(candidate, mission, buyer, seller, account_balances, sellerRegionSubgraph):
+def find_q_subtrees(candidate, mission, buyer, seller, account_balances, sellerRegionSubgraph, pairsTimeOut):
     print("========================================================")
-    stack = [candidate]
-    visited = set()
-    bestTradeIndex = float('inf') # Set to high number to start
 
-    # DFS Traversal of all subtrees from the selected root node to determine the best trade
-    # ** NOTE ** Avoids loops by using a visited node
-    while stack:
-        node = stack.pop()
-        print("========================================================")
-        print("Searching all subtrees from root node: " + str(node))
-        # print("Visiting node: " + str(node))
-        if node not in visited:
-            visited.add(node)
-        
+    bestTradeIndex = float('inf')
+    bestTradeSum = 0
+    bestTrade = {}
+
+    for neighbor in sellerRegionSubgraph[candidate]:
+        stack = [neighbor]
+        visited = set()
+        # DFS Traversal of all subtrees from the selected root node to determine the best trade
+        # ** NOTE ** Avoids loops by using a visited node
+        while stack:
+            node = stack.pop()
+            if node not in visited:
+                visited.add(node)
+            for neighbor in sellerRegionSubgraph[node]:
+                if neighbor not in visited and neighbor != candidate:
+                    stack.append(neighbor)
+
         candidateTrade = mission.vehicle_assignments[mission.vehicles[seller]] - visited
         tradeSum = sum_weights(mission, candidateTrade)
         currTradeIndex = max(abs(account_balances[buyer] - tradeSum), abs(account_balances[seller] + tradeSum))
-        
         if currTradeIndex < bestTradeIndex:
             print("The current trade index: " + str(currTradeIndex) + " is less than the best trade index: "
             + str(bestTradeIndex))
             print("Thus current trade is the new best trade.")
             print("Buyer's balance: " + str(account_balances[buyer] - tradeSum))
-            print("Seller's balance: " + str(account_balances[seller] - tradeSum))
+            print("Seller's balance: " + str(account_balances[seller] + tradeSum))
             print("Trade sum: " + str(tradeSum))
             bestTradeIndex = currTradeIndex
             bestTradeSum = tradeSum
             bestTrade = visited.copy()
         else:
             print("Candidate trade is not better than best trade")
-            print("Buyer's balance: " + str(account_balances[buyer] - bestTradeSum))
-            print("Seller's balance: " + str(account_balances[seller] - bestTradeSum))
+            print("Buyer's balance would have been: " + str(account_balances[buyer] - tradeSum))
+            print("Seller's balance would have been: " + str(account_balances[seller] + tradeSum))
+            print("Trade sum: " + str(tradeSum))
 
-        # print("Neighbor nodes: " + str(regionSubgraph[node]))
-        for neighbor in sellerRegionSubgraph[node]:
-            # print("Appending node: " + str(neighbor))
-            if neighbor not in visited:
-                stack.append(neighbor)
-        # print("Seller nodes: " + str(set(mission.vehicle_assignments[mission.vehicles[seller]])))
+    if max(abs(account_balances[buyer]), abs(account_balances[seller])) < bestTradeIndex:
+        # mark pair as untradeable for 3 turns
+        pairsTimeOut[frozenset({buyer, seller})] = 3
+        # Don't make the trade
+        print("No available trades are better, trading nothing and moving on")
+        print("=============================================================")
+        return mission.vehicle_assignments[mission.vehicles[seller]]
 
     account_balances[buyer] = account_balances[buyer] - bestTradeSum
     account_balances[seller] = account_balances[seller] + bestTradeSum
     print("Trading " + str(bestTradeSum) + " from the seller to the buyer")
+    print("=============================================================")
     return bestTrade
 
 
@@ -189,6 +222,6 @@ def sum_weights(mission, subgraph):
     for node_key in subgraph:
         node_data = graph.nodes[node_key]
         weightSum += node_data['weight']
-        print("\t" + str(node_data['weight']) + " + ", end="")
+        # print("\t" + str(node_data['weight']) + " + ", end="")
     print("\n\t" + str(weightSum))
     return weightSum
