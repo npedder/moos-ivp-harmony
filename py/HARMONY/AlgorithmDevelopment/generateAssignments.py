@@ -15,11 +15,10 @@ from .missionLayouts import *
 def generate_assignments(UxVs, grid_data, show_graph=False, mission_name="Mission"):
 
     # Create mission object containing graph information to be manipulated
-    cellDimension = int(calculate_sensor_range_gcd(UxVs) * 2)
+    cellDimension = int(calculate_sensor_range_gcd(UxVs))
     mission = MissionArea(mission_name, grid_data, cellDimension)
 
     mission.add_vehicles_to_graph(UxVs)
-    mission.draw()
     cell_decomposition(mission)
 
     cyclic_region_growth(mission)

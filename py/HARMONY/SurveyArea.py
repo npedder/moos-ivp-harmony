@@ -15,7 +15,7 @@ class SurveyArea:
 
         # Return the corners in order
 
-        grid = f"pts={{{self.position[0]},{self.position[1]}:{top_left[0]},{top_left[1]}:{top_right[0]},{top_right[1]}:{bottom_right[0]},{bottom_right[1]}}},label='{label}', msg='{label}'"
+        grid = f"pts={{{self.position[0]},{self.position[1]}:{top_left[0]},{top_left[1]}:{top_right[0]},{top_right[1]}:{bottom_right[0]},{bottom_right[1]}}},label='{label}',msg='{label},cell_size=5"
         return grid
 
 

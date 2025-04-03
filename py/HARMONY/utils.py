@@ -74,7 +74,7 @@ def parseSurveyAreaAndCreateObject(survey_msg, gcd):
 
         # rounding width and height to match sensor range
         width = math.ceil(width / gcd) * gcd
-        height = width = math.ceil(width / gcd) * gcd
+        height = math.ceil(height / gcd) * gcd
 
         print(f"Height: {height}")
         print(f"Width: {width}")
