@@ -202,9 +202,8 @@ ProcessConfig = pShare
    AppTick    = 4
    CommsTick  = 4
    
-   paused     = false
-   reset_time = none
-   reset_var  = RETURN
+   paused = false
+   reset_time = 1
    event = var =HARMONY_REPORT, val = "NAME=$(VNAME),TYPE=UUV,X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
 
  }

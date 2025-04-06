@@ -64,7 +64,6 @@ bool ReturnSignal::OnNewMail(MOOSMSG_LIST &NewMail)
       m_received_return = true;
       }
     else if(value == "false"){
-      m_community_name = msg.GetCommunity(); // or msg.GetDouble() depending on use
       m_received_return = false;
     }
     }

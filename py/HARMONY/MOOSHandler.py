@@ -78,13 +78,13 @@ class MOOSHandler:
                     if vehicle.type == 'UUV':
                         if vehicle and vehicle.name not in self.available_vehicles:
                             self.available_vehicles[vehicle.name] = vehicle
-                            print("Updated vehicles:", self.available_vehicles)
+                            print("Added UUV:", vehicle)
                         if vehicle.sensorRange not in self.sensor_ranges:
                             self.sensor_ranges.append(int(vehicle.sensorRange))
                     if vehicle.type == 'glider':
                         if vehicle and vehicle.name not in self.available_uavs:
                              self.available_uavs[vehicle.name] = vehicle
-                             print("Updated UAVs:", self.available_uavs)
+                             print("Added UAVs:", vehicle)
                         if vehicle.sensorRange not in self.sensor_ranges:
                             self.sensor_ranges.append(int(vehicle.sensorRange))
 
@@ -92,12 +92,12 @@ class MOOSHandler:
 
                 case "SURVEY_AREA":
                     # Rounding Survey Area to match sensor ranges
-                    print("SENSOR RANGES: " + str(self.sensor_ranges))
+                    # print("SENSOR RANGES: " + str(self.sensor_ranges))
                     if len(self.sensor_ranges) > 1:
                         self.gcd = utils.gcd_of_list(self.sensor_ranges)
                     elif len(self.sensor_ranges) == 1:
                         self.gcd = self.sensor_ranges[0]
-                    print("GCD: " + str(self.gcd))
+                    # print("GCD: " + str(self.gcd))
 
                     self.survey_area = utils.parseSurveyAreaAndCreateObject(msg.string(), self.gcd)
                     self.survey_area_land = utils.parseSurveyAreaAndCreateObject(msg.string(), self.gcd)
@@ -122,7 +122,7 @@ class MOOSHandler:
                     uav_complete = utils.parseStatusAndCreateObject(msg.string())
                     if uav_complete.name not in self.completed_uavs:
                         if int(uav_complete.status) > 2:
-                            print(uav_complete.name, " Completed!")
+                            print(uav_complete.name, " Completed!-------------------------------------------------")
                             self.completed_uavs[uav_complete.name] = uav_complete
                     if len(self.completed_uavs) == len(self.available_uavs):
                         print("All UAVs finished")

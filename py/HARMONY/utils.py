@@ -33,8 +33,7 @@ def parseNodeReportAndCreateVehicle(nodeReport):
         return None
 
 def parseHarmonyReportAndCreateVehicle(nodeReport):
-    # Regular expression to extract NAME, LAT, and LON
-    print("HARMONY REPORT: ", nodeReport)
+    # Regular expression to extract NAME, LAT, and LONRun = uTimerScript @ NewConsole = false
     pattern = r"NAME=([^,]+),.*TYPE=([^,]+),.*X=([-\d.]+),.*Y=([-\d.]+),.*SPD=([-\d.]+),.*ENDURANCE=([-\d.]+),.*SENSOR_RANGE=([-\d.]+)"
 
     # Search for the match
@@ -75,11 +74,6 @@ def parseSurveyAreaAndCreateObject(survey_msg, gcd):
         # rounding width and height to match sensor range
         width = math.ceil(width / gcd) * gcd
         height = math.ceil(height / gcd) * gcd
-
-        print(f"Height: {height}")
-        print(f"Width: {width}")
-        # print(f"X_pos: {x_pos}")
-        # print(f"Y_pos: {y_pos}")
 
         surveyArea = SurveyArea(width, height, (x_pos, y_pos));
         return surveyArea
@@ -152,7 +146,6 @@ def gcd_of_list(numList):
     gcd = math.gcd(numList[0], numList[1])
     for i in range(2, len(numList)):
         gcd = math.gcd(gcd, numList[i])
-        print("GCD: ", gcd)
     return gcd
 
 

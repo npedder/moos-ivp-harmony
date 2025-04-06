@@ -39,7 +39,7 @@ class ReturnSignal : public AppCastingMOOSApp
  protected: // App-specific functions / parameters
    void RegisterVariables();           // Registers variables published to the community
 
-   string m_community;
+   std::string m_community_name; 
    bool m_received_return;
    bool m_received_community;
 

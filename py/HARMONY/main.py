@@ -41,6 +41,7 @@ def main():
             # print(moos_handler.survey_area.areaToGrid())
             moos_handler.assign_waypoints_and_notify_uavs()
             while(len(moos_handler.completed_uavs) != len(moos_handler.available_uavs)):
+                messages = moos_handler.fetch_messages()
                 moos_handler.parse_incoming_messages(messages);
                 time.sleep(1)
             moos_handler.assign_waypoints_and_notify_uuvs()
