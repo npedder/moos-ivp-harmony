@@ -216,6 +216,74 @@ class MOOSHandler:
                     self.notify(wpt_var, waypoints_str)
 
 
+    def assign_waypoints_and_notify_uavs(self):
+        # Run if dict not empty
+        if self.available_uavs and not self.vehicles_turn:
+            # Create a 2d array of 1's for vehicles in survey area. '1' is unassigned space
+            height = int(self.survey_area.height / self.gcd)
+            width = int(self.survey_area.width / self.gcd)
+            grid_data = np.ones((height, width), dtype=int)
+            uav_assignments = generate_assignments(list(self.available_uavs.values()), grid_data, show_graph=True)
+
+            print("UAVs Assignments:", uav_assignments)
+
+            # Notify MOOSDB with the waypoint updates
+            for count, (name, assignment) in enumerate(uav_assignments.items()):
+                # assignment.reposition();
+
+                points = Points(assignment, self.survey_area.position[0], self.survey_area.position[1])
+                waypoints_str = points.string()
+                print(f"current vehicle: {name}, waypoints: {waypoints_str} ")
+                color = self.available_uavs[name].color
+                wpt_var = f"{name}_WPT_UPDATE"
+                print(f"SENDING {waypoints_str} to {wpt_var}")
+                self.notify(wpt_var, waypoints_str)
+
+                # color = colors[count % len(colors)]  # for waypoint color
+
+                print(f"SENDING {points.string()} to {wpt_var}")
+
+                if len(assignment) == 0:  # No waypoint assigned because survey area is too large
+                    print("Waypoint notifications not sent because uav area assignment = 0")
+                    self.notify("VIEW_SEGLIST",
+                                f'{points.seglist_string()},label={name}_wpt_survey, active=false')  # removes any prior waypoint visuals
+                else:
+                    self.notify("VIEW_SEGLIST",
+                                f'{points.seglist_string()},label={name}_wpt_survey, edge_color={color}, edge_size=2')  # Displays waypoints before deployment
+                    self.notify(wpt_var, waypoints_str)
+
+    def assign_waypoints_and_notify_uuvs(self):
+        # Create a 2d array of 1's for vehicles in survey area. '1' is unassigned space
+        height = int(self.survey_area.height / self.gcd)
+        width = int(self.survey_area.width / self.gcd)
+        grid_data = np.ones((height, width), dtype=int)
+
+        # Assign areas to vehicles using allocation algorithm
+        vehicle_assignments = generate_assignments(list(self.available_vehicles.values()), grid_data, show_graph=True)
+        print("Vehicle Assignments:", vehicle_assignments)
+
+        # Notify MOOSDB with the waypoint updates
+        for count, (name, assignment) in enumerate(vehicle_assignments.items()):
+            # assignment.reposition();
+            # color = colors[count % len(colors)]     # for waypoint color
+            points = Points(assignment, self.survey_area.position[0], self.survey_area.position[1])
+            print(f"current vehicle: {name}, waypoints: {points.string()} ")
+            msg_key = f"{name}_WAYPOINTS"
+            color = self.available_vehicles[name].color
+            wpt_var = f"{name}_WPT_UPDATE"
+            print(f"SENDING {points.string()} to {wpt_var}")
+            self.notify(wpt_var, points.string())
+
+            if len(assignment) == 0:  # No waypoint assigned because survey area is too large
+                print("Waypoint notifications not sent because vehicle area assignment = 0")
+                self.notify("VIEW_SEGLIST",
+                            f'{points.seglist_string()},label={name}_wpt_survey,active=false')  # removes any prior waypoint visuals
+            else:
+                self.notify("VIEW_SEGLIST",
+                            f'{points.seglist_string()},label={name}_wpt_survey,edge_color={color},edge_size=2')  # Displays waypoints before deployment
+                # CHANGE THIS LINE BELOW
+                self.notify(wpt_var, points.string())
+
 
 
 # Array of colors that can be used for pMarineViewer geometry. Not a complete list

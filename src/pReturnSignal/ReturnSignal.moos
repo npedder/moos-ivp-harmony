@@ -1,0 +1,9 @@
+//------------------------------------------------
+// pReturnSignal config block
+
+ProcessConfig = pReturnSignal
+{
+   AppTick   = 4
+   CommsTick = 4
+}
+
