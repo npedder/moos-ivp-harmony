@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
 
-from .MissionArea import MissionArea, calculate_sensor_range_gcd
+from AlgorithmDevelopment.MissionArea import MissionArea, calculate_sensor_range_gcd
 
-from .cyclicRegionGrowth import cyclic_region_growth, calculate_optimal_tasks
+from AlgorithmDevelopment.cyclicRegionGrowth import cyclic_region_growth, calculate_optimal_tasks
 # from region_fine_tuning
-from .cellDecomposition import cell_decomposition
-from .sensorRangeDecomposition import sensor_range_decomposition
-from .pathPlanning import calculate_vehicle_paths
-from .missionLayouts import *
+from AlgorithmDevelopment.cellDecomposition import cell_decomposition
+from AlgorithmDevelopment.sensorRangeDecomposition import sensor_range_decomposition
+from AlgorithmDevelopment.pathPlanning import calculate_vehicle_paths
+from AlgorithmDevelopment.missionLayouts import *
 
 # All the portions of the algorithm, condensed into a single method
 # Input: list of UxV objects, binary grid data, 0 is dead space, 1 is uncovered
@@ -30,12 +30,12 @@ def generate_assignments(UxVs, grid_data, show_graph=False, mission_name="Missio
 
     vehicle_paths = calculate_vehicle_paths(mission)
 
-    return vehicle_paths
-
     # Display result
     if show_graph:
         mission.draw(show_neighbors=False, node_color="blue", edge_color="white", vehicle_paths=vehicle_paths)
         plt.show()
+
+    return vehicle_paths
 
 
 if __name__ == "__main__":

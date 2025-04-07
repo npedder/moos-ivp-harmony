@@ -35,7 +35,7 @@ ProcessConfig = ANTLER
   Run = pHostInfo     @ NewConsole = false
   Run = uFldNodeBroker @ NewConsole = false
   Run = uTimerScript @ NewConsole = false
-  Run = pReturnSignal @ NewConsole = true
+  Run = pReturnSignal @ NewConsole = false
 }
 
 //------------------------------------------

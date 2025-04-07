@@ -1,4 +1,4 @@
-from .MissionArea import MissionArea
+from AlgorithmDevelopment.MissionArea import MissionArea
 import math
 
 

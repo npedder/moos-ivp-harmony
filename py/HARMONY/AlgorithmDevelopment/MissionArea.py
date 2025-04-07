@@ -1,8 +1,8 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-from .gridGraph import gridGraph
-from .gridVisualizer import GridVisualizer
-from .gridArrayGenerator import genGrid
+from AlgorithmDevelopment.gridGraph import gridGraph
+from AlgorithmDevelopment.gridVisualizer import GridVisualizer
+from AlgorithmDevelopment.gridArrayGenerator import genGrid
 from UxV import UxV
 import math
 from scipy.spatial import distance
@@ -101,8 +101,12 @@ class MissionArea:
         if isinstance(node, UxV):
             node_label = node.position
             node_original_pos = node.position
-            if self.grid_graph.graph.has_node(node_label) is False:
-                node_label = self._normalize_vehicle_to_graph(node_label)
+            if self.grid_graph.graph.has_node(node_label) is False or node.position in self.vehicles:
+                try:
+                    node_label = self._normalize_vehicle_to_graph(node_label)
+                except Exception as e:
+                    print(e)
+                    return
 
             nx.set_node_attributes(self.grid_graph.graph,
                                        {node_label: {'name': node.name, 'type': node.type, "position": node.position,
@@ -115,6 +119,7 @@ class MissionArea:
             self.vehicles.append(node_label)
             self.vehicle_assignments[node_label] = []
             self.original_positions[node.name] = node_original_pos
+            self.original_positions[node_label] = node_original_pos
 
 
     def add_vehicles_to_graph(self, vehicles):
@@ -204,10 +209,23 @@ class MissionArea:
 
     # Vehicle position will be set inside the grid graph. Stores original position and distance from original position
     def _normalize_vehicle_to_graph(self, vehiclePos):  # TODO: This could be made more efficient
-            closest_node = min(list(self.grid_graph.graph.nodes()), key=lambda n: distance.euclidean(vehiclePos, n))
-            distance_from_graph = distance.euclidean(vehiclePos,closest_node)
-            self.grid_graph.graph.nodes[closest_node]["displacement"] = distance_from_graph
-            return closest_node
+            # Sort nodes by closest
+            sorted_nodes = sorted(self.grid_graph.graph.nodes(), key=lambda n: distance.euclidean(vehiclePos, n))
+
+            # Get all 0-values currently in use by vehicles
+            vehicle_x_values = {v[0] for v in self.vehicles}
+
+            for node in sorted_nodes:
+                if node in self.vehicles:
+                    continue
+                if node[0] in vehicle_x_values:
+                    continue
+
+                # Passed all conditions — this is the valid closest node
+                self.grid_graph.graph.nodes[node]["displacement"] = distance.euclidean(vehiclePos, node)
+                return node
+
+            raise Exception("No valid nodes to start vehicle")
 
     # def number_of_vehicles_offset_from_node
 

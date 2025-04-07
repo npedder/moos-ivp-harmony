@@ -1,7 +1,7 @@
 import networkx
 from networkx.algorithms import approximation as approx
 
-from .MissionArea import MissionArea
+from AlgorithmDevelopment.MissionArea import MissionArea
 import math
 import networkx as nx
 
