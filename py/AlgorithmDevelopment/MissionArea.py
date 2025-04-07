@@ -103,6 +103,8 @@ class MissionArea:
             if self.grid_graph.graph.has_node(node_label) is False:
                 node_label = self._normalize_vehicle_to_graph(node_label)
 
+            self.vehicles.append(node_label)
+            self.vehicle_assignments[node_label] = set()
             nx.set_node_attributes(self.grid_graph.graph,
                                        {node_label: {'name': node.name, 'type': node.type, "position": node.position,
                                                         "speed": node.speed, "sensorRange": node.sensorRange,

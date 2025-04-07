@@ -5,7 +5,7 @@ from MissionArea import MissionArea, calculate_sensor_range_gcd
 from gridArrayGenerator import genConnectedGrid
 from UxV import UxV
 from cyclicRegionGrowth import cyclic_region_growth, calculate_optimal_tasks
-from regionFineTuning import findNeighborNodes
+from regionFineTuning import find_neighbor_nodes, region_fine_tuning
 from cellDecomposition import cell_decomposition
 from networkx.algorithms.approximation import traveling_salesman_problem
 from sensorRangeDecomposition import sensor_range_decomposition
@@ -33,7 +33,6 @@ mission_3 = MissionArea("Mission", grid_data, cellDimension)
 mission_3.add_vehicles_to_graph(uxvs)
 
 # Apply algorithms to mission to determine task allocation
-
 cell_decomposition(mission_3)
 
 cyclic_region_growth(mission_3)
@@ -55,6 +54,11 @@ vehicle_paths = calculate_vehicle_paths(mission_3)
 
 mission_3.draw(show_neighbors=False, node_color="blue", edge_color="white", vehicle_paths=vehicle_paths)
 plt.show()
+bals = cyclic_region_growth(mission_3)
+print("Balances post reigon growth: " + str(bals))
+region_fine_tuning(mission_3, 10, bals)
+# Display result pre-fine tuning
+mission_3.draw(show_neighbors=True)
 
 
 

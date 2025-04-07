@@ -57,12 +57,12 @@ def cyclic_region_growth(mission: MissionArea):
                 # Assign nodes
                 if NV_k[k]: # Checks if list of NVs are empty
                     last_updated_cell =  list(NV_k[k])[0] # select a cell from NV_k
-                    mission.vehicle_assignments[mission.vehicles[k]].append(last_updated_cell)  # Assign selected cell
+                    mission.vehicle_assignments[mission.vehicles[k]].add(last_updated_cell)  # Assign selected cell
                     assigned_nodes.add(last_updated_cell)
                     mission.grid_graph.graph.nodes[last_updated_cell]['region'] = mission.vehicles[k]
                     account_balances[k] = account_balances[k] - mission.grid_graph.graph.nodes[last_updated_cell]["weight"]
                     N = N - 1
-                    print("Remaining Nodes: ", N - 4)
+                    # print("Remaining Nodes: ", N - 4)
 
     return account_balances
 
@@ -105,10 +105,11 @@ def calculate_optimal_tasks(mission: MissionArea, vehicle):
 
 def mission_weight(mission: MissionArea):
     V = mission.grid_graph.graph.number_of_nodes()
-    print("Total number of nodes: ", V)
+    # print("Total number of nodes: ", V)
     summation_node_weights = 0
     for node in mission.grid_graph.graph.nodes():
         if node not in mission.vehicles:
+            # print("A nodes weight: " + str(mission.grid_graph.graph.nodes[node]["weight"]))
             summation_node_weights += mission.grid_graph.graph.nodes[node]["weight"]
 
     return summation_node_weights
@@ -121,7 +122,7 @@ def gcd_of_list(numList):
     gcd = math.gcd(numList[0], numList[1])
     for i in range(2, len(numList)):
         gcd = math.gcd(gcd, numList[i])
-        print("GCD: ", gcd)
+        # print("GCD: ", gcd)
 
     return gcd
 
@@ -143,7 +144,7 @@ def update_NV_K(mission: MissionArea, NV_K, k, cell, assigned_nodes):
     elif cell in NV_K:
         NV_K.remove(cell)
 
-        print("NVK ", NV_K)
+        # print("NVK ", NV_K)
 
     return NV_K
 
