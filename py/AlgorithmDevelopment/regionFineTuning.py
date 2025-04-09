@@ -84,7 +84,7 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
 
     tradeFound = False
     kthLargest = 1
-    while (tradeFound == False and kthLargest < len(buyerNeighborsInSeller)):
+    while (tradeFound == False and kthLargest <= len(buyerNeighborsInSeller)):
         print(f"All possible cell candidates: {str(buyerNeighborsInSeller)}")
         print("Now checking " + str(kthLargest) + "th largest cell as candidate")
         if not buyerNeighborsInSeller:
@@ -150,17 +150,12 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
                 return bestTrade
         
         else:
-            if max(abs(account_balances[buyer]), abs(account_balances[seller])) > max(abs(account_balances[buyer] - graph.nodes[candidate]['weight']), abs(account_balances[seller] + graph.nodes[candidate]['weight'])):
-                print("Candidate is not the cut point, using candidate as trade")
-                print("Candidate weight: " + str(graph.nodes[candidate]['weight']))
-                account_balances[buyer] = account_balances[buyer] - graph.nodes[candidate]['weight']
-                account_balances[seller] = account_balances[seller] + graph.nodes[candidate]['weight']
-                tradeFound = True
-                pairsTimeOut[frozenset({buyer, seller})] = 1
-                return mission.vehicle_assignments[mission.vehicles[seller]] - {candidate}
-            else:
-                print("Not the cut point, but does not result in a good trade, continuing to search...")
-                kthLargest += 1
+            print("Candidate weight: " + str(graph.nodes[candidate]['weight']))
+            account_balances[buyer] = account_balances[buyer] - graph.nodes[candidate]['weight']
+            account_balances[seller] = account_balances[seller] + graph.nodes[candidate]['weight']
+            tradeFound = True
+            pairsTimeOut[frozenset({buyer, seller})] = 1
+            return mission.vehicle_assignments[mission.vehicles[seller]] - {candidate}
         # If not returned yet no trade found, time out pair for 3 iterations and return seller assignments
     pairsTimeOut[frozenset({buyer, seller})] = 3
     return mission.vehicle_assignments[mission.vehicles[seller]]
