@@ -6,7 +6,13 @@ import heapq
 # Pre-condition: A mission area, the number of iterations the fine tuning should run for, and the account balances
 #                for the vehicles/regions
 # Post-condition: Updates mission area with new regions which should more closely reflect optimal vehicle assignments
-def region_fine_tuning (mission, iterations, account_balances):
+def region_fine_tuning(mission, iterations, account_balances):
+    # Create a map from index to vehicle.
+    # Needed because of change of nodes.[node]['region'] from int to tuple
+    region_map = {}
+    for i, v in enumerate(mission.vehicles):
+        region_map[v] = i
+
     graph = mission.grid_graph.graph
     i = iterations
     pairsTimeOut = dict() # frozen set of two regions to a counter for how many turns they are in time out (if untradeable)
@@ -23,8 +29,8 @@ def region_fine_tuning (mission, iterations, account_balances):
         while pairFound == False and pairCounter < len(account_balances) * len(account_balances):
             pairCounter += 1
             buyer = heapq.nlargest(kthBestBuyer, range(len(account_balances)), key=lambda i: account_balances[i])[-1]
-            sellerKey = heapq.nsmallest(kthBestSeller, regionNeighborNodes[buyer], key=lambda node_key: account_balances[graph.nodes[node_key]['region']])[-1]
-            seller = graph.nodes[sellerKey]['region']
+            sellerKey = heapq.nsmallest(kthBestSeller, regionNeighborNodes[mission.vehicles[buyer]], key=lambda node_key: account_balances[region_map[graph.nodes[node_key]['region']]])[-1]
+            seller = region_map[graph.nodes[sellerKey]['region']]
             try:
                 tradeable = pairsTimeOut[frozenset({buyer, seller})] == 0
             except KeyError:
@@ -57,7 +63,7 @@ def region_fine_tuning (mission, iterations, account_balances):
         tradedNodes = mission.vehicle_assignments[mission.vehicles[seller]] - keptNodes
         mission.vehicle_assignments[mission.vehicles[buyer]] =  mission.vehicle_assignments[mission.vehicles[buyer]].union(tradedNodes)
         mission.vehicle_assignments[mission.vehicles[seller]] = keptNodes
-        updateRegions(mission, regionNeighborNodes, seller, buyer, tradedNodes)
+        updateRegions(mission, regionNeighborNodes, seller, buyer, tradedNodes, region_map)
 
         print(str(account_balances))
         print(str(buyer) + " is the buyer with a balance of: " + str(account_balances[buyer]))
@@ -74,7 +80,7 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
 
     sellerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[mission.vehicles[seller]])
     buyerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[mission.vehicles[buyer]])
-    buyerNeighborsInSeller = regionNeighborNodes[buyer].intersection(mission.vehicle_assignments[mission.vehicles[seller]])
+    buyerNeighborsInSeller = regionNeighborNodes[mission.vehicles[buyer]].intersection(mission.vehicle_assignments[mission.vehicles[seller]])
 
     tradeFound = False
     kthLargest = 1
@@ -90,7 +96,7 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
         # Candidate is kth largets node
         candidate = heapq.nlargest(kthLargest, buyerNeighborsInSeller, key=lambda node_key: graph.nodes[node_key]['weight'])[-1]
         print(f"{candidate} is selected as the candidate, with an area of {graph.nodes[candidate]['weight']}")
-        if candidate in regionNeighborNodes[buyer]:
+        if candidate in regionNeighborNodes[mission.vehicles[buyer]]:
             print("candidate is in buyer's neighbor set")
         else:
             print("candidate is not in buyer's neighbor set")
@@ -165,7 +171,7 @@ def find_neighbor_nodes (mission: MissionArea):
     graph = mission.grid_graph.graph
     print("Entering findNeighborNodes")
     # initalize a dictionary of empty sets for holding the neighbors of each region
-    regionNeighborNodes = {key: set() for key in range(len(mission.vehicles))}
+    regionNeighborNodes = {key: set() for key in mission.vehicles}
     # Iterate through the keys of each node and then the keys of that node's neighbors
     for node_key in graph.nodes:
         node_data = graph.nodes[node_key]
@@ -185,22 +191,22 @@ def sum_weights(mission, subgraph):
     print("\n\t" + str(weightSum))
     return weightSum
 
-def updateRegions(mission, regionNeighborNodes, seller, buyer, tradedNodes):
+def updateRegions(mission, regionNeighborNodes, seller, buyer, tradedNodes, region_map):
         graph = mission.grid_graph.graph
         # Update regions post trade
         for node_key in mission.vehicle_assignments[mission.vehicles[seller]]:
-            graph.nodes[node_key]['region'] = seller
+            graph.nodes[node_key]['region'] = mission.vehicles[seller]
         for node_key in mission.vehicle_assignments[mission.vehicles[buyer]]:
-            graph.nodes[node_key]['region'] = buyer
+            graph.nodes[node_key]['region'] = mission.vehicles[buyer]
 
         # If a region gains neighboring that they were also neighbors with, they are no longer neighbors
-        regionNeighborNodes[buyer] = regionNeighborNodes[buyer] - regionNeighborNodes[buyer].intersection(tradedNodes)
+        regionNeighborNodes[mission.vehicles[buyer]] = regionNeighborNodes[mission.vehicles[buyer]] - regionNeighborNodes[mission.vehicles[buyer]].intersection(tradedNodes)
         
         for node_key in tradedNodes:
             for neighbor_key in graph[node_key]:
                 neighbor_data = graph.nodes[neighbor_key]
-                if neighbor_data['region'] != seller:
-                    regionNeighborNodes[seller] -= {neighbor_key}
+                if region_map[neighbor_data['region']] != seller:
+                    regionNeighborNodes[mission.vehicles[buyer]] -= {neighbor_key}
         
         # Add new neighbors
         buyerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[mission.vehicles[buyer]])

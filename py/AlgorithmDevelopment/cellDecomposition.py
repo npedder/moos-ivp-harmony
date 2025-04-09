@@ -74,7 +74,7 @@ def cell_decomposition(mission: MissionArea):
                 cell_graph.nodes[center_node]['region'] = center_node
                 mission.vehicles[mission.vehicles.index(vehicle)] = center_node
                 mission.vehicle_assignments[center_node] = mission.vehicle_assignments.pop(vehicle)
-                mission.vehicle_assignments[center_node].append(center_node)
+                mission.vehicle_assignments[center_node].add(center_node)
                 mission.original_positions[center_node] = cell_graph.nodes[center_node]["originalPos"]
 
 

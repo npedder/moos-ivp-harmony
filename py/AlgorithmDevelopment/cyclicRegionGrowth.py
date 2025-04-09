@@ -64,6 +64,11 @@ def cyclic_region_growth(mission: MissionArea):
                     N = N - 1
                     # print("Remaining Nodes: ", N - 4)
 
+    # Convert account balances into a dict with vehicle pos as the key
+    # account_balances_dict = {}
+    # for i in range(len(mission.vehicles)):
+    #     account_balances_dict[mission.vehicles[i]] = account_balances[i]
+
     return account_balances
 
 
