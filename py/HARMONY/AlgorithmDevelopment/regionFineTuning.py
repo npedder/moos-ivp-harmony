@@ -1,4 +1,4 @@
-import MissionArea
+from AlgorithmDevelopment.MissionArea import MissionArea
 from collections import defaultdict
 import heapq
 

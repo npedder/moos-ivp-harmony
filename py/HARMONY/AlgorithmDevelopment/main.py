@@ -5,6 +5,7 @@ from MissionArea import MissionArea, calculate_sensor_range_gcd
 from UxV import UxV
 from AlgorithmDevelopment.cyclicRegionGrowth import cyclic_region_growth
 from AlgorithmDevelopment.cellDecomposition import cell_decomposition
+from AlgorithmDevelopment.regionFineTuning import region_fine_tuning
 from AlgorithmDevelopment.sensorRangeDecomposition import sensor_range_decomposition
 from AlgorithmDevelopment.pathPlanning import calculate_vehicle_paths
 from missionLayouts import *
@@ -22,8 +23,8 @@ uxvs.append(UxV(name="charlie", position=(155,275), speed=(10), sensorRange=(5),
 uxvs.append(UxV(name="delta", position=(315, 345), speed=(10), sensorRange=(20), type="UUV", endurance=100))
 
 # Generate a random 2D numpy array to represent mission area
-grid_data = genConnectedGrid(75, 50, .2, 5)
-# grid_data = missionLayouts.mission_area_1_upscaled
+# grid_data = genConnectedGrid(75, 50, .2, 5)
+grid_data = missionLayouts.mission_area_1_upscaled
 
 
 # Create a MissionArea object to manage mission info

@@ -76,7 +76,7 @@ def calculate_vehicle_paths(mission: MissionArea):
             # Insert the exit node after the entrance node
             if vehicle_entrance_exit_pairs[entrance_node] != entrance_node:
                 # TODO: Messy fix, data type changes are required to truly fix
-            vehicle_paths[name_key[0]].insert(index + 1, vehicle_entrance_exit_pairs[entrance_node])
+                vehicle_paths[name_key[0]].insert(index + 1, vehicle_entrance_exit_pairs[entrance_node])
 
                 # Move index forward by 2 (because we just added an exit node after the entrance node)
                 index += 2
