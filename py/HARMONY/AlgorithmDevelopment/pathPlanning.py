@@ -29,7 +29,7 @@ def calculate_vehicle_paths(mission: MissionArea):
                     raise Exception("Error: More than two nodes in group")
 
                 if len(neighbors) == 0:
-                    vehicle_entrance_exit_pairs[node] = [node]
+                    vehicle_entrance_exit_pairs[node] = node
                     vehicle_sorted_nodes[vehicle_sorted_nodes.index(node)] = 0
                 else:
                     neighbor = neighbors[0]
@@ -74,11 +74,14 @@ def calculate_vehicle_paths(mission: MissionArea):
             entrance_node = vehicle_paths[name_key[0]][index]
 
             # Insert the exit node after the entrance node
-            # TODO: Messy fix, data type changes are required to truly fix
+            if vehicle_entrance_exit_pairs[entrance_node] != entrance_node:
+                # TODO: Messy fix, data type changes are required to truly fix
             vehicle_paths[name_key[0]].insert(index + 1, vehicle_entrance_exit_pairs[entrance_node])
 
-            # Move index forward by 2 (because we just added an exit node after the entrance node)
-            index += 2
+                # Move index forward by 2 (because we just added an exit node after the entrance node)
+                index += 2
+            else:
+                index +=1
 
         # del vehicle_paths[vehicle][0]
         print("Path")

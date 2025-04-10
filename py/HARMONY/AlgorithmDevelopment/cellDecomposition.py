@@ -27,7 +27,7 @@ def cell_decomposition(mission: MissionArea):
             highest_node = node
             lowest_node = node
             highest_node, lowest_node = _dfs_combine_nodes(mission.grid_graph.graph, node, visited, nodes_to_combine, highest_node, lowest_node)
-            print(" Highest Node: " ,highest_node, "   Lowest Node: ",  lowest_node)
+            # print(" Highest Node: " ,highest_node, "   Lowest Node: ",  lowest_node)
 
             # Add a node in new graph representing a decomposed cell
             center_node = (int((highest_node[0] + lowest_node[0]) / 2), int((highest_node[1] + lowest_node[1]) / 2))
@@ -77,10 +77,11 @@ def cell_decomposition(mission: MissionArea):
                     #_add_node_and_update_pos(cell_graph, cell_graph_pos, vehicle)
                     # Center node becomes new vehicle start location
                     cell_graph.nodes[center_node].update(mission.grid_graph.graph.nodes[vehicle])  # Transfer attributes to center node
-                    cell_graph.nodes[center_node]['region'] = center_node
+                    cell_graph.nodes[center_node]["weight"] = weight  # Transfer of attributes overwrites the weight
+                cell_graph.nodes[center_node]['region'] = center_node
                     mission.vehicles[mission.vehicles.index(vehicle)] = center_node
                     mission.vehicle_assignments[center_node] = mission.vehicle_assignments.pop(vehicle)
-                    mission.vehicle_assignments[center_node].append(center_node)
+                    mission.vehicle_assignments[center_node].add(center_node)
                     mission.original_positions[center_node] = cell_graph.nodes[center_node]["originalPos"]
 
 
