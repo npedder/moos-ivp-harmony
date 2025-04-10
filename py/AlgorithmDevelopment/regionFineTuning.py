@@ -7,7 +7,7 @@ import heapq
 #                for the vehicles/regions
 # Post-condition: Updates mission area with new regions which should more closely reflect optimal vehicle assignments
 def region_fine_tuning(mission, iterations, account_balances):
-    # Create a map from index to vehicle.
+    # Create a map from vehicle to index.
     # Needed because of change of nodes.[node]['region'] from int to tuple
     region_map = {}
     for i, v in enumerate(mission.vehicles):
@@ -201,7 +201,7 @@ def updateRegions(mission, regionNeighborNodes, seller, buyer, tradedNodes, regi
             for neighbor_key in graph[node_key]:
                 neighbor_data = graph.nodes[neighbor_key]
                 if region_map[neighbor_data['region']] != seller:
-                    regionNeighborNodes[mission.vehicles[buyer]] -= {neighbor_key}
+                    regionNeighborNodes[mission.vehicles[seller]] -= {neighbor_key}
         
         # Add new neighbors
         buyerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[mission.vehicles[buyer]])
@@ -225,7 +225,7 @@ def isCutPoint(mission, candidate, sellerRegionSubgraph, seller):
         break
     stack = [start]
     visited = set()
-    while stack:
+    while stack and start is not None:
         node = stack.pop()
         visited.add(node)
         for neighbor in sellerRegionSubgraph[node]:

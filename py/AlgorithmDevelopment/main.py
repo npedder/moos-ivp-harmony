@@ -13,10 +13,15 @@ from missionLayouts import *
 
 # Create a list of UxV objects to be added as nodes
 uxvs = []
-uxvs.append(UxV(name="alpha", position=(0,15), speed=(5), sensorRange=(10), type="UUV", endurance=200))
-uxvs.append(UxV(name="bravo", position=(300,30), speed=(5), sensorRange=(10), type="UUV", endurance=100))
-uxvs.append(UxV(name="charlie", position=(600,75), speed=(10), sensorRange=(5), type="UUV", endurance=100))
-uxvs.append(UxV(name="delta", position=(900, 55), speed=(20), sensorRange=(20), type="UUV", endurance=100))
+# uxvs.append(UxV(name="alpha", position=(0,15), speed=(5), sensorRange=(10), type="UUV", endurance=200))
+# uxvs.append(UxV(name="bravo", position=(300,30), speed=(5), sensorRange=(10), type="UUV", endurance=100))
+# uxvs.append(UxV(name="charlie", position=(600,75), speed=(10), sensorRange=(5), type="UUV", endurance=100))
+# uxvs.append(UxV(name="delta", position=(900, 55), speed=(20), sensorRange=(20), type="UUV", endurance=200))
+
+uxvs.append(UxV(name="alpha", position=(5,15), speed=(10), sensorRange=(20), type="UUV", endurance=100))
+uxvs.append(UxV(name="bravo", position=(45,275), speed=(10), sensorRange=(15), type="UUV", endurance=100))
+uxvs.append(UxV(name="charlie", position=(155,275), speed=(10), sensorRange=(5), type="UUV", endurance=100))
+uxvs.append(UxV(name="delta", position=(315, 345), speed=(10), sensorRange=(20), type="UUV", endurance=100))
 
 # Generate a random 2D numpy array to represent mission area
 # grid_data = genConnectedGrid(75, 50, .2, 5)
@@ -37,9 +42,9 @@ cell_decomposition(mission_3)
 bals = cyclic_region_growth(mission_3)
 
 
-#mission_3.draw(show_neighbors=False, node_color="blue", edge_color="white")
+# mission_3.draw(show_neighbors=False, node_color="blue", edge_color="white")
 
-region_fine_tuning(mission_3, 100, bals)
+region_fine_tuning(mission_3, 1000, bals)
 print("Balances post reigon growth: " + str(bals))
 mission_3.redraw_grid_colormesh()
 # Display result
