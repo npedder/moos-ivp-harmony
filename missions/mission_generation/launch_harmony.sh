@@ -47,7 +47,7 @@ uav_files=(uav_*.moos)
 # Get the total number of uav files found
 u=${#uav_files[@]}
 
-if [ $m -eq 0] && [$u -eq 0]; then
+if [ "$m" -eq "0" ] && [ "$u" -eq "0" ]; then
     echo "No vehicle_*.moos or uav_*.moos files found. Exiting."
     exit 1
 fi
@@ -76,4 +76,8 @@ pAntler shoreside.moos --MOOSTimeWarp=$TIME_WARP >& /dev/null &
 uMAC -t shoreside.moos 
 
 # Kill all processes after completion
-kill -- -$$
+echo "Cleaning up background processes..."
+for pid in $(jobs -p); do
+    kill "$pid" 2>/dev/null
+done
+
