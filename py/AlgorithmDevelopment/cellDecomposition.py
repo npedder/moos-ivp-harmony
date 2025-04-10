@@ -71,6 +71,7 @@ def cell_decomposition(mission: MissionArea):
                 #_add_node_and_update_pos(cell_graph, cell_graph_pos, vehicle)
                 # Center node becomes new vehicle start location
                 cell_graph.nodes[center_node].update(mission.grid_graph.graph.nodes[vehicle])  # Transfer attributes to center node
+                cell_graph.nodes[center_node]["weight"] = weight  # Transfer of attributes overwrites the weight
                 cell_graph.nodes[center_node]['region'] = center_node
                 mission.vehicles[mission.vehicles.index(vehicle)] = center_node
                 mission.vehicle_assignments[center_node] = mission.vehicle_assignments.pop(vehicle)

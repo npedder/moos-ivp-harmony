@@ -37,7 +37,7 @@ def region_fine_tuning(mission, iterations, account_balances):
                 tradeable = True
             if tradeable == False:
                 print("Pair is on timeout, searhcing for next best pair")
-            if tradeable:
+            if tradeable and len(mission.vehicle_assignments[mission.vehicles[seller]]) > 1:
                 pairFound = True
                 print("Seller and buyer successfully found")
                 print(f"Buyer's balance {account_balances[buyer]}")
@@ -225,7 +225,7 @@ def isCutPoint(mission, candidate, sellerRegionSubgraph, seller):
         break
     stack = [start]
     visited = set()
-    while stack and start is not None:
+    while stack:
         node = stack.pop()
         visited.add(node)
         for neighbor in sellerRegionSubgraph[node]:

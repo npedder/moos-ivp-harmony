@@ -24,18 +24,19 @@ def sensor_range_decomposition(mission: MissionArea):
                         top_cell = (new_x, largest_y)
                         bottom_cell = (new_x, smallest_y)
 
+                        if top_cell not in new_graph.nodes() and bottom_cell not in new_graph.nodes(): # TODO: bandaid fix to problem with more than top and bottom in a cell
 
-                        _add_node_and_update_pos(new_graph, new_pos, top_cell)
-                        _add_node_and_update_pos(new_graph, new_pos, bottom_cell)
+                                _add_node_and_update_pos(new_graph, new_pos, top_cell)
+                                _add_node_and_update_pos(new_graph, new_pos, bottom_cell)
 
-                        if top_cell[1] != bottom_cell[1]:
-                                new_graph.add_edge(top_cell,bottom_cell)
+                                if top_cell[1] != bottom_cell[1]:
+                                        new_graph.add_edge(top_cell, bottom_cell)
 
-                        remaining_nodes.difference_update(combined_nodes)
+                                remaining_nodes.difference_update(combined_nodes)
 
-                        new_vehicle_assignments[vehicle].append(top_cell)
+                                new_vehicle_assignments[vehicle].append(top_cell)
 
-                        if bottom_cell!= top_cell: new_vehicle_assignments[vehicle].append(bottom_cell)
+                                if bottom_cell != top_cell: new_vehicle_assignments[vehicle].append(bottom_cell)
 
 
         mission.grid_graph.graph = new_graph

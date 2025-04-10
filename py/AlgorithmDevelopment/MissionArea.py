@@ -94,7 +94,7 @@ class MissionArea:
         label_pos = {k: (v[0], v[1] + 5) for k, v in pos.items()}  # Adjust the y-coordinate
         #        nx.draw_networkx_labels(self.grid_graph.graph, label_pos, labels, font_size=12, font_color='r')
 
-        plt.show()
+        plt.savefig("result.png")
 
     def add_vehicle_to_graph(self, node):
         if isinstance(node, UxV):
@@ -149,8 +149,8 @@ class MissionArea:
 
         # Assign a color to each of the unit cells in grid.
         color_index = 2
-        for vehicle_assignment in self.vehicle_assignments:
-            for node in self.vehicle_assignments[vehicle_assignment]:
+        for i in range(len(self.vehicles)):
+            for node in self.vehicle_assignments[self.vehicles[i]]:
                 top_node = self.grid_graph.graph.nodes[node]["top"]
                 bottom_node = self.grid_graph.graph.nodes[node]["bottom"]
                 num_cells_between = int((top_node[1] - bottom_node[1]) / self.cellDimension)
