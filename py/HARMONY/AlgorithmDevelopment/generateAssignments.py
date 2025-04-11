@@ -5,6 +5,7 @@ from AlgorithmDevelopment.MissionArea import MissionArea, calculate_sensor_range
 from AlgorithmDevelopment.cyclicRegionGrowth import cyclic_region_growth, calculate_optimal_tasks
 # from region_fine_tuning
 from AlgorithmDevelopment.cellDecomposition import cell_decomposition
+from AlgorithmDevelopment.regionFineTuning import region_fine_tuning
 from AlgorithmDevelopment.sensorRangeDecomposition import sensor_range_decomposition
 from AlgorithmDevelopment.pathPlanning import calculate_vehicle_paths
 from AlgorithmDevelopment.missionLayouts import *
@@ -21,7 +22,9 @@ def generate_assignments(UxVs, grid_data, show_graph=False, mission_name="Missio
     mission.add_vehicles_to_graph(UxVs)
     cell_decomposition(mission)
 
-    cyclic_region_growth(mission)
+    bals = cyclic_region_growth(mission)
+
+    region_fine_tuning(mission, 1000, bals)
 
     if show_graph:
         mission.redraw_grid_colormesh()
