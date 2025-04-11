@@ -110,8 +110,8 @@ def cell_decomposition(mission: MissionArea):
     # Replace mission graph with new decomposed graph
     mission.grid_graph.graph = cell_graph
     mission.grid_graph.pos = cell_graph_pos
-    nx.set_node_attributes(mission.grid_graph.graph, values=-1, name='region')
-    nx.set_node_attributes(mission.grid_graph.graph, values=0, name='displacement')
+    # nx.set_node_attributes(mission.grid_graph.graph, values=-1, name='region')
+    # nx.set_node_attributes(mission.grid_graph.graph, values=0, name='displacement')
 
     # for vehicle in mission.vehicles:
     #     _add_node_and_update_pos(cell_graph, cell_graph_pos, normalized_vehicle)
