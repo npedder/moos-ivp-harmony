@@ -22,6 +22,12 @@ LongOrigin = -70.330400
 //  LatOrigin = 41.315286
 // LongOrigin  = -70.309013
 
+<<<<<<< Updated upstream
+=======
+// South Watuppa Pond
+// LatOrigin  = 42.358456
+// LongOrigin = -71.087589
+>>>>>>> Stashed changes
 
 //------------------------------------------
 // Antler configuration  block
@@ -34,6 +40,7 @@ ProcessConfig = ANTLER
   Run = pShare	      @ NewConsole = false
   Run = uFldShoreBroker @ NewConsole = false
   Run = pHostInfo     @ NewConsole = false
+  Run = pSearchGrid     @ NewConsole = false
 }
 
 
@@ -46,7 +53,9 @@ ProcessConfig = pMarineViewer
   CommsTick  = 4
 
   //tiff_file            = forrest19.tif
-  tiff_file = forrest19.tif
+  tiff_file            = forrest19.tif
+  
+  //tiff_file            = south_Watuppa.tif
   tiff_viewable	       = true
 	//tiff_file            = MIT_SP.tif
 
@@ -182,5 +191,24 @@ ProcessConfig = pShare
    //output = src_name=FASTER , route=localhost:9003
    //output = src_name=vehicle_4_WPT_UPDATE , dest_name=WPT_UPDATE, route=localhost:9003
  }
+
+//--------------------------------------------------
+// pSearchGrid Configuration Block
+
+ProcessConfig = pSearchGrid
+{
+  AppTick       = 1
+  CommsTick     = 1
+
+  //grid_config = pts={50,40: 10,0: -180,0: -180,150: 50,150}
+  //grid_config = pts={-50,-40: -10,0: 180,0: 180,-150: -50,-150}
+  grid_config = pts={0,0: 0,0: 0,0: 0,0}
+  grid_config = cell_size=5
+  grid_config = cell_vars=x:0:y:0
+  grid_config = cell_min=x:0
+  grid_config = cell_max=x:10
+
+	report_deltas = true
+}
 
 

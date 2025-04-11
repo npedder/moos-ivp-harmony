@@ -38,6 +38,7 @@ ProcessConfig = ANTLER
   Run = pHostInfo     @ NewConsole = false
   Run = uFldNodeBroker @ NewConsole = false
   Run = uTimerScript @ NewConsole = false
+  Run = pContactMgrV20  @ NewConsole = false
 }
 
 //------------------------------------------
@@ -99,9 +100,17 @@ ProcessConfig = uSimMarineV22
 
   start_pos     = $(START_X), $(START_Y), $(HEADING), 0
   prefix        = NAV
+<<<<<<< Updated upstream
   turn_rate     = 95
   thrust_map    = 0:0, 20:1, 100:$(SPEED)
 	turn_spd_loss = 0.4
+=======
+  turn_rate     = 0
+  thrust_map    = 10:$(SPEED)
+  //thrust_map    = 0:0, 20:1, 100:$(SPEED)
+	turn_spd_loss = 0
+  max_speed     = 20
+>>>>>>> Stashed changes
 }
 
 //------------------------------------------
@@ -114,7 +123,8 @@ ProcessConfig = pHelmIvP
 
   behaviors  = $(BHV)
   domain     = course:0:359:360
-  domain     = speed:0:$(SPEED):50
+  //domain     = speed:0:$(SPEED):50
+  domain     = speed:0:$(SPEED):100
   //ok_skew=any
 }
 
@@ -204,3 +214,24 @@ ProcessConfig = pShare
    event = var =HARMONY_REPORT, val = "NAME=$(VNAME),TYPE=UUV,X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
 
  }
+<<<<<<< Updated upstream
+=======
+
+//--------------------------------------------------------
+// pContactMgrV20 Config Block
+
+ProcessConfig = pContactMgrV20
+{
+  AppTick   = 2
+  CommsTick = 2
+
+  contact_max_age = 300
+  display_radii   = true
+
+  recap_interval = 5
+
+  alert_range_color = gray70
+  cpa_range_color   = gray30
+}
+
+>>>>>>> Stashed changes

@@ -1,6 +1,6 @@
 
 class UxV:
-    def __init__(self, name, type, position : tuple, speed, sensorRange, endurance, color):
+    def __init__(self, name, type, position : tuple, speed, sensorRange, endurance, heading, color):
         """
         Initialize a UxV instance.
 
@@ -15,7 +15,8 @@ class UxV:
         self.speed = speed        # Speed (in units per time, e.g., km/h or miles/h)
         self.sensorRange = sensorRange
         self.endurance = endurance # Maximum distance the vehicle can travel (e.g., miles or km)
+        self.heading = heading
         self.color = color # Vehicle color
 
     def __repr__(self):
-        return f"UxV(name={self.name}, type={self.type}, position={self.position}, speed={self.speed}, sensorRange={self.sensorRange}, endurance={self.endurance}, color={self.color})"
+        return f"UxV(name={self.name}, type={self.type}, position={self.position}, speed={self.speed}, sensorRange={self.sensorRange}, endurance={self.endurance}, heading={self.heading}, color={self.color})"

@@ -6,12 +6,13 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import matplotlib.patches as patches
 import random
-
+import math
+from Status import Status
 
 
 def parseNodeReportAndCreateVehicle(nodeReport):
     # Regular expression to extract NAME, LAT, and LON
-    pattern = r"NAME=([^,]+),.*X=([-\d.]+),.*Y=([-\d.]+),.*COLOR=([^,]+)"
+    pattern = r"NAME=([^,]+),.*X=([-\d.]+),.*Y=([-\d.]+),.*HDG=([-\d.]+),.*COLOR=([^,]+)"
     # Search for the match
     match = re.search(pattern, nodeReport)
 
@@ -19,20 +20,20 @@ def parseNodeReportAndCreateVehicle(nodeReport):
         name = match.group(1)
         x = float(match.group(2))
         y = float(match.group(3))
-        color = match.group(4)
-
+        heading = float(match.group(4))
+        color = match.group(5)
         # print(f"Name: {name}")
         # print(f"Latitude: {lat}")
         # print(f"Longitude: {lon}")
         # print(f"Color: {color}")
-        vehicle = UxV(name, '',(x,y), None, None, None, color);
+        vehicle = UxV(name, '',(x,y), None, None, None, heading, color)
         return vehicle
     else:
         print("Pattern not found in the string.")
         return None
 
 def parseHarmonyReportAndCreateVehicle(nodeReport):
-    # Regular expression to extract NAME, LAT, and LON
+    # Regular expression to extract NAME, LAT, and LONRun = uTimerScript @ NewConsole = false
     pattern = r"NAME=([^,]+),.*TYPE=([^,]+),.*X=([-\d.]+),.*Y=([-\d.]+),.*SPD=([-\d.]+),.*ENDURANCE=([-\d.]+),.*SENSOR_RANGE=([-\d.]+)"
 
     # Search for the match
@@ -51,16 +52,15 @@ def parseHarmonyReportAndCreateVehicle(nodeReport):
         # print(f"Latitude: {lat}")
         # print(f"Longitude: {lon}")
 
-        vehicle = UxV(name, type, (x, y), speed,sensor_range,endurance, None);
+        vehicle = UxV(name, type, (x, y), speed,sensor_range,endurance, None, None)
         return vehicle
     else:
         print("Pattern not found in the string.")
         return None
 
-def parseSurveyAreaAndCreateObject(survey_msg):
+def parseSurveyAreaAndCreateObject(survey_msg, gcd):
     # Regular expression to extract NAME, LAT, and LON
     pattern = r"WIDTH=([^,]+),.*HEIGHT=([-\d.]+),.*X_POS=([-\d.]+),.*Y_POS=([-\d.]+)"
-
 
     # Search for the match
     match = re.search(pattern, survey_msg)
@@ -71,12 +71,12 @@ def parseSurveyAreaAndCreateObject(survey_msg):
         x_pos = float(match.group(3))
         y_pos = float(match.group(4))
 
-        # print(f"Height: {height}")
-        # print(f"Width: {width}")
-        # print(f"X_pos: {x_pos}")
-        # print(f"Y_pos: {y_pos}")
+        gcd = gcd
+        # rounding width and height to match sensor range
+        width = math.ceil(width / gcd) * gcd
+        height = math.ceil(height / gcd) * gcd
 
-        surveyArea = SurveyArea(width, height, (x_pos, y_pos));
+        surveyArea = SurveyArea(width, height, (x_pos, y_pos), gcd);
         return surveyArea
     else:
         print("Pattern not found in the string.")
@@ -142,3 +142,25 @@ def plotAssignments(vehicleAssignments: dict, vehicles: dict, totalSurvey: Surve
     ax.set_title("Vehicle Assignments")
 
     plt.show()
+
+def gcd_of_list(numList):
+    gcd = math.gcd(numList[0], numList[1])
+    for i in range(2, len(numList)):
+        gcd = math.gcd(gcd, numList[i])
+    return gcd
+
+
+def parseStatusAndCreateObject(status_msg):
+    pattern = r"NAME=([^,]+),.*STATUS=([^,]+)"
+
+    match = re.search(pattern, status_msg)
+    if match:
+        name = match.group(1)
+        status = match.group(2)
+
+        vehicleStatus = Status(name, status)
+        return vehicleStatus
+    else:
+        print("Pattern not found in the string.")
+        return None
+

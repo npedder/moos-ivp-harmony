@@ -1,10 +1,10 @@
 
 class SurveyArea:
-    def __init__(self, width, height, position : tuple):
+    def __init__(self, width, height, position : tuple, gcd):
         self.width = width
         self.height = height
         self.position = position  # (x, y)
-
+        self.gcd = gcd
     def areaToGrid(self, label):
         # neded for VIEW_GRID
         x, y = self.position

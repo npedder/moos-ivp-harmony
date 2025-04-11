@@ -87,3 +87,4 @@ Behavior=BHV_ConstantSpeed
 	duration_reset = CONST_SPD_RESET=true
 	
 }
+

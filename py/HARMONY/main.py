@@ -32,16 +32,22 @@ def main():
         # moos_handler.notify("APPCAST", "node=HARMONY")
         # When respective messages are received, moos_handler.survey_area and mood_handler.available_vehicles updates.
         moos_handler.parse_incoming_messages(messages)
-
-
+        #for moos_handler.vehicle in moos_handler.available_uavs:
+            # moos_handler.visualizeGrid(moos_handler.vehicle, moos_handler.survey_area)
         if moos_handler.survey_area is not None:
             moos_handler.notify("VIEW_GRID", moos_handler.survey_area.areaToGrid("Survey Area UUV"));
             if moos_handler.available_uavs:
                 moos_handler.notify("VIEW_GRID", moos_handler.survey_area_land.areaToGrid("Survey Area UAV"));
             # print(moos_handler.survey_area.areaToGrid())
-            moos_handler.assign_and_notify()
-            moos_handler.survey_area = None  # Reset survey area for the next iteration
-            moos_handler.survey_area_land = None
+            moos_handler.assign_waypoints_and_notify_uavs()
+            while len(moos_handler.completed_uavs) != len(moos_handler.available_uavs):
+                messages = moos_handler.fetch_messages()
+                moos_handler.parse_incoming_messages(messages)
+                moos_handler.visualizeGrid(moos_handler.survey_area)
+                time.sleep(1)
+            moos_handler.assign_waypoints_and_notify_uuvs()
+            #moos_handler.survey_area = None  # Reset survey area for the next iteration
+            #moos_handler.survey_area_land = None
 
         # if moos_handler.survey_area_land is not None:
         #     moos_handler.notify("VIEW_GRID", moos_handler.survey_area_land.areaToGrid());
