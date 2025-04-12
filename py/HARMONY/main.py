@@ -35,13 +35,13 @@ def main():
 
 
         if moos_handler.survey_area is not None:
-            moos_handler.notify("VIEW_GRID", moos_handler.survey_area.areaToGrid("Survey Area UUV"));
-            # print(moos_handler.survey_area.areaToGrid())
-            moos_handler.assign_waypoints_and_notify_uavs()
-            while(len(moos_handler.completed_uavs) != len(moos_handler.available_uavs)):
+            # moos_handler.assign_waypoints_and_notify_uavs()
+            while(len(moos_handler.completed_uavs) != len(moos_handler.available_uavs)): # Wait for all UAVs to return
+
                 messages = moos_handler.fetch_messages()
                 moos_handler.parse_incoming_messages(messages);
                 time.sleep(1)
+            moos_handler.completed_uavs = {}
             moos_handler.assign_waypoints_and_notify_uuvs()
 
             moos_handler.survey_area = None  # Reset survey area for the next iteration

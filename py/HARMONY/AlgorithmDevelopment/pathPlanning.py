@@ -9,7 +9,7 @@ import networkx as nx
 # To be done after sensor range decomposition.
 def calculate_vehicle_paths(mission: MissionArea):
     vehicle_paths = {}   # Key: vehicle name. Value: list of nodes in order of traversal TODO: not vehicle name yet
-
+    cellAdjustConst = 0 # TODO Transformation may not be needed. mission.cellDimension
 
     for vehicle in mission.vehicles:
         vehicle_sorted_nodes = sort_by_x_then_y(list(mission.vehicle_assignments[vehicle]))
@@ -44,9 +44,13 @@ def calculate_vehicle_paths(mission: MissionArea):
                         topIsEntrance = not topIsEntrance
 
                     if topIsEntrance:
-                        vehicle_entrance_exit_pairs[top_cell] = bottom_cell
+                        adjusted_top_cell = (top_cell[0], top_cell[1] + cellAdjustConst)
+                        adjusted_bottom_cell = (bottom_cell[0], bottom_cell[1] - cellAdjustConst)
+                        vehicle_entrance_exit_pairs[adjusted_top_cell] = adjusted_bottom_cell
                     else:
-                        vehicle_entrance_exit_pairs[bottom_cell] = top_cell
+                        adjusted_top_cell = (top_cell[0], top_cell[1] + cellAdjustConst)
+                        adjusted_bottom_cell = (bottom_cell[0], bottom_cell[1] - cellAdjustConst)
+                        vehicle_entrance_exit_pairs[adjusted_bottom_cell] = adjusted_top_cell
 
 
                     topIsEntrance = not topIsEntrance

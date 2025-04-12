@@ -93,17 +93,15 @@ class MOOSHandler:
 
                 case "SURVEY_AREA":
                     # Rounding Survey Area to match sensor ranges
-                    # print("SENSOR RANGES: " + str(self.sensor_ranges))
                     if len(self.sensor_ranges) > 1:
                         self.gcd = utils.gcd_of_list(self.sensor_ranges)
                     elif len(self.sensor_ranges) == 1:
                         self.gcd = self.sensor_ranges[0]
-                    # print("GCD: " + str(self.gcd))
-
                     self.survey_area = utils.parseSurveyAreaAndCreateObject(msg.string(), self.gcd)
                     self.survey_area_land = utils.parseSurveyAreaAndCreateObject(msg.string(), self.gcd)
                     self.survey_area_land.position = (self.survey_area.position[0] - self.survey_area.width - 100, self.survey_area.position[1] - self.survey_area.height - 100) #mirror survey area on both axis
-
+                    self.notify("VIEW_GRID", self.survey_area.areaToGrid("Survey Area UUV"));
+                    self.assign_waypoints_and_notify_uavs()
 
                 # Mostly for receiving current x,y
                 case "NODE_REPORT":
@@ -128,7 +126,6 @@ class MOOSHandler:
                     if len(self.completed_uavs) == len(self.available_uavs):
                         print("All UAVs finished")
                         for uav in self.completed_uavs.keys():
-                            print("---------------here-------------")
                             self.notify("VIEW_SEGLIST", f'pts={{}}, label={uav}_wpt_survey, active=false')  # Clears waypoint display
 
 
@@ -208,6 +205,17 @@ class MOOSHandler:
                 # CHANGE THIS LINE BELOW
                 self.notify(wpt_var, points.string())
 
+    # Remove the waypoint information from a list of vehicles
+    def unassign_and_notify(self, vehiclelist):
+        # Notify MOOSDB with empty waypoint updates
+        for name in vehiclelist:
+            # assignment.reposition();
+            waypoints_str = f'' # TODO: Not working
+            wpt_var = f"{name}_WPT_UPDATE"
+            print(f"SENDING {waypoints_str} to {wpt_var}")
+            self.notify(wpt_var, waypoints_str)
+
+            # color = colors[count % len(colors)]  # for waypoint color
 
 
 # Array of colors that can be used for pMarineViewer geometry. Not a complete list

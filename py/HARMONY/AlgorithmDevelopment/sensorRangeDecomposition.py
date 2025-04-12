@@ -11,6 +11,7 @@ def sensor_range_decomposition(mission: MissionArea):
         new_pos = {}
         new_vehicle_assignments = {}
         combined_nodes = set()
+        cellTransformConstant = mission.cellDimension/2           # Used to bring cell nodes to the ends of the cells
         for vehicle in mission.vehicles:
                 remaining_nodes = set(mission.vehicle_assignments[vehicle])
                 new_vehicle_assignments[vehicle] = []
@@ -21,8 +22,8 @@ def sensor_range_decomposition(mission: MissionArea):
 
                         new_x = int((largest_x + smallest_x)/2)
 
-                        top_cell = (new_x, largest_y)
-                        bottom_cell = (new_x, smallest_y)
+                        top_cell = (new_x, largest_y + cellTransformConstant)
+                        bottom_cell = (new_x, smallest_y - cellTransformConstant)
 
                         if top_cell not in new_graph.nodes() and bottom_cell not in new_graph.nodes(): # TODO: bandaid fix to problem with more than top and bottom in a cell
 

@@ -104,6 +104,7 @@ ProcessConfig = uSimMarineV22
   //thrust_map    = 0:0, 20:1, 100:$(SPEED)
 	turn_spd_loss = 0.4
   //NAV_SPEED     = $(SPEED)
+  max_speed = $(SPEED)
 }
 
 //------------------------------------------
