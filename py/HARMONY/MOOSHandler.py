@@ -26,6 +26,14 @@ class MOOSHandler:
         self.sensor_ranges = []
         self.gcd = 1
         self.completed_uavs = {}
+        self.gridMSG = " "
+        self.position = " "
+        self.bottomRight = " "
+        self.topRight = " "
+        self.topLeft = " "
+        self.x, self.y = 0,0
+        self.x_edge = 0
+        self.y_edge = 0
 
     def connect(self):
         # Start connection to MOOSDB and set callback
@@ -103,20 +111,33 @@ class MOOSHandler:
                     self.survey_area_land = utils.parseSurveyAreaAndCreateObject(msg.string(), self.gcd)
                     self.survey_area_land.position = (self.survey_area.position[0] - self.survey_area.width - 100, self.survey_area.position[1] - self.survey_area.height - 100) #mirror survey area on both axis
 
+                    # FOR pSEARCHGRID
+                    self.x, self.y = self.survey_area.position
+                    self.x_edge = self.x + self.survey_area.width
+                    self.y_edge = self.y + self.survey_area.height
 
-                # Mostly for receiving current x,y
+                    #                                 BOTTOM LEFT                                   BOTTOM RIGHT                                     TOP RIGHT                                    TOP LEFT
+                    self.gridMSG = "pts={" + str(self.x) + "," + str(self.y) + ": " + str(self.x_edge) + "," + str(self.y) + ": " + str(self.x_edge) + "," + str(self.y_edge) + ": "+ str(self.x) + "," + str(self.y_edge) + "}, cell_size=" + str(self.survey_area.gcd) + ",cell_vars=x:0:y:0,cell_min=x:0,cell_max=x:10,label=psg"
+
+                    print(self.gridMSG)
+                    self.comms.notify("VIEW_GRID",self.gridMSG)
+
+
+                # Mostly for receiving current x,y and heading
                 case "NODE_REPORT":
                     vehicle = utils.parseNodeReportAndCreateVehicle(msg.string())
                     if vehicle and vehicle.name in self.available_vehicles:
                         self.available_vehicles[vehicle.name].x = vehicle.position[0]
                         self.available_vehicles[vehicle.name].y = vehicle.position[1]
                         self.available_vehicles[vehicle.name].color = vehicle.color
-                        #print("Updated vehicles:", self.available_vehicles)
+                        self.available_vehicles[vehicle.name].heading = vehicle.heading
+                        print("Updated vehicles:", self.available_vehicles)
                     if vehicle and vehicle.name in self.available_uavs:
                         self.available_uavs[vehicle.name].x = vehicle.position[0]
                         self.available_uavs[vehicle.name].y = vehicle.position[1]
                         self.available_uavs[vehicle.name].color = vehicle.color
-                        #print("Updated vehicles:", self.available_vehicles)
+                        self.available_uavs[vehicle.name].heading = vehicle.heading
+                        print("Updated vehicles:", self.available_vehicles)
 
                 case "STATUS":
                     uav_complete = utils.parseStatusAndCreateObject(msg.string())
@@ -177,9 +198,9 @@ class MOOSHandler:
         # Run if dict not empty
         if self.available_uavs and not self.vehicles_turn:
             # Create a 2d array of 1's for vehicles in survey area. '1' is unassigned space
-            height = int(self.survey_area.height / self.gcd)
-            width = int(self.survey_area.width / self.gcd)
-            grid_data = np.ones((height, width), dtype=int)
+            height2 = int(self.survey_area.height / self.gcd)
+            width2 = int(self.survey_area.width / self.gcd)
+            grid_data = np.ones((height2, width2), dtype=int)
             uav_assignments = generate_assignments(list(self.available_uavs.values()), grid_data, show_graph=True)
 
             print("UAVs Assignments:", uav_assignments)
@@ -220,9 +241,9 @@ class MOOSHandler:
         # Run if dict not empty
         if self.available_uavs and not self.vehicles_turn:
             # Create a 2d array of 1's for vehicles in survey area. '1' is unassigned space
-            height = int(self.survey_area.height / self.gcd)
-            width = int(self.survey_area.width / self.gcd)
-            grid_data = np.ones((height, width), dtype=int)
+            height1 = int(self.survey_area.height / self.gcd)
+            width1 = int(self.survey_area.width / self.gcd)
+            grid_data = np.ones((height1, width1), dtype=int)
             uav_assignments = generate_assignments(list(self.available_uavs.values()), grid_data, show_graph=True)
 
             print("UAVs Assignments:", uav_assignments)
@@ -283,6 +304,78 @@ class MOOSHandler:
                             f'{points.seglist_string()},label={name}_wpt_survey,edge_color={color},edge_size=2')  # Displays waypoints before deployment
                 # CHANGE THIS LINE BELOW
                 self.notify(wpt_var, points.string())
+
+    def visualizeGrid(self, surveyArea):
+        surveyArea = surveyArea
+        cell_size = self.gcd
+        survey_height = surveyArea.height
+        survey_width = surveyArea.width
+        survey_startX, survey_startY  = surveyArea.position
+        cell_height = survey_height/cell_size
+        # while True:
+        # For Each Vehicle
+        for name, vehicle in self.available_uavs.items():
+            # Get location and sensor range
+            x = vehicle.x
+            y = vehicle.y
+            head = vehicle.heading
+            sensor = vehicle.sensorRange
+            # if in survey
+            if x >= survey_startX and x <= (survey_startX+survey_width) and y >= survey_startY and y <= (survey_startY + survey_height):
+                grid_x = x - survey_startX
+                grid_y = y - survey_startY
+                grid_row = int(grid_x/cell_size)+1
+                grid_num = int(grid_x/cell_size)*int(survey_height/cell_size) + int(grid_y/cell_size)
+                sensor_to_grid = int(sensor/cell_size)
+                poke_msg = "psg@" + str(grid_num) + ",x,5"
+                self.notify("VIEW_GRID_DELTA", poke_msg)
+                for i in range(0, sensor_to_grid+1, 1):
+                    # if head%90 == 0:
+                    # grid_sensor = grid_num + int(i*cell_height)
+                    # Cells to left and right of vehicle
+                    poke_msg = "psg@" + str(grid_num + int(i*cell_height)) + ",x,2:" + str(grid_num - int(i*cell_height)) + ",x,2"
+                    self.notify("VIEW_GRID_DELTA", poke_msg)
+
+                    # Cells above and below
+                    # Makes sure we don't exceed grid height and loop back to bottom
+                    if int(grid_num+i) < int(grid_row*cell_size):
+                        poke_msg = "psg@" + str(grid_num + i) + ",x,2"
+                        self.notify("VIEW_GRID_DELTA", poke_msg)
+                    if int(grid_num - i) > 0:
+                        poke_msg = "psg@" + str(grid_num - i) + ",x,2"
+                        self.notify("VIEW_GRID_DELTA", poke_msg)
+
+        # TODO, copy top loop for UUVs
+
+                    # poke_msg = "psg@" + str(grid_num + i) + ",x,2:" + str(grid_num - i) + ",x,2"
+                    # if int(grid_num-i) > 0:
+                    #     poke_msg = "psg@" + str(grid_num + i) + ",x,2:" + str(grid_num - i) + ",x,2"
+                    #     self.notify("VIEW_GRID_DELTA", poke_msg)
+                    # else:
+                    #     poke_msg = "psg@" + str(grid_num + i) + ",x,2"
+                    #     self.notify("VIEW_GRID_DELTA", poke_msg)
+
+
+                    #poke_msg = "psg@" + str(grid_num + i) + ",x,2:" + str(grid_num - i) + ",x,2"
+                    #poke_msg = "psg@" + str(grid_num - i) + ",x,2"
+                    #self.notify("VIEW_GRID_DELTA", poke_msg)
+                    #poke_msg = "psg@" + str(0-grid_sensor) + ",x,2"
+                    #self.notify("VIEW_GRID_DELTA", poke_msg)
+
+
+
+                # if in survey
+                    # translate position relation to grid origin
+                    # translate new position value to grid number (x/cell_size)*(grid height/cell_size) + (y/cell_size)
+                    # For int i = 0; i <= vehicle.sensor_range/cell_size; i++
+                        # self.notify("VIEW_GRID_DELTA", "psg@" + str(gridNum+i) + ",x,2")
+                        # self.notify("VIEW_GRID_DELTA", "psg@" + str(gridNum-i) + ",x,2")
+                        # self.notify("VIEW_GRID_DELTA", "psg@" + str(gridNum+cell_size*i) + ",x,2")
+                        # self.notify("VIEW_GRID_DELTA", "psg@" + str(gridNum-cell_size*i) + ",x,2")
+
+
+
+
 
 
 

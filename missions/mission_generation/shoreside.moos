@@ -10,8 +10,8 @@ MOOSTimeWarp = $(TIME_WARP)
 // MOOSTimeWarp = 5
 
 // Forest Lake
-//LatOrigin  = 43.825300
-//LongOrigin = -70.330400 
+LatOrigin  = 43.825300
+LongOrigin = -70.330400 
 
 // MIT Sailing Pavilion (use this one)
 // LatOrigin  = 42.358456 
@@ -23,8 +23,8 @@ MOOSTimeWarp = $(TIME_WARP)
 // LongOrigin  = -70.309013
 
 // South Watuppa Pond
- LatOrigin  = 42.358456
- LongOrigin = -71.087589
+// LatOrigin  = 42.358456
+// LongOrigin = -71.087589
 
 //------------------------------------------
 // Antler configuration  block
@@ -48,8 +48,8 @@ ProcessConfig = pMarineViewer
   AppTick    = 4
   CommsTick  = 4
 
-  //tiff_file            = forrest19.tif
-  tiff_file            = south_Watuppa.tif
+  tiff_file            = forrest19.tif
+  //tiff_file            = south_Watuppa.tif
   tiff_viewable	       = true
 	//tiff_file            = MIT_SP.tif
 

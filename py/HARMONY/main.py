@@ -41,10 +41,16 @@ def main():
             # print(moos_handler.survey_area.areaToGrid())
             moos_handler.assign_waypoints_and_notify_uavs()
             while(len(moos_handler.completed_uavs) != len(moos_handler.available_uavs)):
+                moos_handler.visualizeGrid(moos_handler.survey_area)
                 messages = moos_handler.fetch_messages()
-                moos_handler.parse_incoming_messages(messages);
+                moos_handler.parse_incoming_messages(messages)
                 time.sleep(1)
+            # Reset grid for UUVs
+            # moos_handler.notify("VIEW_GRID_RESET", "true")
+            # Poke with shallow areas
             moos_handler.assign_waypoints_and_notify_uuvs()
+            while True:
+                moos_handler.visualizeGrid(moos_handler.survey_area)
 
             moos_handler.survey_area = None  # Reset survey area for the next iteration
             moos_handler.survey_area_land = None
