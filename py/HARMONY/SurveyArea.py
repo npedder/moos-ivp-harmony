@@ -1,9 +1,10 @@
 
 class SurveyArea:
-    def __init__(self, width, height, position : tuple):
+    def __init__(self, width, height, position : tuple, gcd):
         self.width = width
         self.height = height
         self.position = position  # (x, y)
+        self.gcd = gcd
 
     def areaToGrid(self, label):
         # neded for VIEW_GRID
@@ -15,7 +16,7 @@ class SurveyArea:
 
         # Return the corners in order
 
-        grid = f"pts={{{self.position[0]},{self.position[1]}:{top_left[0]},{top_left[1]}:{top_right[0]},{top_right[1]}:{bottom_right[0]},{bottom_right[1]}}},label='{label}',msg='{label},cell_size=5"
+        grid = f"pts={{{self.position[0]},{self.position[1]}:{top_left[0]},{top_left[1]}:{top_right[0]},{top_right[1]}:{bottom_right[0]},{bottom_right[1]}}},label='{label}',msg='{label},cell_size={self.gcd}"
         return grid
 
 

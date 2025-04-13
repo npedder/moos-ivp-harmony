@@ -75,7 +75,7 @@ def parseSurveyAreaAndCreateObject(survey_msg, gcd):
         width = math.ceil(width / gcd) * gcd
         height = math.ceil(height / gcd) * gcd
 
-        surveyArea = SurveyArea(width, height, (x_pos, y_pos));
+        surveyArea = SurveyArea(width, height, (x_pos, y_pos), gcd);
         return surveyArea
     else:
         print("Pattern not found in the string.")

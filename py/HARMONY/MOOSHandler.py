@@ -98,9 +98,7 @@ class MOOSHandler:
                     elif len(self.sensor_ranges) == 1:
                         self.gcd = self.sensor_ranges[0]
                     self.survey_area = utils.parseSurveyAreaAndCreateObject(msg.string(), self.gcd)
-                    self.survey_area_land = utils.parseSurveyAreaAndCreateObject(msg.string(), self.gcd)
-                    self.survey_area_land.position = (self.survey_area.position[0] - self.survey_area.width - 100, self.survey_area.position[1] - self.survey_area.height - 100) #mirror survey area on both axis
-                    self.notify("VIEW_GRID", self.survey_area.areaToGrid("Survey Area UUV"));
+                    # self.notify("VIEW_GRID", self.survey_area.areaToGrid("Survey Area UUV"));
                     self.assign_waypoints_and_notify_uavs()
 
                 # Mostly for receiving current x,y
@@ -136,6 +134,7 @@ class MOOSHandler:
             height = int(self.survey_area.height / self.gcd)
             width = int(self.survey_area.width / self.gcd)
             grid_data = np.ones((height, width), dtype=int)
+            grid_data = ml.resize_mission_layout(ml.mission_area_2, width, height)
 
             #normalize_vehicle assignments for algorithm TODO: move to algorithm side
             for uav in self.available_uavs.values():
@@ -174,7 +173,7 @@ class MOOSHandler:
         # Create a 2d array based off a preconfigured mission grid layout
         grid_height = int(self.survey_area.height / self.gcd)
         grid_width = int(self.survey_area.width / self.gcd)
-        grid_data = ml.resize_mission_layout(ml.mission_area_1, grid_width, grid_height)
+        grid_data = ml.resize_mission_layout(ml.mission_area_2, grid_width, grid_height)
 
         for vehicle in self.available_vehicles.values():
             vehicle.postition = (vehicle.position[0] - self.survey_area.position[0], vehicle.position[1] - self.survey_area.position[1])

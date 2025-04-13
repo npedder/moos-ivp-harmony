@@ -99,7 +99,7 @@ ProcessConfig = uSimMarineV22
 
   start_pos     = $(START_X), $(START_Y), $(HEADING), 0
   prefix        = NAV
-  turn_rate     = 95
+  turn_rate     = 80
   thrust_map    = 100:$(SPEED)
   //thrust_map    = 0:0, 20:1, 100:$(SPEED)
 	turn_spd_loss = 0.4
