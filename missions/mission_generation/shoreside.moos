@@ -127,8 +127,8 @@ ProcessConfig = pHostInfo
 //uFldShoreBroker
   ProcessConfig = uFldShoreBroker
   {
-    AppTick   = 4
-    CommsTick = 4
+    AppTick   = 10
+    CommsTick = 10
 
     warning_on_stale      = false
     auto_bridge_realmcast = true

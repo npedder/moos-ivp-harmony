@@ -163,8 +163,8 @@ ProcessConfig = pMarinePIDV22
 
 ProcessConfig = pNodeReporter
 {
-  AppTick    = 2
-  CommsTick	 = 2
+  AppTick    = 10
+  CommsTick	 = 10
 
   platform_type   = glider
   platform_color  = $(VEHICLE_COLOR)
@@ -174,8 +174,8 @@ ProcessConfig = pNodeReporter
 //---------------------------------
 ProcessConfig = uFldNodeBroker
  {
-    AppTick   = 4
-    CommsTick = 4
+    AppTick   = 10
+    CommsTick = 10
 
     try_shore_host = pshare_route=localhost:8999
 
