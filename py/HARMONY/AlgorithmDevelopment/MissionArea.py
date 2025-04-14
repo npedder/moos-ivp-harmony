@@ -26,8 +26,12 @@ class MissionArea:
         self.neighbors = {}
         self.__remove_obstacle_nodes__()
 
-    def draw(self, show_neighbors=False, node_color=False, edge_color="dimgray", vehicles_colored=False, vehicle_paths={}):
+    def draw(self, show_neighbors=False, node_color=False, edge_color="dimgray", vehicles_colored=False, vehicle_paths={}, figName="fig"):
 
+        # Redraw the color mesh and update colorbar
+        # Color bar is kept in the scope of draw in order to clear it after use
+        # Otherwise it keeps adding it to the axes
+        cbar = self.redraw_grid_colormesh()
         pos = self.grid_graph.pos
 
         node_colors = ['red' if node in self.vehicles else 'blue' for node in
@@ -45,9 +49,10 @@ class MissionArea:
         # Assign region colors
         if node_color is False:
             i = 0
-            for assignment in self.vehicle_assignments:
+
+            for vehicle in self.vehicles:
                 for index, val in enumerate(self.grid_graph.graph.nodes()):
-                    if val in self.vehicle_assignments[assignment]:
+                    if val in self.vehicle_assignments[vehicle]:
                         node_colors[index] = colors[i % len(colors)]
                 i += 1
         else:
@@ -93,9 +98,9 @@ class MissionArea:
             labels[node] = node
 
         label_pos = {k: (v[0], v[1] + 5) for k, v in pos.items()}  # Adjust the y-coordinate
-        #        nx.draw_networkx_labels(self.grid_graph.graph, label_pos, labels, font_size=12, font_color='r')
 
-        plt.savefig("result.png")
+        self.grid_visualizer.fig.savefig(f"{figName}", dpi=300, bbox_inches="tight", pad_inches=1)
+        cbar.remove()
 
     def add_vehicle_to_graph(self, node):
         if isinstance(node, UxV):
@@ -185,9 +190,9 @@ class MissionArea:
 
         # Generate dynamic boundaries for whole numbers from 0 to len(vehicle_assignments), 0 and 1 are not vehicles
         max_value = len(self.vehicle_assignments) + 2
-        boundaries = [i - 0.5 for i in range(max_value + 2)]
+        boundaries = [i - 0.5 for i in range(max_value + 1)]
 
-        norm = BoundaryNorm(boundaries, len(self.vehicle_assignments) + 3, clip=False)
+        norm = BoundaryNorm(boundaries, len(self.vehicle_assignments) + 2, clip=False)
 
         c = self.grid_visualizer.ax.pcolormesh(x, y, self.grid_visualizer.scaledGrid, shading='flat', norm=norm, cmap=cmap, rasterized=True)
 
@@ -196,17 +201,17 @@ class MissionArea:
 
         # Generate labels
         labels = [""] * max_value
-        labels[0] = "Dead space"
-        labels[1] = "Uncovered"
+        labels[0] = "Area covered by UAV"
+        labels[1] = "Unassigned area"
         for i in range(2,max_value):
             vehicle_speed = self.grid_graph.graph.nodes[self.vehicles[i - 2]]['speed']
             vehicle_sensor_range = self.grid_graph.graph.nodes[self.vehicles[i - 2]]['sensorRange']
-            labels[i] = f"Speed: {vehicle_speed}, Sensor Radius: {vehicle_sensor_range}"
+            labels[i] = f"Speed: {vehicle_speed}, Sensor Diameter: {vehicle_sensor_range * 2}"
 
         cbar.ax.set_yticklabels(labels)
 
         self.grid_visualizer.ax.text(1, -20, f"Cell Width: {self.cellDimension}", ha="left", fontsize=12)
-
+        return cbar
 
     # Vehicle position will be set inside the grid graph. Stores original position and distance from original position
     def _normalize_vehicle_to_graph(self, vehiclePos):  # TODO: This could be made more efficient

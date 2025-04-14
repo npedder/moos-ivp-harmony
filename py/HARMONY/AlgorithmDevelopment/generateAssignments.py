@@ -26,17 +26,17 @@ def generate_assignments(UxVs, grid_data, show_graph=False, mission_name="Missio
 
     region_fine_tuning(mission, 1000, bals)
 
-    if show_graph:
-        mission.redraw_grid_colormesh()
+    # if show_graph:
+    #     mission.redraw_grid_colormesh()
 
     sensor_range_decomposition(mission)
 
     vehicle_paths = calculate_vehicle_paths(mission)
 
-    # Display result
-    if show_graph:
-        mission.draw(show_neighbors=False, node_color="blue", edge_color="white", vehicle_paths=vehicle_paths)
-        plt.show()
+    # # Display result
+    # if show_graph:
+    #     mission.draw(show_neighbors=False, node_color="blue", edge_color="white", vehicle_paths=vehicle_paths)
+    #     plt.show()
 
     return vehicle_paths
 

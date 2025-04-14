@@ -63,7 +63,7 @@ def cyclic_region_growth(mission: MissionArea):
                     account_balances[k] = account_balances[k] - mission.grid_graph.graph.nodes[last_updated_cell]["weight"]
                     N = N - 1
                     # print("Remaining Nodes: ", N - 4)
-
+        mission.draw(figName=f"{mission.grid_graph.graph.number_of_nodes() - N}thGrowthIteration")
     # Convert account balances into a dict with vehicle pos as the key
     # account_balances_dict = {}
     # for i in range(len(mission.vehicles)):
