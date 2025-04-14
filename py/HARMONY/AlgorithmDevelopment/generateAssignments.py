@@ -13,7 +13,7 @@ from AlgorithmDevelopment.missionLayouts import *
 # All the portions of the algorithm, condensed into a single method
 # Input: list of UxV objects, binary grid data, 0 is dead space, 1 is uncovered
 # Output: Dictionary representing vehicle assignments (name : list of waypoints)
-def generate_assignments(UxVs, grid_data, show_graph=False, mission_name="Mission"):
+def generate_assignments(UxVs, grid_data, show_graph=False, mission_name="Mission", iterations=200):
 
     # Create mission object containing graph information to be manipulated
     cellDimension = int(calculate_sensor_range_gcd(UxVs))
@@ -24,7 +24,7 @@ def generate_assignments(UxVs, grid_data, show_graph=False, mission_name="Missio
 
     bals = cyclic_region_growth(mission)
 
-    region_fine_tuning(mission, 1000, bals)
+    region_fine_tuning(mission, iterations, bals)
 
     if show_graph:
         mission.redraw_grid_colormesh()

@@ -1,6 +1,14 @@
-#demo  start
-
 #!/bin/bash
 
-./GenerateMission.sh UAV_UUV.txt 5
-./launch_harmony.sh
+
+if [ "$#" -ne 2 ]; then
+  echo "Usage: $0 <input_file> <timewarp>"
+  exit 1
+fi
+
+INPUT_FILE="$1"
+NUMBER="$2"
+
+./GenerateMission.sh "$INPUT_FILE" "$NUMBER"
+./launch_harmony.sh "$NUMBER"
+
