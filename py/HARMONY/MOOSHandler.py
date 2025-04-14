@@ -135,7 +135,8 @@ class MOOSHandler:
             # Create a 2d array of 1's for vehicles in survey area. '1' is unassigned space
             height = int(self.survey_area.height / self.gcd)
             width = int(self.survey_area.width / self.gcd)
-            grid_data = np.ones((height, width), dtype=int)
+            # grid_data = np.ones((height, width), dtype=int)
+            grid_data = ml.resize_mission_layout(ml.mission_area_2, width, height)
 
             #normalize_vehicle assignments for algorithm TODO: move to algorithm side
             for uav in self.available_uavs.values():

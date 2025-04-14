@@ -149,13 +149,14 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
                 pairsTimeOut[frozenset({buyer, seller})] = 1
                 return bestTrade
         
-        else:
+        else: # Not a cut point
             print("Candidate weight: " + str(graph.nodes[candidate]['weight']))
             account_balances[buyer] = account_balances[buyer] - graph.nodes[candidate]['weight']
             account_balances[seller] = account_balances[seller] + graph.nodes[candidate]['weight']
             tradeFound = True
             pairsTimeOut[frozenset({buyer, seller})] = 1
             return mission.vehicle_assignments[mission.vehicles[seller]] - {candidate}
+        
         # If not returned yet no trade found, time out pair for 3 iterations and return seller assignments
     pairsTimeOut[frozenset({buyer, seller})] = 3
     return mission.vehicle_assignments[mission.vehicles[seller]]
