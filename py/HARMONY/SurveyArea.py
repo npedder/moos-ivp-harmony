@@ -1,7 +1,6 @@
 
 class SurveyArea:
     def __init__(self, width, height, position : tuple, gcd):
-    def __init__(self, width, height, position : tuple, gcd):
         self.width = width
         self.height = height
         self.position = position  # (x, y)

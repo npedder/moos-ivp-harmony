@@ -41,8 +41,6 @@ def main():
 
         if moos_handler.survey_area is not None:
             moos_handler.notify("VIEW_GRID", moos_handler.survey_area.areaToGrid("Survey Area UUV"));
-            if moos_handler.available_uavs:
-                moos_handler.notify("VIEW_GRID", moos_handler.survey_area_land.areaToGrid("Survey Area UAV"));
             # print(moos_handler.survey_area.areaToGrid())
             moos_handler.assign_waypoints_and_notify_uavs()
             while(len(moos_handler.completed_uavs) != len(moos_handler.available_uavs)):
