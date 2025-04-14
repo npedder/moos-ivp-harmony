@@ -5,8 +5,7 @@
 
 
 # These values can be overwritten if the user passes the 4 necessary arguments.
-# SWITCH WIDTH BACK TO 300 AFTER TROY
-width=200
+width=300
 height=100
 x_pos=50
 y_pos=50

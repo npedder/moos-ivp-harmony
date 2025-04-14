@@ -103,7 +103,10 @@ ProcessConfig = uSimpleRobot
   rate_heading  = 180.0 //degrees per sec
   rate_speed    = 2.5   //meters  per sec^2
   rate_depth    = 3.5   //meters  per sec
-  thrust_map    = 0:0, 20:1, 40:2, 60:3, 80:4, 100:$(SPEED)
+  //thrust_map    = 0:0, 20:1, 40:2, 60:3, 80:4, 100:$(SPEED)
+  thrust_map    = 10:$(SPEED)
+  turn_spd_loss = 0
+  turn_rate     = 100
 }
 
 //------------------------------------------
@@ -116,7 +119,8 @@ ProcessConfig = pHelmIvP
 
   behaviors  = $(BHV)
   domain     = course:0:359:360
-  domain     = speed:0:$(SPEED):50S
+  //domain     = speed:0:$(SPEED):50
+  domain     = speed:0:$(SPEED):100
   //ok_skew=any
 }
 
@@ -159,8 +163,8 @@ ProcessConfig = pMarinePIDV22
 
 ProcessConfig = pNodeReporter
 {
-  AppTick    = 2
-  CommsTick	 = 2
+  AppTick    = 10
+  CommsTick	 = 10
 
   platform_type   = glider
   platform_color  = $(VEHICLE_COLOR)
@@ -170,8 +174,8 @@ ProcessConfig = pNodeReporter
 //---------------------------------
 ProcessConfig = uFldNodeBroker
  {
-    AppTick   = 4
-    CommsTick = 4
+    AppTick   = 10
+    CommsTick = 10
 
     try_shore_host = pshare_route=localhost:8999
 

@@ -12,7 +12,7 @@ from Status import Status
 
 def parseNodeReportAndCreateVehicle(nodeReport):
     # Regular expression to extract NAME, LAT, and LON
-    pattern = r"NAME=([^,]+),.*X=([-\d.]+),.*Y=([-\d.]+),.*COLOR=([^,]+)"
+    pattern = r"NAME=([^,]+),.*X=([-\d.]+),.*Y=([-\d.]+),.*HDG=([-\d.]+),.*COLOR=([^,]+)"
     # Search for the match
     match = re.search(pattern, nodeReport)
 
@@ -20,13 +20,14 @@ def parseNodeReportAndCreateVehicle(nodeReport):
         name = match.group(1)
         x = float(match.group(2))
         y = float(match.group(3))
-        color = match.group(4)
+        heading = match.group(4)
+        color = match.group(5)
 
         # print(f"Name: {name}")
         # print(f"Latitude: {lat}")
         # print(f"Longitude: {lon}")
         # print(f"Color: {color}")
-        vehicle = UxV(name, '',(x,y), None, None, None, color);
+        vehicle = UxV(name, '',(x,y), None, None, None, heading, color)
         return vehicle
     else:
         print("Pattern not found in the string.")
@@ -52,7 +53,7 @@ def parseHarmonyReportAndCreateVehicle(nodeReport):
         # print(f"Latitude: {lat}")
         # print(f"Longitude: {lon}")
 
-        vehicle = UxV(name, type, (x, y), speed,sensor_range,endurance, None);
+        vehicle = UxV(name, type, (x, y), speed,sensor_range,endurance, None, None)
         return vehicle
     else:
         print("Pattern not found in the string.")
@@ -75,7 +76,7 @@ def parseSurveyAreaAndCreateObject(survey_msg, gcd):
         width = math.ceil(width / gcd) * gcd
         height = math.ceil(height / gcd) * gcd
 
-        surveyArea = SurveyArea(width, height, (x_pos, y_pos), gcd);
+        surveyArea = SurveyArea(width, height, (x_pos, y_pos), gcd)
         return surveyArea
     else:
         print("Pattern not found in the string.")

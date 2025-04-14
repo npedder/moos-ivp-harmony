@@ -3,6 +3,7 @@ import numpy as np
 import utils
 from AlgorithmDevelopment import generate_assignments
 from AlgorithmDevelopment import missionLayouts as ml
+from AlgorithmDevelopment import missionLayouts as ml
 import time
 import sys
 
@@ -14,6 +15,10 @@ from Points import Points
 class MOOSHandler:
 
     def __init__(self, host, port, client_name, time_warp):
+        self.filled_cells = set()
+        self.grid_data = None
+        self.grid_width = None
+        self.grid_height = None
         self.comms = pymoos.comms()
         self.host = host
         self.port = port
@@ -27,6 +32,17 @@ class MOOSHandler:
         self.sensor_ranges = []
         self.gcd = 1
         self.completed_uavs = {}
+        self.completed_uuvs = {}
+        self.gridMSG = " "
+        self.position = " "
+        self.bottomRight = " "
+        self.topRight = " "
+        self.topLeft = " "
+        self.x, self.y = 0,0
+        self.x_edge = 0
+        self.y_edge = 0
+
+
 
     def connect(self):
         # Start connection to MOOSDB and set callback
@@ -34,6 +50,7 @@ class MOOSHandler:
         #pymoos.set_moos_timewarp(5)
         self.comms.set_on_connect_callback(self.__on_connect)
         self.comms.run(self.host, self.port, self.client_name)
+        self.comms.set_comms_tick(20)
 
     def __on_connect(self):
         # Runs after connection
@@ -100,31 +117,138 @@ class MOOSHandler:
                     self.survey_area = utils.parseSurveyAreaAndCreateObject(msg.string(), self.gcd)
                     # self.notify("VIEW_GRID", self.survey_area.areaToGrid("Survey Area UUV"));
                     self.assign_waypoints_and_notify_uavs()
+                    # FOR pSEARCHGRID
+                    self.x, self.y = self.survey_area.position
+                    self.x_edge = self.x + self.survey_area.width
+                    self.y_edge = self.y + self.survey_area.height
 
-                # Mostly for receiving current x,y
+                    #                                 BOTTOM LEFT                                   BOTTOM RIGHT                                     TOP RIGHT                                    TOP LEFT
+                    self.gridMSG = "pts={" + str(self.x) + "," + str(self.y) + ": " + str(self.x_edge) + "," + str(self.y) + ": " + str(self.x_edge) + "," + str(self.y_edge) + ": "+ str(self.x) + "," + str(self.y_edge) + "}, cell_size=" + str(self.survey_area.gcd) + ",cell_vars=x:0:y:0,cell_min=x:0,cell_max=x:5,label=psg"
+
+                    print(self.gridMSG)
+                    self.comms.notify("VIEW_GRID",self.gridMSG)
+
+
+                # Mostly for receiving current x,y and heading
                 case "NODE_REPORT":
                     vehicle = utils.parseNodeReportAndCreateVehicle(msg.string())
                     if vehicle and vehicle.name in self.available_vehicles:
                         self.available_vehicles[vehicle.name].x = vehicle.position[0]
                         self.available_vehicles[vehicle.name].y = vehicle.position[1]
                         self.available_vehicles[vehicle.name].color = vehicle.color
-                        #print("Updated vehicles:", self.available_vehicles)
+                        self.available_vehicles[vehicle.name].heading = vehicle.heading
+                        print("Updated vehicles:", self.available_vehicles)
                     if vehicle and vehicle.name in self.available_uavs:
                         self.available_uavs[vehicle.name].x = vehicle.position[0]
                         self.available_uavs[vehicle.name].y = vehicle.position[1]
                         self.available_uavs[vehicle.name].color = vehicle.color
-                        #print("Updated vehicles:", self.available_vehicles)
+                        self.available_uavs[vehicle.name].heading = vehicle.heading
+                        print("Updated vehicles:", self.available_vehicles)
 
                 case "STATUS":
-                    uav_complete = utils.parseStatusAndCreateObject(msg.string())
-                    if uav_complete.name not in self.completed_uavs:
-                        if int(uav_complete.status) > 2:
-                            print(uav_complete.name, " Completed!-------------------------------------------------")
-                            self.completed_uavs[uav_complete.name] = uav_complete
-                    if len(self.completed_uavs) == len(self.available_uavs):
-                        print("All UAVs finished")
-                        for uav in self.completed_uavs.keys():
-                            self.notify("VIEW_SEGLIST", f'pts={{}}, label={uav}_wpt_survey, active=false')  # Clears waypoint display
+                    vehicle_complete = utils.parseStatusAndCreateObject(msg.string())
+                    if 'uav' in vehicle_complete.name:
+                        if vehicle_complete.name not in self.completed_uavs:
+                            if int(vehicle_complete.status) > 2:
+                                print(vehicle_complete.name, " Completed!-------------------------------------------------")
+                                self.completed_uavs[vehicle_complete.name] = vehicle_complete
+                        if len(self.completed_uavs) == len(self.available_uavs):
+                            print("All UAVs finished")
+                            # This is where we would run the UUV algorithm
+                    if 'vehicle' in vehicle_complete.name:
+                        if vehicle_complete.name not in self.completed_uuvs:
+                            if int(vehicle_complete.status) > 2:
+                                print(vehicle_complete.name, " Completed!-------------------------------------------------")
+                            self.completed_uuvs[vehicle_complete.name] = vehicle_complete
+                        if len(self.completed_uavs) == len(self.available_uavs):
+                            print("All UUVs finished")
+
+
+
+
+
+
+
+    def assign_and_notify(self):
+        # Assign tasks to vehicles and send notifications to MOOSDB
+        print(f"{len(self.available_vehicles)} vehicles found. Survey area: {self.survey_area}")
+        print(f"{len(self.available_uavs)} uavs found. UAV Survey area: {self.survey_area_land}")
+
+        # Run if dict not empty
+        if self.available_vehicles and self.vehicles_turn:
+            # Create a 2d array of 1's for vehicles in survey area. '1' is unassigned space
+            height = int(self.survey_area.height / self.gcd)
+            width = int(self.survey_area.width/self.gcd)
+            grid_data = np.ones((height,width), dtype=int)
+
+            # Assign areas to vehicles using allocation algorithm
+            vehicle_assignments = generate_assignments(list(self.available_vehicles.values()), grid_data, show_graph=True)
+            print("Vehicle Assignments:", vehicle_assignments)
+            
+            # Notify MOOSDB with the waypoint updates
+            for count, (name, assignment) in enumerate(vehicle_assignments.items()):
+                # assignment.reposition();
+                # color = colors[count % len(colors)]     # for waypoint color
+                points = Points(assignment,self.survey_area.position[0],self.survey_area.position[1])
+                print(f"current vehicle: {name}, waypoints: {points.string()} ")
+                msg_key = f"{name}_WAYPOINTS"
+                color = self.available_vehicles[name].color
+                wpt_var = f"{name}_WPT_UPDATE"
+                print(f"SENDING {points.string()} to {wpt_var}")
+                self.notify(wpt_var, points.string())
+
+                if len(assignment) == 0:     # No waypoint assigned because survey area is too large
+                    print("Waypoint notifications not sent because vehicle area assignment = 0")
+                    self.notify("VIEW_SEGLIST", f'{points.seglist_string()},label={name}_wpt_survey,active=false')  # removes any prior waypoint visuals
+                else:
+                    self.notify("VIEW_SEGLIST", f'{points.seglist_string()},label={name}_wpt_survey,edge_color={color},edge_size=2')  # Displays waypoints before deployment
+                    # CHANGE THIS LINE BELOW
+                    self.notify(wpt_var, points.string())
+
+
+
+    # ------------------------------------------------------
+
+        # Run if dict not empty
+        if self.available_uavs and not self.vehicles_turn:
+            # Create a 2d array of 1's for vehicles in survey area. '1' is unassigned space
+            height2 = int(self.survey_area.height / self.gcd)
+            width2 = int(self.survey_area.width / self.gcd)
+            grid_data = np.ones((height2, width2), dtype=int)
+            uav_assignments = generate_assignments(list(self.available_uavs.values()), grid_data, show_graph=True)
+
+            print("UAVs Assignments:", uav_assignments)
+
+
+            # Notify MOOSDB with the waypoint updates
+            for count, (name, assignment) in enumerate(uav_assignments.items()):
+                # assignment.reposition();
+
+                points = Points(assignment, self.survey_area.position[0], self.survey_area.position[1])
+                waypoints_str = points.string()
+                print(f"current vehicle: {name}, waypoints: {waypoints_str} ")
+                color = self.available_uavs[name].color
+                wpt_var = f"{name}_WPT_UPDATE"
+                print(f"SENDING {waypoints_str} to {wpt_var}")
+                self.notify(wpt_var, waypoints_str)
+
+                # color = colors[count % len(colors)]  # for waypoint color
+
+                if "uav" in name:
+                    color = warm_colors[count % len(warm_colors)]
+                elif "vehicle" in name:
+                    color = cool_colors[count % len(cool_colors)]
+
+                print(f"SENDING {points.string()} to {wpt_var}")
+
+                if len(assignment) == 0:  # No waypoint assigned because survey area is too large
+                    print("Waypoint notifications not sent because uav area assignment = 0")
+                    self.notify("VIEW_SEGLIST",
+                                f'{points.seglist_string()},label={name}_wpt_survey, active=false')  # removes any prior waypoint visuals
+                else:
+                    self.notify("VIEW_SEGLIST",
+                                f'{points.seglist_string()},label={name}_wpt_survey, edge_color={color}, edge_size=2')  # Displays waypoints before deployment
+                    self.notify(wpt_var, waypoints_str)
 
 
     def assign_waypoints_and_notify_uavs(self):
@@ -179,7 +303,7 @@ class MOOSHandler:
             vehicle.postition = (vehicle.position[0] - self.survey_area.position[0], vehicle.position[1] - self.survey_area.position[1])
 
         # Assign areas to vehicles using allocation algorithm
-        vehicle_assignments = generate_assignments(list(self.available_vehicles.values()), grid_data, show_graph=True)
+        vehicle_assignments = generate_assignments(list(self.available_vehicles.values()), self.grid_data, show_graph=True)
         print("Vehicle Assignments:", vehicle_assignments)
 
         # Notify MOOSDB with the waypoint updates

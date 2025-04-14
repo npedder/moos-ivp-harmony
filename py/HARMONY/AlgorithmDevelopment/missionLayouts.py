@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.ndimage import zoom
+from scipy.ndimage import zoom
 
 # 20 x 10
 mission_area_1 = np.array([

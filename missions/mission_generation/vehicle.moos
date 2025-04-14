@@ -38,6 +38,7 @@ ProcessConfig = ANTLER
   Run = pHostInfo     @ NewConsole = false
   Run = uFldNodeBroker @ NewConsole = false
   Run = uTimerScript @ NewConsole = false
+  Run = pReturnSignal @ NewConsole = false
 }
 
 //------------------------------------------
@@ -99,12 +100,11 @@ ProcessConfig = uSimMarineV22
 
   start_pos     = $(START_X), $(START_Y), $(HEADING), 0
   prefix        = NAV
-  turn_rate     = 80
-  thrust_map    = 100:$(SPEED)
+  turn_rate     = 0
+  thrust_map    = 10:$(SPEED)
   //thrust_map    = 0:0, 20:1, 100:$(SPEED)
-	turn_spd_loss = 0.4
-  //NAV_SPEED     = $(SPEED)
-  max_speed = $(SPEED)
+	turn_spd_loss = 0
+  max_speed     = 20
 }
 
 //------------------------------------------
@@ -160,8 +160,8 @@ ProcessConfig = pMarinePIDV22
 
 ProcessConfig = pNodeReporter
 {
-  AppTick    = 2
-  CommsTick	 = 2
+  AppTick    = 10
+  CommsTick	 = 10
 
   platform_type   = kayak //used to differentiate uuv from uav
   platform_color  = $(VEHICLE_COLOR)
@@ -171,8 +171,8 @@ ProcessConfig = pNodeReporter
 //---------------------------------
 ProcessConfig = uFldNodeBroker
  {
-    AppTick   = 4
-    CommsTick = 4
+    AppTick   = 10
+    CommsTick = 10
 
     try_shore_host = pshare_route=localhost:8999
 
@@ -209,3 +209,11 @@ ProcessConfig = pShare
 
  }
 
+ //------------------------------------------------
+// pReturnSignal config block
+
+ProcessConfig = pReturnSignal
+{
+   AppTick   = 4
+   CommsTick = 4
+}
