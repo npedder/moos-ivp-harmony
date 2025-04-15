@@ -218,6 +218,7 @@ class MOOSHandler:
 
 
     def assign_waypoints_and_notify_uuvs(self):
+
         # Create a 2d array based off a preconfigured mission grid layout
         self.grid_height = int(self.survey_area.height / self.gcd)
         self.grid_width = int(self.survey_area.width / self.gcd)

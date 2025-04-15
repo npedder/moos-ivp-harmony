@@ -75,13 +75,20 @@ def main():
                 moos_handler.notify("VIEW_GRID_DELTA", spot_msg)
                 check = 1
 
+            # Clear UAV waypoint information
+            for name in moos_handler.available_uavs:
+                moos_handler.notify("VIEW_SEGLIST",
+                            f'pts={{0,0}},label={name}_wpt_survey, active=false')  # removes any prior waypoint visuals
+
             while (len(moos_handler.completed_uuvs) != len(moos_handler.available_vehicles)):
                 messages = moos_handler.fetch_messages()
                 moos_handler.parse_incoming_messages(messages)
                 moos_handler.visualizeGrid(moos_handler.survey_area, moos_handler.available_vehicles)
 
-            # while True:
-                # moos_handler.visualizeGrid(moos_handler.survey_area)
+            # Clear UAV waypoint information
+            for name in moos_handler.available_vehicles:
+                moos_handler.notify("VIEW_SEGLIST",
+                                    f'pts={{0,0}},label={name}_wpt_survey, active=false')  # removes any prior waypoint visuals
 
             moos_handler.survey_area = None  # Reset survey area for the next iteration
             moos_handler.survey_area_land = None
