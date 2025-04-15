@@ -180,6 +180,7 @@ class MOOSHandler:
             width1 = int(self.survey_area.width / self.gcd)
             grid_data = np.ones((height1, width1), dtype=int)
 
+            # Offset vehicle positions for algorithm
             for uav in self.available_uavs.values():
                 uav.position = (uav.position[0] - self.survey_area.position[0], uav.position[1] - self.survey_area.position[1])
 
@@ -222,8 +223,10 @@ class MOOSHandler:
         self.grid_width = int(self.survey_area.width / self.gcd)
         self.grid_data = ml.resize_mission_layout(ml.mission_area_2, self.grid_width, self.grid_height)
 
+        # Offset vehicle positions for algorithm
         for vehicle in self.available_vehicles.values():
-            vehicle.postition = (vehicle.position[0] - self.survey_area.position[0], vehicle.position[1] - self.survey_area.position[1])
+            vehicle.position = (vehicle.position[0] - self.survey_area.position[0], vehicle.position[1] - self.survey_area.position[1])
+            print(self.survey_area.position)
 
         # Assign areas to vehicles using allocation algorithm
         vehicle_assignments = generate_assignments(list(self.available_vehicles.values()), self.grid_data,
@@ -263,39 +266,6 @@ class MOOSHandler:
             print(f"SENDING {waypoints_str} to {wpt_var}")
             self.notify(wpt_var, waypoints_str)
 
-            # color = colors[count % len(colors)]  # for waypoint color
-
-    # def assign_waypoints_and_notify_uuvs(self):
-    #     # Create a 2d array of 1's for vehicles in survey area. '1' is unassigned space
-    #     height = int(self.survey_area.height / self.gcd)
-    #     width = int(self.survey_area.width / self.gcd)
-    #     grid_data = np.ones((height, width), dtype=int)
-    #
-    #     # Assign areas to vehicles using allocation algorithm
-    #     vehicle_assignments = generate_assignments(list(self.available_vehicles.values()), grid_data, show_graph=True)
-    #     print("Vehicle Assignments:", vehicle_assignments)
-    #
-    #     # Notify MOOSDB with the waypoint updates
-    #     for count, (name, assignment) in enumerate(vehicle_assignments.items()):
-    #         # assignment.reposition();
-    #         # color = colors[count % len(colors)]     # for waypoint color
-    #         points = Points(assignment, self.survey_area.position[0], self.survey_area.position[1])
-    #         print(f"current vehicle: {name}, waypoints: {points.string()} ")
-    #         msg_key = f"{name}_WAYPOINTS"
-    #         color = self.available_vehicles[name].color
-    #         wpt_var = f"{name}_WPT_UPDATE"
-    #         print(f"SENDING {points.string()} to {wpt_var}")
-    #         self.notify(wpt_var, points.string())
-    #
-    #         if len(assignment) == 0:  # No waypoint assigned because survey area is too large
-    #             print("Waypoint notifications not sent because vehicle area assignment = 0")
-    #             self.notify("VIEW_SEGLIST",
-    #                         f'{points.seglist_string()},label={name}_wpt_survey,active=false')  # removes any prior waypoint visuals
-    #         else:
-    #             self.notify("VIEW_SEGLIST",
-    #                         f'{points.seglist_string()},label={name}_wpt_survey,edge_color={color},edge_size=2')  # Displays waypoints before deployment
-    #             # CHANGE THIS LINE BELOW
-    #             self.notify(wpt_var, points.string())
 
     def visualizeGrid(self, surveyArea, vehicleList):
         surveyArea = surveyArea
