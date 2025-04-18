@@ -47,7 +47,6 @@ def main():
                 moos_handler.visualizeGrid(moos_handler.survey_area, moos_handler.available_uavs)
                 messages = moos_handler.fetch_messages()
                 moos_handler.parse_incoming_messages(messages)
-                print("sleeping")
                 time.sleep(0.01)
 
             # Reset grid for UUVs and allow separate deploying
