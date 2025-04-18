@@ -49,8 +49,11 @@ def main():
                 moos_handler.parse_incoming_messages(messages)
                 print("sleeping")
                 time.sleep(0.01)
-            # Reset grid for UUVs
+
+            # Reset grid for UUVs and allow separate deploying
             moos_handler.comms.notify("VIEW_GRID", moos_handler.gridMSG)
+            moos_handler.notify("DEPLOY_ALL", "false")
+
             # Poke with shallow areas
             moos_handler.assign_waypoints_and_notify_uuvs()
 
@@ -79,13 +82,15 @@ def main():
             for name in moos_handler.available_uavs:
                 moos_handler.notify("VIEW_SEGLIST",
                             f'pts={{0,0}},label={name}_wpt_survey, active=false')  # removes any prior waypoint visuals
+                # Remove waypoint data from UAVs to allow separate deploying of UUVs
+                moos_handler.unassign_and_notify(moos_handler.available_uavs)
 
             while (len(moos_handler.completed_uuvs) != len(moos_handler.available_vehicles)):
                 messages = moos_handler.fetch_messages()
                 moos_handler.parse_incoming_messages(messages)
                 moos_handler.visualizeGrid(moos_handler.survey_area, moos_handler.available_vehicles)
 
-            # Clear UAV waypoint information
+            # Clear UUV waypoint information
             for name in moos_handler.available_vehicles:
                 moos_handler.notify("VIEW_SEGLIST",
                                     f'pts={{0,0}},label={name}_wpt_survey, active=false')  # removes any prior waypoint visuals

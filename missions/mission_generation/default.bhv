@@ -81,7 +81,7 @@ Behavior=BHV_ConstantSpeed
   updates   = SPEED_UPDATE
   endflag   = SPD = false
 
-           speed = $(SPEED)
+           speed = 0.5
 		    duration = 10
 	duration_reset = CONST_SPD_RESET=true
 }

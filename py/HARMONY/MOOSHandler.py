@@ -258,11 +258,11 @@ class MOOSHandler:
 
 
     # Remove the waypoint information from a list of vehicles
-    def unassign_and_notify(self, vehiclelist):
+    def unassign_and_notify(self, vehicleList):
         # Notify MOOSDB with empty waypoint updates
-        for name in vehiclelist:
+        for name, vehicle in vehicleList.items():
             # assignment.reposition();
-            waypoints_str = f''  # TODO: Not working
+            waypoints_str = f"points = {vehicle.x},{vehicle.y}"
             wpt_var = f"{name}_WPT_UPDATE"
             print(f"SENDING {waypoints_str} to {wpt_var}")
             self.notify(wpt_var, waypoints_str)
@@ -314,79 +314,7 @@ class MOOSHandler:
                         poke_msg = "psg@" + str(sensor_left) + ",x,2:"
                         self.notify("VIEW_GRID_DELTA", poke_msg)
 
-                    # Cells above and below
-                    # Makes sure we don't exceed grid height and loop back to bottom
-                    # if int(grid_num+i) < int(grid_row*cell_size):
-                    #     poke_msg = "psg@" + str(grid_num + i) + ",x,2"
-                    #     self.notify("VIEW_GRID_DELTA", poke_msg)
-                    # if int(grid_num - i) > 0:
-                    #     poke_msg = "psg@" + str(grid_num - i) + ",x,2"
-                    #     self.notify("VIEW_GRID_DELTA", poke_msg)
-        #
-        # # TODO, copy top loop for UUVs
-        # if vehicleType == "uuv":
-        #     for name, vehicle in self.available_vehicles.items():
-        #         # Get location and sensor range
-        #         x = vehicle.x
-        #         y = vehicle.y
-        #         head = vehicle.heading
-        #         sensor = vehicle.sensorRange
-        #         sensor_to_grid = int(sensor / cell_size)
-        #         # if in survey
-        #         if x >= survey_startX and x <= (survey_startX+survey_width) and y >= survey_startY and y <= (survey_startY + survey_height):
-        #             grid_x = x - survey_startX
-        #             grid_y = y - survey_startY
-        #             grid_row = int(grid_x/cell_size)+1
-        #             grid_num = int(grid_x/cell_size)*int(survey_height/cell_size) + int(grid_y/cell_size)
-        #             if grid_num not in self.filled_cells:
-        #                 self.filled_cells.add(grid_num)
-        #                 poke_msg = "psg@" + str(grid_num) + ",x,2"
-        #                 self.notify("VIEW_GRID_DELTA", poke_msg)
-        #             for i in range(0, sensor_to_grid+1, 1):
-        #                 # if head%90 == 0:
-        #                 # grid_sensor = grid_num + int(i*cell_height)
-        #                 # Cells to left and right of vehicle
-        #                 sensor_right = grid_num + int(i * cell_height)
-        #                 sensor_left = grid_num - int(i * cell_height)
-        #                 if sensor_right not in self.filled_cells:
-        #                     #poke_msg = "psg@" + str(sensor_right) + ",x,5:" + str(sensor_left) + ",x,2"
-        #                     self.filled_cells.add(sensor_right)
-        #                     poke_msg = "psg@" + str(sensor_right) + ",x,2:"
-        #                     self.notify("VIEW_GRID_DELTA", poke_msg)
-        #                 if sensor_left not in self.filled_cells:
-        #                     self.filled_cells.add(sensor_left)
-        #                     poke_msg = "psg@" + str(sensor_left) + ",x,2:"
-        #                     self.notify("VIEW_GRID_DELTA", poke_msg)
-        #                 # poke_msg = "psg@" + str(grid_num + i) + ",x,2:" + str(grid_num - i) + ",x,2"
-        #                 # if int(grid_num-i) > 0:
-        #                 #     poke_msg = "psg@" + str(grid_num + i) + ",x,2:" + str(grid_num - i) + ",x,2"
-        #                 #     self.notify("VIEW_GRID_DELTA", poke_msg)
-        #                 # else:
-        #                 #     poke_msg = "psg@" + str(grid_num + i) + ",x,2"
-        #                 #     self.notify("VIEW_GRID_DELTA", poke_msg)
-        #
-        #
-        #                 #poke_msg = "psg@" + str(grid_num + i) + ",x,2:" + str(grid_num - i) + ",x,2"
-        #                 #poke_msg = "psg@" + str(grid_num - i) + ",x,2"
-        #                 #self.notify("VIEW_GRID_DELTA", poke_msg)
-        #                 #poke_msg = "psg@" + str(0-grid_sensor) + ",x,2"
-        #                 #self.notify("VIEW_GRID_DELTA", poke_msg)
-        #
-        #
-        #
-        #             # if in survey
-        #                 # translate position relation to grid origin
-        #                 # translate new position value to grid number (x/cell_size)*(grid height/cell_size) + (y/cell_size)
-        #                 # For int i = 0; i <= vehicle.sensor_range/cell_size; i++
-        #                     # self.notify("VIEW_GRID_DELTA", "psg@" + str(gridNum+i) + ",x,2")
-        #                     # self.notify("VIEW_GRID_DELTA", "psg@" + str(gridNum-i) + ",x,2")
-        #                     # self.notify("VIEW_GRID_DELTA", "psg@" + str(gridNum+cell_size*i) + ",x,2")
-        #                     # self.notify("VIEW_GRID_DELTA", "psg@" + str(gridNum-cell_size*i) + ",x,2")
-        #
-        #
-        #
-        #
-        #
+
 
 
 # Array of colors that can be used for pMarineViewer geometry. Not a complete list

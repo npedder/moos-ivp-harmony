@@ -117,8 +117,8 @@ ProcessConfig = pHelmIvP
 
   behaviors  = $(BHV)
   domain     = course:0:359:360
-  domain     = speed:0:$(SPEED):50
-  //ok_skew=any
+  domain     = speed:0:$(SPEED):100
+  ok_skew=any
 }
 
 //------------------------------------------

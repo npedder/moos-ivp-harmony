@@ -100,13 +100,14 @@ ProcessConfig = uSimpleRobot
   start_x       = $(START_X)
   start_y       = $(START_Y)
 
-  rate_heading  = 180.0 //degrees per sec
+  //rate_heading  = 180.0 //degrees per sec
+  rate_heading  = 360.0 //set to 360 to avoid uavs spinning out 
   rate_speed    = 2.5   //meters  per sec^2
   rate_depth    = 3.5   //meters  per sec
   //thrust_map    = 0:0, 20:1, 40:2, 60:3, 80:4, 100:$(SPEED)
   thrust_map    = 10:$(SPEED)
   turn_spd_loss = 0
-  turn_rate     = 100
+  turn_rate     = 0
 }
 
 //------------------------------------------
