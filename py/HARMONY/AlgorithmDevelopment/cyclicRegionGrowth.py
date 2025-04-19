@@ -48,7 +48,7 @@ def cyclic_region_growth(mission: MissionArea):
         NV_k[i] = set((mission.grid_graph.graph[R[i]].keys()))
 
     last_updated_cell = 0;
-    while (N > len(R)):  # This is len R because the once the last nodes are updated, if statement doesn't N-1 again.
+    while (N > len(R) + len(removed_vehicles)):  # This is len R because the once the last nodes are updated, if statement doesn't N-1 again.
         for k in range(0, len(R)):
             for j in range(0, rate[k]):
                 # Update NV_K:
@@ -56,7 +56,7 @@ def cyclic_region_growth(mission: MissionArea):
                     NV_k[n] = update_NV_K(mission, NV_k[n], n, last_updated_cell, assigned_nodes)
                 # Assign nodes
                 if NV_k[k]: # Checks if list of NVs are empty
-                    last_updated_cell =  list(NV_k[k])[0] # select a cell from NV_k
+                    last_updated_cell = list(NV_k[k])[0]  # select a cell from NV_k
                     mission.vehicle_assignments[mission.vehicles[k]].add(last_updated_cell)  # Assign selected cell
                     assigned_nodes.add(last_updated_cell)
                     mission.grid_graph.graph.nodes[last_updated_cell]['region'] = mission.vehicles[k]

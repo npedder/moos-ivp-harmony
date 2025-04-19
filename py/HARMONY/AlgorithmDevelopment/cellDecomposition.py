@@ -68,24 +68,18 @@ def cell_decomposition(mission: MissionArea):
 
             # Add vehicle node and make an edge between the vehicle and the cell containing it
             for vehicle in vehicles_in_cell:
-                if center_node in mission.vehicles:
-                    mission.add_vehicles_to_graph()
-                    mission.vehicles.remove(vehicle)
-                    #new_cell = mission._normalize_vehicle_to_graph(mission.grid_graph.graph.nodes[vehicle]['originalPos'])
-
-                else:
-                    #_add_node_and_update_pos(cell_graph, cell_graph_pos, vehicle)
-                    # Center node becomes new vehicle start location
-                    cell_graph.nodes[center_node].update(mission.grid_graph.graph.nodes[vehicle])  # Transfer attributes to center node
-                    cell_graph.nodes[center_node]["weight"] = weight  # Transfer of attributes overwrites the weight
-                    cell_graph.nodes[center_node]['region'] = center_node
-                    mission.vehicles[mission.vehicles.index(vehicle)] = center_node
-                    mission.vehicle_assignments[center_node] = mission.vehicle_assignments.pop(vehicle)
-                    mission.vehicle_assignments[center_node].add(center_node)
-                    mission.original_positions[center_node] = cell_graph.nodes[center_node]["originalPos"]
+                #_add_node_and_update_pos(cell_graph, cell_graph_pos, vehicle)
+                # Center node becomes new vehicle start location
+                cell_graph.nodes[center_node].update(mission.grid_graph.graph.nodes[vehicle])  # Transfer attributes to center node
+                cell_graph.nodes[center_node]["weight"] = weight  # Transfer of attributes overwrites the weight
+                cell_graph.nodes[center_node]['region'] = center_node
+                mission.vehicles[mission.vehicles.index(vehicle)] = center_node
+                mission.vehicle_assignments[center_node] = mission.vehicle_assignments.pop(vehicle)
+                mission.vehicle_assignments[center_node].add(center_node)
+                mission.original_positions[center_node] = cell_graph.nodes[center_node]["originalPos"]
 
 
-    center_nodes_grouped_by_x = group_by_x(set(cell_graph.nodes).difference(set(mission.vehicles))) # Makes it easier to find bordering cells
+    center_nodes_grouped_by_x = group_by_x(set(cell_graph.nodes)) # Makes it easier to find bordering cells
     distance_between_nodes = mission.cellDimension
     # Create edges between bordering cells.
     for center_node in center_nodes_old_neighbors:
@@ -104,6 +98,9 @@ def cell_decomposition(mission: MissionArea):
 
             for possible_bordering_cell in possible_bordering_cells:
                 if neighbor in center_nodes_old_neighbors[possible_bordering_cell]:
+                    cell_graph.add_edge(center_node, possible_bordering_cell)
+                    print(cell_graph[center_node])
+                elif center_node in center_nodes_old_neighbors[possible_bordering_cell]:
                     cell_graph.add_edge(center_node, possible_bordering_cell)
 
 
