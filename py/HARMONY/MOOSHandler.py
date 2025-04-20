@@ -16,10 +16,6 @@ from Points import Points
 class MOOSHandler:
 
     def __init__(self, host, port, client_name, time_warp):
-        self.filled_cells = set()
-        self.grid_data = None
-        self.grid_width = None
-        self.grid_height = None
         self.comms = pymoos.comms()
         self.host = host
         self.port = port
@@ -35,13 +31,8 @@ class MOOSHandler:
         self.completed_uavs = {}
         self.completed_uuvs = {}
         self.gridMSG = " "
-        self.position = " "
-        self.bottomRight = " "
-        self.topRight = " "
-        self.topLeft = " "
-        self.x, self.y = 0, 0
-        self.x_edge = 0
-        self.y_edge = 0
+        self.filled_cells = set()
+        self.grid_data = None
 
     def connect(self):
         # Start connection to MOOSDB and set callback
@@ -121,14 +112,14 @@ class MOOSHandler:
                                                           1] - self.survey_area.height - 100)  # mirror survey area on both axis
 
                     # FOR pSEARCHGRID
-                    self.x, self.y = self.survey_area.position
-                    self.x_edge = self.x + self.survey_area.width
-                    self.y_edge = self.y + self.survey_area.height
+                    x, y = self.survey_area.position
+                    x_edge = x + self.survey_area.width
+                    y_edge = y + self.survey_area.height
 
                     #                                 BOTTOM LEFT                                   BOTTOM RIGHT                                     TOP RIGHT                                    TOP LEFT
-                    self.gridMSG = "pts={" + str(self.x) + "," + str(self.y) + ": " + str(self.x_edge) + "," + str(
-                        self.y) + ": " + str(self.x_edge) + "," + str(self.y_edge) + ": " + str(self.x) + "," + str(
-                        self.y_edge) + "}, cell_size=" + str(
+                    self.gridMSG = "pts={" + str(x) + "," + str(y) + ": " + str(x_edge) + "," + str(
+                        y) + ": " + str(x_edge) + "," + str(y_edge) + ": " + str(x) + "," + str(
+                        y_edge) + "}, cell_size=" + str(
                         self.survey_area.gcd) + ",cell_vars=x:0:y:0,cell_min=x:0,cell_max=x:5,label=psg"
 
                     print(self.gridMSG)
@@ -220,9 +211,9 @@ class MOOSHandler:
     def assign_waypoints_and_notify_uuvs(self):
 
         # Create a 2d array based off a preconfigured mission grid layout
-        self.grid_height = int(self.survey_area.height / self.gcd)
-        self.grid_width = int(self.survey_area.width / self.gcd)
-        self.grid_data = ml.resize_mission_layout(ml.mission_area_2, self.grid_width, self.grid_height)
+        grid_height = int(self.survey_area.height / self.gcd)
+        grid_width = int(self.survey_area.width / self.gcd)
+        self.grid_data = ml.resize_mission_layout(ml.mission_area_2, grid_width, grid_height)
 
         # Offset vehicle positions for algorithm
         for vehicle in self.available_vehicles.values():
@@ -313,6 +304,24 @@ class MOOSHandler:
                         self.filled_cells.add(sensor_left)
                         poke_msg = "psg@" + str(sensor_left) + ",x,2:"
                         self.notify("VIEW_GRID_DELTA", poke_msg)
+
+    def visualize_shallow_space(self):
+        self.filled_cells.clear()
+        shallow_spots = " "
+        covered_space = np.argwhere(self.grid_data == 0)
+        num_rows = self.grid_data.shape[0]
+        for idx in covered_space:
+            row, col = idx
+            # print(f"Zero found at row {row}, column {col}")
+            # Convert this
+            # flipped_row = num_rows - 1 - row
+            # cell = flipped_row + col * num_rows
+            cell = row + col * num_rows
+            self.filled_cells.add(cell)
+            shallow_spots = shallow_spots + str(cell) + ",x,10:"
+        spot_msg = "psg@" + shallow_spots
+        print(spot_msg)
+        self.notify("VIEW_GRID_DELTA", spot_msg)
 
 
 
