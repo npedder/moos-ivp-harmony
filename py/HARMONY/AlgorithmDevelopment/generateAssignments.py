@@ -23,10 +23,11 @@ def generate_assignments(UxVs, grid_data, show_graph=False, mission_name="Missio
 
     mission.add_vehicles_to_graph(UxVs)
 
+    if len(mission.vehicles) > 1:
+        bals = cyclic_region_growth(mission)
 
-    bals = cyclic_region_growth(mission)
-
-    region_fine_tuning(mission, iterations, bals)
+    if len(mission.vehicles) > 1:
+        region_fine_tuning(mission, iterations, bals)
 
     if show_graph:
         mission.redraw_grid_colormesh()

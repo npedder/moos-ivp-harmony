@@ -169,6 +169,13 @@ class MOOSHandler:
             # Create a 2d array of 1's for vehicles in survey area. '1' is unassigned space
             height1 = int(self.survey_area.height / self.gcd)
             width1 = int(self.survey_area.width / self.gcd)
+
+            # In case height or width is less than gcd
+            if height1 < 1:
+                height1 = 1
+            if width1 < 1 :
+                width1 = 1
+
             grid_data = np.ones((height1, width1), dtype=int)
 
             # Offset vehicle positions for algorithm
