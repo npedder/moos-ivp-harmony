@@ -119,6 +119,7 @@ class MissionArea:
 
             self.vehicles.append(node_label)
             self.vehicle_assignments[node_label] = set()
+            self.vehicle_assignments[node_label].add(node_label)
             self.original_positions[node.name] = node_original_pos
             self.original_positions[node_label] = node_original_pos
 

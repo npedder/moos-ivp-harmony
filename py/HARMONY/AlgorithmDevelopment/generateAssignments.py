@@ -19,8 +19,10 @@ def generate_assignments(UxVs, grid_data, show_graph=False, mission_name="Missio
     cellDimension = int(calculate_sensor_range_gcd(UxVs))
     mission = MissionArea(mission_name, grid_data, cellDimension)
 
-    mission.add_vehicles_to_graph(UxVs)
     cell_decomposition(mission)
+
+    mission.add_vehicles_to_graph(UxVs)
+
 
     bals = cyclic_region_growth(mission)
 

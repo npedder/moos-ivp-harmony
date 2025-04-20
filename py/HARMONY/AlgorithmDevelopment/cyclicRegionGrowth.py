@@ -39,6 +39,11 @@ def cyclic_region_growth(mission: MissionArea):
         account_balances[i] = OptimalTasks[i]
         rate[i] = int(OptimalTasks[i]/min(OptimalTasks))
         NV_k[i] = set((mission.grid_graph.graph[R[i]].keys()))
+        # Other vehicle nodes can not be in NV_k
+        for r in R:
+            if r is not R[i] and r in NV_k[i]:
+                NV_k[i].remove(r)
+
 
     last_updated_cell = 0;
     while (N > len(R)):  # This is len R because the once the last nodes are updated, if statement doesn't N-1 again.
