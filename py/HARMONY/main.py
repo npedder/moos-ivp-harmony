@@ -21,7 +21,7 @@ else:
 
 def main():
 
-    shallow_spots = " "
+    # shallow_spots = " "
     check = 0
     # Handles MOOSDB connection, stores survey area and vehicle information, and sends waypoints based on algorithm
     moos_handler = MOOSHandler(MOOS_HOST, PORT, CLIENT_NAME, TIME_WARP)
@@ -56,25 +56,10 @@ def main():
             # Poke with shallow areas
             moos_handler.assign_waypoints_and_notify_uuvs()
 
-            moos_handler.filled_cells.clear()
-
             # VISUALIZING THE SHALLOW WATER
+            # check to make sure method only runs once
             while check == 0:
-                # covered_space = np.argwhere(mission_area_1 == 0)
-                covered_space = np.argwhere(moos_handler.grid_data == 0)
-                num_rows = moos_handler.grid_data.shape[0]
-                for idx in covered_space:
-                    row, col = idx
-                    # print(f"Zero found at row {row}, column {col}")
-                    # Convert this
-                    # flipped_row = num_rows - 1 - row
-                    # cell = flipped_row + col * num_rows
-                    cell = row + col * num_rows
-                    moos_handler.filled_cells.add(cell)
-                    shallow_spots = shallow_spots + str(cell) + ",x,10:"
-                spot_msg = "psg@" + shallow_spots
-                print(spot_msg)
-                moos_handler.notify("VIEW_GRID_DELTA", spot_msg)
+                moos_handler.visualize_shallow_space()
                 check = 1
 
             # Clear UAV waypoint information
