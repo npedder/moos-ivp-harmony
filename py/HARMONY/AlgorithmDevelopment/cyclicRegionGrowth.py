@@ -15,13 +15,6 @@ def cyclic_region_growth(mission: MissionArea):
             r = R[i]
             rNumTasks = calculate_optimal_tasks(mission, r)
             if rNumTasks <= 0 and r not in removed_vehicles:
-                # Softly remove r from mission by giving 0 capabilities.
-                # mission.grid_graph.graph.nodes[r]['speed'] = 0
-                # mission.grid_graph.graph.nodes[r]['sensorRange'] = 0
-                # mission.grid_graph.graph.nodes[r]['displacement'] = 0
-                # mission.grid_graph.graph.nodes[r]['originalPos'] = None
-                # mission.grid_graph.graph.nodes[r]['region'] = -1
-                # mission.grid_graph.graph.remove_node(r)
                 mission.vehicle_assignments.pop(r)
                 mission.vehicles.remove(r)
                 R = mission.vehicles
@@ -48,7 +41,7 @@ def cyclic_region_growth(mission: MissionArea):
         NV_k[i] = set((mission.grid_graph.graph[R[i]].keys()))
 
     last_updated_cell = 0;
-    while (N > len(R) + len(removed_vehicles)):  # This is len R because the once the last nodes are updated, if statement doesn't N-1 again.
+    while (N > len(R)):  # This is len R because the once the last nodes are updated, if statement doesn't N-1 again.
         for k in range(0, len(R)):
             for j in range(0, rate[k]):
                 # Update NV_K:
