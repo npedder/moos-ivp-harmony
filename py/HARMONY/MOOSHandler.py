@@ -224,7 +224,7 @@ class MOOSHandler:
         # Create a 2d array based off a preconfigured mission grid layout
         grid_height = int(self.survey_area.height / self.gcd)
         grid_width = int(self.survey_area.width / self.gcd)
-        self.grid_data = ml.resize_mission_layout(ml.mission_area_2, grid_width, grid_height)
+        self.grid_data = ml.resize_mission_layout(ml.ACTIVE_MISSION, grid_width, grid_height)
 
         # Offset vehicle positions for algorithm
         for vehicle in self.available_vehicles.values():
