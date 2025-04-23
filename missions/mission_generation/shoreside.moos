@@ -58,10 +58,10 @@ ProcessConfig = pMarineViewer
   tiff_viewable	       = true
 	//tiff_file            = MIT_SP.tif
 
-  set_pan_x            = -90
-  set_pan_y            = -280
-  zoom                 = 0.65
-  vehicle_shape_scale  = 20
+  set_pan_x            = -60
+  set_pan_y            = 40
+  zoom                 = 0.6
+  vehicle_shape_scale  = 30
   hash_delta           = 50
   hash_shade           = 0.22
   hash_viewable        = false
