@@ -32,7 +32,7 @@ Behavior = BHV_Waypoint
 
 	         speed_alt = 1.2
        use_alt_speed = false
-                lead = 8
+                lead = 20
          lead_damper = 1
        lead_to_start = true
                speed = $(SPEED)   // meters per second
