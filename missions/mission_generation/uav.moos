@@ -6,8 +6,8 @@
 ServerHost   = localhost
 ServerPort   = $(PORT)
 Community    = $(VNAME)
-// MOOSTimeWarp = $(TIME_WARP)
-MOOSTimeWarp = 6
+MOOSTimeWarp = $(TIME_WARP)
+// MOOSTimeWarp = 6
 
 // Forest Lake
 LatOrigin  = -41.9237674

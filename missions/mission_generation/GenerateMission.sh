@@ -26,6 +26,9 @@ fi
 
 input_file="MissionConfigs/${1}"
 TIME_WARP=${2:-1}  # Default time warp is 1 if not provided
+UAV_TIME_WARP=$(awk -v tw="$TIME_WARP" 'BEGIN { printf("%d", sqrt(tw)) }')  # Calculates UAV Time Warp as Square Root of normal timewarp to match speeds
+# echo "UAV_TIME_WARP calculated as: $UAV_TIME_WARP"
+
 
 # Check if the file exists
 if [ ! -f "$input_file" ]; then
@@ -76,7 +79,7 @@ while IFS= read -r line; do
   elif [ "$CURRENT_OBJECT_TYPE" == "uav" ]; then
     # For UAVs, use the uav templates
     # nsplug uav.moos "uav_${line_number}.moos" VNAME="uav_${line_number}" PORT="$PORT" BHV="uav_${line_number}.bhv" VEHICLE_COLOR=${cool_colors[uavcount]} $line
-    nsplug uav.moos "uav_${line_number}.moos" VNAME="uav_${line_number}" PORT="$PORT" BHV="uav_${line_number}.bhv" VEHICLE_COLOR=${cool_colors[uavcount]} TIME_WARP="$TIME_WARP" $line
+    nsplug uav.moos "uav_${line_number}.moos" VNAME="uav_${line_number}" PORT="$PORT" BHV="uav_${line_number}.bhv" VEHICLE_COLOR=${cool_colors[uavcount]} TIME_WARP="$UAV_TIME_WARP" $line
     nsplug uav.bhv "uav_${line_number}.bhv" $line
     ((uavcount++))
   fi
