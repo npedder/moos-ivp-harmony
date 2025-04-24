@@ -48,7 +48,7 @@ mission_area_3 = np.array([
 ])
 
 
-ACTIVE_MISSION = mission_area_2
+ACTIVE_MISSION = mission_area_1
 
 def upscale_mission_layout(mission_area_np_array, scale_x, scale_y):
     return np.kron(mission_area_np_array, np.ones((scale_y, scale_x)))
