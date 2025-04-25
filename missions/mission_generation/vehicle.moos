@@ -205,7 +205,7 @@ ProcessConfig = pShare
    
    paused = false
    reset_time = 1
-   event = var =HARMONY_REPORT, val = "NAME=$(VNAME),TYPE=UUV,X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=$(ENDURANCE),SENSOR_RANGE=$(SENSOR_RANGE)"
+   event = var =HARMONY_REPORT, val = "NAME=$(VNAME),TYPE=UUV,X=$(START_X),Y=$(START_Y),SPD=$(SPEED),ENDURANCE=0,SENSOR_RANGE=$(SENSOR_RANGE)"
 
  }
 
