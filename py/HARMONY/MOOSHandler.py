@@ -186,7 +186,7 @@ class MOOSHandler:
             for uav in self.available_uavs.values():
                 uav.position = (uav.position[0] - self.survey_area.position[0], uav.position[1] - self.survey_area.position[1])
 
-            uav_assignments = generate_assignments(list(self.available_uavs.values()), grid_data, show_graph=True)
+            uav_assignments = generate_assignments(list(self.available_uavs.values()), grid_data, show_graph=False)
 
             print("UAVs Assignments:", uav_assignments)
 
@@ -233,7 +233,7 @@ class MOOSHandler:
 
         # Assign areas to vehicles using allocation algorithm
         vehicle_assignments = generate_assignments(list(self.available_vehicles.values()), self.grid_data,
-                                                   show_graph=True)
+                                                   show_graph=False)
         print("Vehicle Assignments:", vehicle_assignments)
 
         # Notify MOOSDB with the waypoint updates

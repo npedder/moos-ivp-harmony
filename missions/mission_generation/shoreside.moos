@@ -65,7 +65,7 @@ ProcessConfig = pMarineViewer
   hash_delta           = 50
   hash_shade           = 0.22
   hash_viewable        = false
-  grid_opaqueness = 1.0
+  grid_opaqueness = 0.0
   point_viewable_all = false
   
 
