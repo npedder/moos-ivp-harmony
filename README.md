@@ -107,5 +107,4 @@ set(MOOSIVP_SOURCE_TREE_BASE "/pasth/to/moos-ivp" CACHE STRING "MOOS-IvP Base Di
 
 # Notes: 
 - Due to the limitations of pMarineViewer, large numbers of vehicles or survey areas with a large number of cell may freeze the viewer.
-- Our algorithm was widely based on 
 
