@@ -1,6 +1,8 @@
 # HARMONY
 HARMONY is a system for allocating tasks among UAVs and UUVs with different capabilities to complete a survey mission. It is demonstrated by a python app that can connect to a MOOS shoreside database to receive incoming vehicle information and output waypoint information for each any number of vehicles.
 
+First, a preliminary survey with UAVs is conducted. Then, a secondary survey is conducted with UUVs that has deadspace, or areas not needed to be covered but can be passed through. 
+
 # Directory Structure
 
 The directory structure for the moos-ivp-extend is described below:
@@ -24,13 +26,13 @@ The HARMONY system is demonstrated within a MOOS-IvP simulation. The MOOS-IvP Co
 pReturn Signal is a simple application made for HARMONY that signals the shoreside that a vehicle has returned.
 
 ### Build pReturn Signal 
-Run the ```build.sh``` script in the root moos-ivp-harmony. This will build the pReturnSignal executable file in the the bin folder. 
+Run the ```build.sh``` script in the root directory of moos-ivp-harmony. This will build the pReturnSignal executable file in the bin folder. 
 
 ## Add to PATH environment variable.
 pReturnSignal needs to be added to the PATH environment variable in order to be launched with pAntler. To do so, try one of the following: 
-- Add the line export PATH=“$PATH:your/installpath/moos-ivp-harmony/bin” to the .bashrc in your home/user directory	 
+- Add the line export PATH="$PATH:your/installpath/moos-ivp-harmony/bin" to the .bashrc in your home/user directory	 
 
-- Add the line export PATH=“$PATH:your/installpath/moos-ivp-harmony/bin” to the .profile in your home/user directory 
+- Add the line export PATH="$PATH:your/installpath/moos-ivp-harmony/bin" to the .profile in your home/user directory 
 
 - Add the line :/your/installpath/moos-ivp-harmony/bin to the environment file in your etc directory (etc/environment).
   - E.g.
@@ -65,23 +67,23 @@ This will produce a "pymoos*.so" file that needs to be added to your python inte
 - networkx
 - scipy
 
-If the xterm python window crashes, make sure these packages are installed in your python environment, or run ```pip install requirements.txt``` in the py/HARMONY folder.
+If the xterm python window crashes, make sure these packages are installed in your python environment, or run ```pip install -r requirements.txt``` in the py/HARMONY folder.
   
 # Usage
-Once setup is complete, example HAMRONY missions can be generated in the missions/mission_generation folder. This folder contains bash scripts that can quickly set up new mission configurations based on the ".txt" files located in the 'MissionConfigs' folder.
+Once setup is complete, example HARMONY missions can be generated in the missions/mission_generation folder. This folder contains bash scripts that can quickly set up new mission configurations based on the ".txt" files located in the 'MissionConfigs' folder.
 
 To build and launch the vehicles based on the config file, from inside the MissionGeneration folder, run
 ```
 ./build_launch_harmony <config_file.txt> <time_warp>
 ```
 
-Now, a survey area can be sent to the application using running 
+Now, a survey area can be sent to the application by running in a separate terminal:
 
 ```
 ./inject_survey <width> <height> <start_x> <start_y>
 ```
 
-The survey area should appear in pMarineViewer followed by the vehicle assignments. The vehicles can be deployed onto their assigned waypoints with the "RUN" button.
+Width and height are in meters. The survey area should appear in pMarineViewer followed by the vehicle assignments. The vehicles can be deployed onto their assigned waypoints with the "RUN" button.
 
 # Setup moos-ivp-umassd
 HARMONY uses the _uSimpleRobot_ application from moos-ivp-umassd. To set up, clone the following repo and follow the instructions found in its README. 
@@ -100,7 +102,7 @@ in " # Set the output directories for the binary and library files " add below
 ("pwd" in moos-ivp to find path)
 
 ```
-set(MOOSIVP_SOURCE_TREE_BASE "/pasth/to/moos-ivp" CACHE STRING "MOOS-IvP Base Directory" FORCE) 
+set(MOOSIVP_SOURCE_TREE_BASE "/path/to/moos-ivp" CACHE STRING "MOOS-IvP Base Directory" FORCE) 
 ```
 
 ```
