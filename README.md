@@ -111,4 +111,5 @@ set(MOOSIVP_SOURCE_TREE_BASE "/path/to/moos-ivp" CACHE STRING "MOOS-IvP Base Dir
 
 # Notes: 
 - Due to the limitations of pMarineViewer, large numbers of vehicles or survey areas with a large number of cell may freeze the viewer.
+- The layout of the deadspace in the UUV mission is contained in py/HARMONY/missionLayouts.py, and is used in py/HARMONY/MOOSHandler.py.
 
