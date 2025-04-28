@@ -64,6 +64,7 @@ This will produce a "pymoos*.so" file that needs to be added to your python inte
 - matplotlib
 - networkx
 - scipy
+If the xterm python window crashes, make sure these packages are installed in your python environment, or run ```pip install requirements.txt``` in the py/HARMONY folder.
   
 # Usage
 Once setup is complete, example HAMRONY missions can be generated in the missions/mission_generation folder. This folder contains bash scripts that can quickly set up new mission configurations based on the ".txt" files located in the 'MissionConfigs' folder.
