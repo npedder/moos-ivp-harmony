@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
 
-from AlgorithmDevelopment.MissionArea import MissionArea, calculate_sensor_range_gcd
+from .MissionArea import MissionArea, calculate_sensor_range_gcd
 from UxV import UxV
-from AlgorithmDevelopment.cyclicRegionGrowth import cyclic_region_growth
-from AlgorithmDevelopment.cellDecomposition import cell_decomposition
-from AlgorithmDevelopment.regionFineTuning import region_fine_tuning
-from AlgorithmDevelopment.sensorRangeDecomposition import sensor_range_decomposition
-from AlgorithmDevelopment.pathPlanning import calculate_vehicle_paths
-from AlgorithmDevelopment.missionLayouts import mission_area_1_upscaled
+from .cyclicRegionGrowth import cyclic_region_growth
+from .cellDecomposition import cell_decomposition
+from .regionFineTuning import region_fine_tuning
+from .sensorRangeDecomposition import sensor_range_decomposition
+from .pathPlanning import calculate_vehicle_paths
+from .missionLayouts import mission_area_1_upscaled
 
 # Create a list of UxV objects to be added as nodes
 uxvs = []
