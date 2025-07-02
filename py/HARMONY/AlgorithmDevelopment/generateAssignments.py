@@ -61,4 +61,4 @@ if __name__ == "__main__":
 
     grid = mission_area_1_upscaled
 
-    print(generate_assignments(uxvs, grid, show_graph=True, mission_name="Mission Test"))
+    # print(generate_assignments(uxvs, grid, show_graph=True, mission_name="Mission Test"))

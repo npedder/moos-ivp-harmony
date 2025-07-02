@@ -75,6 +75,7 @@ def cell_decomposition(mission: MissionArea):
                 cell_graph.nodes[center_node]['region'] = center_node
                 mission.vehicles[mission.vehicles.index(vehicle)] = center_node
                 mission.vehicle_assignments[center_node] = mission.vehicle_assignments.pop(vehicle)
+                mission.vehicle_assignments[center_node].remove(vehicle)
                 mission.vehicle_assignments[center_node].add(center_node)
                 mission.original_positions[center_node] = cell_graph.nodes[center_node]["originalPos"]
 
@@ -99,7 +100,7 @@ def cell_decomposition(mission: MissionArea):
             for possible_bordering_cell in possible_bordering_cells:
                 if neighbor in center_nodes_old_neighbors[possible_bordering_cell]:
                     cell_graph.add_edge(center_node, possible_bordering_cell)
-                    print(cell_graph[center_node])
+                    # print(cell_graph[center_node])
                 elif center_node in center_nodes_old_neighbors[possible_bordering_cell]:
                     cell_graph.add_edge(center_node, possible_bordering_cell)
 

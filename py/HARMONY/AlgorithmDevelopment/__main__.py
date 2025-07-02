@@ -1,13 +1,13 @@
 import matplotlib.pyplot as plt
 
-from .MissionArea import MissionArea, calculate_sensor_range_gcd
+from AlgorithmDevelopment.MissionArea import MissionArea, calculate_sensor_range_gcd
 from UxV import UxV
-from .cyclicRegionGrowth import cyclic_region_growth
-from .cellDecomposition import cell_decomposition
-from .regionFineTuning import region_fine_tuning
-from .sensorRangeDecomposition import sensor_range_decomposition
-from .pathPlanning import calculate_vehicle_paths
-from .missionLayouts import mission_area_1_upscaled
+from AlgorithmDevelopment.cyclicRegionGrowth import cyclic_region_growth
+from AlgorithmDevelopment.cellDecomposition import cell_decomposition
+from AlgorithmDevelopment.regionFineTuning import region_fine_tuning
+from AlgorithmDevelopment.sensorRangeDecomposition import sensor_range_decomposition
+from AlgorithmDevelopment.pathPlanning import calculate_vehicle_paths
+from AlgorithmDevelopment.missionLayouts import mission_area_1_upscaled
 
 # Create a list of UxV objects to be added as nodes
 uxvs = []
@@ -30,18 +30,27 @@ grid_data = mission_area_1_upscaled
 cellDimension = calculate_sensor_range_gcd(uxvs) * 2
 mission_3 = MissionArea("Mission", grid_data, cellDimension)
 
+
+
 # Add each vehicle to mission
 mission_3.add_vehicles_to_graph(uxvs)
-
+print(f"Vehicle assignments prior to decompoisition and region growth: {mission_3.vehicle_assignments}")
+if(mission_3.grid_graph.graph.has_node((315, 345))) :
+    print(f"\tPposition {(315, 345)} is in the graph")
+else:
+    print(f"\tPosition {(315, 345)} is in NOT in the graph")
 
 # Apply algorithms to mission to determine task allocation
 cell_decomposition(mission_3)
-
-
+print(f"Vehicle assignments after decompoisition and before region growth: {mission_3.vehicle_assignments}")
+if(mission_3.grid_graph.graph.has_node((315, 345))) :
+    print(f"\tPposition {(315, 345)} is in the graph")
+else:
+    print(f"\tPosition {(315, 345)} is in NOT in the graph")
 
 
 bals = cyclic_region_growth(mission_3)
-
+# print(f"Vehicle assignments after region growth and before region fine tuning: {mission_3.vehicle_assignments}")
 
 
 # mission_3.draw(show_neighbors=False, node_color="blue", edge_color="white")

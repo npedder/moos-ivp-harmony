@@ -98,12 +98,20 @@ class MissionArea:
         plt.savefig("result.png")
 
     def add_vehicle_to_graph(self, node):
+        print(f"Adding vehicle {node.position} to the graph")
         if isinstance(node, UxV):
             node_label = node.position
             node_original_pos = node.position
+
+            if(self.grid_graph.graph.has_node(node_label)) :
+                print(f"\tVehicle's position {node_label} is in the graph")
+            else:
+                print(f"\tVehicle's position {node_label} is in NOT in the graph")
+
             if self.grid_graph.graph.has_node(node_label) is False or node.position in self.vehicles:
+                print("\tVehicle's position is not in the graph or already claimed...")
                 try:
-                    node_label = self._normalize_vehicle_to_graph(node_label)
+                    node_label = self._normalize_vehicle_to_graph(node_label) # If outside the graph, or already claimed, change label to closest unclaimed node
                 except Exception as e:
                     print(e)
                     return
@@ -120,6 +128,7 @@ class MissionArea:
             self.vehicles.append(node_label)
             self.vehicle_assignments[node_label] = set()
             self.vehicle_assignments[node_label].add(node_label)
+            print(f"{node_label} is added to vehicle assignments for {node_label}")
             self.original_positions[node.name] = node_original_pos
             self.original_positions[node_label] = node_original_pos
 
@@ -212,6 +221,7 @@ class MissionArea:
     # Vehicle position will be set inside the grid graph. Stores original position and distance from original position
     def _normalize_vehicle_to_graph(self, vehiclePos):  # TODO: This could be made more efficient
             # Sort nodes by closest
+            print("\tNormalizing node to graph...")
             sorted_nodes = sorted(self.grid_graph.graph.nodes(), key=lambda n: distance.euclidean(vehiclePos, n))
 
             # Get all 0-values currently in use by vehicles
@@ -224,6 +234,7 @@ class MissionArea:
                     continue
 
                 # Passed all conditions — this is the valid closest node
+                print(f"\tVehicle's new position is {node.position}")
                 self.grid_graph.graph.nodes[node]["displacement"] = distance.euclidean(vehiclePos, node)
                 return node
 

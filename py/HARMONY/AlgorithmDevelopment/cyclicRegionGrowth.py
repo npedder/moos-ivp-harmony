@@ -6,23 +6,22 @@ def cyclic_region_growth(mission: MissionArea):
     R = mission.vehicles
 
     # Calculate number of optimal tasks for each vehicle. Determines rate of region growth
-    OptimalTasks = [0] * len(R) # pk
+    OptimalTasks = dict() # pk
     removed_vehicles = set()
     # If any vehicles have negative or 0 tasks, then they cant reach survey area, so remove them and recalculate OT
     hasNonPositiveTasks = True
     while (hasNonPositiveTasks):
-        for i in range(len(R)):
-            r = R[i]
-            rNumTasks = calculate_optimal_tasks(mission, r)
-            if rNumTasks <= 0 and r not in removed_vehicles:
-                mission.vehicle_assignments.pop(r)
-                mission.vehicles.remove(r)
+        for vehicle_label in R:
+            rNumTasks = calculate_optimal_tasks(mission, vehicle_label)
+            if rNumTasks <= 0 and vehicle_label not in removed_vehicles:
+                mission.vehicle_assignments.pop(vehicle_label)
+                mission.vehicles.remove(vehicle_label)
                 R = mission.vehicles
-                OptimalTasks = [0] * len(R)
+                OptimalTasks = dict()
                 hasNonPositiveTasks = True
-                removed_vehicles.add(r)
-                break;
-            OptimalTasks[i] = rNumTasks
+                removed_vehicles.add(vehicle_label)
+                break
+            OptimalTasks[vehicle_label] = rNumTasks
             hasNonPositiveTasks = False
 
         # OptimalTasks = [calculate_optimal_tasks(mission, r) for r in R]  # p_k
@@ -31,41 +30,37 @@ def cyclic_region_growth(mission: MissionArea):
 
     assigned_nodes = set()
     N = mission.grid_graph.graph.number_of_nodes()
-    rate = [0] * len(R) # How many times a region will grow before switching off
-    NV_k = [0] * len(R) # A list of sets that contain each robot's adjacent unassigned tasks
+    rate = dict() # How many times a region will grow before switching off
+    NV_k = dict() # A list of sets that contain each robot's adjacent unassigned tasks
     account_balances = [0] * len(R) # Each robot's capital
+    account_balances = dict()
 
-    for i in range(len(R)):
-        account_balances[i] = OptimalTasks[i]
-        rate[i] = int(OptimalTasks[i]/min(OptimalTasks))
-        NV_k[i] = set((mission.grid_graph.graph[R[i]].keys()))
+    for vehicle_label in R:
+        account_balances[vehicle_label] = OptimalTasks[vehicle_label]
+        rate[vehicle_label] = int(OptimalTasks[vehicle_label]/min(OptimalTasks.values()))
+        NV_k[vehicle_label] = set((mission.grid_graph.graph[vehicle_label].keys()))
         # Other vehicle nodes can not be in NV_k
         for r in R:
-            if r is not R[i] and r in NV_k[i]:
-                NV_k[i].remove(r)
+            if r is not vehicle_label and r in NV_k[vehicle_label]:
+                NV_k[vehicle_label].remove(vehicle_label)
 
 
-    last_updated_cell = 0;
+    last_updated_cell = 0
     while (N > len(R)):  # This is len R because the once the last nodes are updated, if statement doesn't N-1 again.
-        for k in range(0, len(R)):
+        for k in R:
             for j in range(0, rate[k]):
                 # Update NV_K:
-                for n in range(0,len(R)):
+                for n in R:
                     NV_k[n] = update_NV_K(mission, NV_k[n], n, last_updated_cell, assigned_nodes)
                 # Assign nodes
                 if NV_k[k]: # Checks if list of NVs are empty
                     last_updated_cell = list(NV_k[k])[0]  # select a cell from NV_k
-                    mission.vehicle_assignments[mission.vehicles[k]].add(last_updated_cell)  # Assign selected cell
+                    mission.vehicle_assignments[k].add(last_updated_cell)  # Assign selected cell
                     assigned_nodes.add(last_updated_cell)
-                    mission.grid_graph.graph.nodes[last_updated_cell]['region'] = mission.vehicles[k]
+                    mission.grid_graph.graph.nodes[last_updated_cell]['region'] = k
                     account_balances[k] = account_balances[k] - mission.grid_graph.graph.nodes[last_updated_cell]["weight"]
                     N = N - 1
                     # print("Remaining Nodes: ", N - 4)
-
-    # Convert account balances into a dict with vehicle pos as the key
-    # account_balances_dict = {}
-    # for i in range(len(mission.vehicles)):
-    #     account_balances_dict[mission.vehicles[i]] = account_balances[i]
 
     return account_balances
 
@@ -131,7 +126,7 @@ def gcd_of_list(numList):
 
 
 def update_NV_K(mission: MissionArea, NV_K, k, cell, assigned_nodes):
-    if cell in NV_K and cell in mission.vehicle_assignments[mission.vehicles[k]]:
+    if cell in NV_K and cell in mission.vehicle_assignments[k]:
         newNodes = set(mission.grid_graph.graph[cell].keys())
         for node in assigned_nodes:
             if node in newNodes:

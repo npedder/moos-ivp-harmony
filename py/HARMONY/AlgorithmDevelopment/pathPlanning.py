@@ -88,10 +88,10 @@ def calculate_vehicle_paths(mission: MissionArea):
                 index +=1
 
         # del vehicle_paths[vehicle][0]
-        print("Path")
-        print(vehicle_paths[name_key[0]])
-        print("Cost")
-        print(cost)
+        # print("Path")
+        # print(vehicle_paths[name_key[0]])
+        # print("Cost")
+        # print(cost)
 
 
     return vehicle_paths

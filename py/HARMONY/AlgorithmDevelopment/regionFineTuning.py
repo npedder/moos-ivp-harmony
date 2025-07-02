@@ -27,7 +27,8 @@ def region_fine_tuning(mission, iterations, account_balances : list[int]):
         # Pre-compute the pairs
         for region in range(len(account_balances)):
             currBal = account_balances[region]
-            for adjRegion in range(len(regionNeighborNodes[mission.vehicles[region]])):
+            numOfNeighborRegions = len(node["region"] for node in regionNeighborNodes[mission.vehicles[region]])
+            for adjRegion in range(numOfNeighborRegions):
                 adjBal = account_balances[adjRegion]
                 difference = currBal - adjBal
                 if difference < 0:
@@ -82,6 +83,13 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
     print("Entering finding kept nodes")
 
     sellerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[mission.vehicles[seller]])
+    if set(sellerRegionSubgraph) - mission.vehicle_assignments[mission.vehicles[seller]] == set() and mission.vehicle_assignments[mission.vehicles[seller]] - set(sellerRegionSubgraph) == set():
+        print(f"Seller region subgraph and seller assignments contain the same elements")
+    else:
+        print(f"Seller region subgraph and seller assignments DO NOT contain the same elements")
+        nonSharedElements = (set(sellerRegionSubgraph) - mission.vehicle_assignments[mission.vehicles[seller]]).union(mission.vehicle_assignments[mission.vehicles[seller]] - set(sellerRegionSubgraph))
+        print(f"\tHere are the elements not in both sets {nonSharedElements}")
+        print(f"The neighbors of (315, 345) in the full mission graph are: {graph.nodes[(315, 345)]}")
     buyerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[mission.vehicles[buyer]])
     buyerNeighborsInSeller = regionNeighborNodes[mission.vehicles[buyer]].intersection(mission.vehicle_assignments[mission.vehicles[seller]])
 
@@ -120,6 +128,8 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
                 print(f"Seller region subgraph and seller assignments contain the same elements")
             else:
                 print(f"Seller region subgraph and seller assignments DO NOT contain the same elements")
+                nonSharedElements = (set(sellerRegionSubgraph) - mission.vehicle_assignments[mission.vehicles[seller]]).union(mission.vehicle_assignments[mission.vehicles[seller]] - set(sellerRegionSubgraph))
+                print(f"\tHere are the elements not in both sets {nonSharedElements}")
 
             if(set(sellerRegionSubgraph) - set(graph) == set()):
                 print(f"All items in the seller region subgraph are in the graph.")
