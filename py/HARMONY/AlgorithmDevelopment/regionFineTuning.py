@@ -8,47 +8,55 @@ import heapq
 def region_fine_tuning(mission, iterations, account_balances : list[int]):
     # Create a map from vehicle to index.
     # Needed because of change of nodes.[node]['region'] from int to tuple
-    region_map = {}
-    for e, v in enumerate(mission.vehicles):
-        region_map[v] = e
+    # region_map = {}
+    # for e, v in enumerate(mission.vehicles):
+    #     region_map[v] = e
 
     graph = mission.grid_graph.graph
     i = iterations
     pairsTimeOut = dict() # frozen set of two regions to a counter for how many turns they are in time out (if untradeable)
     regionNeighborNodes = find_neighbor_nodes(mission)
-    computedPairs = [] # max heap (min heap but using negated values)
 
     while(i > 0):
         printIteration(i, iterations)
         print(f"Account balances: {account_balances}")
         # Select buyer and seller
         pairFound = False
-        
+        computedPairs = [] # max heap (min heap but using negated values)
+
         # Pre-compute the pairs
-        for region in range(len(account_balances)):
-            currBal = account_balances[region]
-            numOfNeighborRegions = len(node["region"] for node in regionNeighborNodes[mission.vehicles[region]])
-            for adjRegion in range(numOfNeighborRegions):
-                adjBal = account_balances[adjRegion]
-                difference = currBal - adjBal
-                if difference < 0:
+        for (region, buyerBal) in account_balances.items():
+            neighborRegions = set(graph.nodes[node]["region"] for node in regionNeighborNodes[region]) # Set of neighboring regions
+            print(f"Region: {region} with balance: {buyerBal} has neighbors: {neighborRegions}")
+            print(f"Region neighbor nodes: {regionNeighborNodes[region]}")
+            for sellerRegion in neighborRegions:
+                sellerBal = account_balances[sellerRegion]
+                difference = buyerBal - sellerBal
+                print(f"DIFFERENCE: {difference} for buyer: {region} with balance: {buyerBal} and seller: {sellerRegion} with balance: {sellerBal}")
+                if difference <= 0 or buyerBal <= sellerBal:
                     continue
                 # else
-                computedPair = (region, adjRegion)
-                pairObj = ((-1 * difference), computedPair)
+                computedPair = (region, sellerRegion)
+                pairObj = ((-1 * buyerBal), (-1 * difference), computedPair)
                 heapq.heappush(computedPairs, pairObj)
+        print(f"Computed pairs: {computedPairs}")
 
         while pairFound == False and computedPairs:
             pairObj = heapq.heappop(computedPairs)
             try:
-                if pairsTimeOut[frozenset({pairObj[1][0], pairObj[1][1]})] == 0:
-                    buyer = pairObj[1][0]
-                    seller = pairObj[1][1]
+                print(f"Checking pair (buyer, seller): {frozenset({pairObj[2][0], pairObj[2][1]})} with a difference of: {-1 * (pairObj[1])}")
+                if pairsTimeOut[frozenset({pairObj[2][0], pairObj[2][1]})] == 0:
+                    buyer = pairObj[2][0]
+                    seller = pairObj[2][1]
                     pairFound = True
-                    print(f"Pair found. The buyer is: ${buyer}, The seller is: ${seller}")
+                    print(f"Pair found. The buyer is: {buyer}, The seller is: {seller}")
+                    print(f"\tThe buyer has a balance of: {-1 * (pairObj[0])}, The seller has a balance of: {account_balances[seller]}")
+                    print(f"\tThe difference is: {-1 * (pairObj[1])}, which should equal {-1 * (pairObj[0])} - {account_balances[seller]}, aka {-1 * (pairObj[0])} - {account_balances[seller]}")
+                else:
+                    print(f"Pair {frozenset({pairObj[2][0], pairObj[2][1]})} is in timeout for {pairsTimeOut[frozenset({pairObj[2][0], pairObj[2][1]})]} iterations")
             except:
-                buyer = pairObj[1][0]
-                seller = pairObj[1][1]
+                buyer = pairObj[2][0]
+                seller = pairObj[2][1]
                 pairFound = True
 
         # Subtract timeout from pairs
@@ -64,10 +72,10 @@ def region_fine_tuning(mission, iterations, account_balances : list[int]):
         print("================================================")
         # Find tasks to trade and update vehicle assignments
         keptNodes = find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances, pairsTimeOut)
-        tradedNodes = mission.vehicle_assignments[mission.vehicles[seller]] - keptNodes
-        mission.vehicle_assignments[mission.vehicles[buyer]] =  mission.vehicle_assignments[mission.vehicles[buyer]].union(tradedNodes)
-        mission.vehicle_assignments[mission.vehicles[seller]] = keptNodes
-        updateRegions(mission, regionNeighborNodes, seller, buyer, tradedNodes, region_map)
+        tradedNodes = mission.vehicle_assignments[seller] - keptNodes
+        mission.vehicle_assignments[buyer] =  mission.vehicle_assignments[buyer].union(tradedNodes)
+        mission.vehicle_assignments[seller] = keptNodes
+        updateRegions(mission, regionNeighborNodes, seller, buyer, tradedNodes)
 
         print(str(account_balances))
         print(str(buyer) + " is the buyer with a balance of: " + str(account_balances[buyer]))
@@ -82,16 +90,16 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
     graph = mission.grid_graph.graph
     print("Entering finding kept nodes")
 
-    sellerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[mission.vehicles[seller]])
-    if set(sellerRegionSubgraph) - mission.vehicle_assignments[mission.vehicles[seller]] == set() and mission.vehicle_assignments[mission.vehicles[seller]] - set(sellerRegionSubgraph) == set():
+    sellerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[seller])
+    if set(sellerRegionSubgraph) - mission.vehicle_assignments[seller] == set() and mission.vehicle_assignments[seller] - set(sellerRegionSubgraph) == set():
         print(f"Seller region subgraph and seller assignments contain the same elements")
     else:
         print(f"Seller region subgraph and seller assignments DO NOT contain the same elements")
-        nonSharedElements = (set(sellerRegionSubgraph) - mission.vehicle_assignments[mission.vehicles[seller]]).union(mission.vehicle_assignments[mission.vehicles[seller]] - set(sellerRegionSubgraph))
+        nonSharedElements = (set(sellerRegionSubgraph) - mission.vehicle_assignments[seller]).union(mission.vehicle_assignments[seller] - set(sellerRegionSubgraph))
         print(f"\tHere are the elements not in both sets {nonSharedElements}")
         print(f"The neighbors of (315, 345) in the full mission graph are: {graph.nodes[(315, 345)]}")
-    buyerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[mission.vehicles[buyer]])
-    buyerNeighborsInSeller = regionNeighborNodes[mission.vehicles[buyer]].intersection(mission.vehicle_assignments[mission.vehicles[seller]])
+    buyerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[buyer])
+    buyerNeighborsInSeller = regionNeighborNodes[buyer].intersection(mission.vehicle_assignments[seller])
 
     tradeFound = False
     kthLargest = 1
@@ -102,16 +110,16 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
             # return empty and mark the pair as untradable if no neighboring nodes (meaning one might be empty or another error?)
             print("Pairs are untradeable")
             pairsTimeOut[frozenset({buyer, seller})] = 1
-            return mission.vehicle_assignments[mission.vehicles[seller]]
+            return mission.vehicle_assignments[seller]
 
         # Candidate is kth largets node
         candidate = heapq.nlargest(kthLargest, buyerNeighborsInSeller, key=lambda node_key: graph.nodes[node_key]['weight'])[-1]
         print(f"{candidate} is selected as the candidate, with an area of {graph.nodes[candidate]['weight']}")
-        if candidate in regionNeighborNodes[mission.vehicles[buyer]]:
+        if candidate in regionNeighborNodes[buyer]:
             print("candidate is in buyer's neighbor set")
         else:
             print("candidate is not in buyer's neighbor set")
-        if candidate in mission.vehicle_assignments[mission.vehicles[seller]]:
+        if candidate in mission.vehicle_assignments[seller]:
             print("Candidate is in the seller")
         else:
             print("Candidate is not in the seller")
@@ -122,13 +130,13 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
             bestTradeIndex = float('inf')
             bestTradeSum = 0
             bestTrade = {}
-            print(f"Seller region subgraph: {sellerRegionSubgraph.nodes.items()}")
+            # print(f"Seller region subgraph: {sellerRegionSubgraph.nodes.items()}")
 
-            if set(sellerRegionSubgraph) - mission.vehicle_assignments[mission.vehicles[seller]] == set() and mission.vehicle_assignments[mission.vehicles[seller]] - set(sellerRegionSubgraph) == set():
+            if set(sellerRegionSubgraph) - mission.vehicle_assignments[seller] == set() and mission.vehicle_assignments[seller] - set(sellerRegionSubgraph) == set():
                 print(f"Seller region subgraph and seller assignments contain the same elements")
             else:
                 print(f"Seller region subgraph and seller assignments DO NOT contain the same elements")
-                nonSharedElements = (set(sellerRegionSubgraph) - mission.vehicle_assignments[mission.vehicles[seller]]).union(mission.vehicle_assignments[mission.vehicles[seller]] - set(sellerRegionSubgraph))
+                nonSharedElements = (set(sellerRegionSubgraph) - mission.vehicle_assignments[seller]).union(mission.vehicle_assignments[seller] - set(sellerRegionSubgraph))
                 print(f"\tHere are the elements not in both sets {nonSharedElements}")
 
             if(set(sellerRegionSubgraph) - set(graph) == set()):
@@ -141,10 +149,10 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
                 stack = [neighbor]
                 visited = set()
                 dfs(visited, stack, candidate, sellerRegionSubgraph)
-                print(f"Visited: {visited}")
-                print(f"Seller region: {mission.vehicle_assignments[mission.vehicles[seller]]}")
+                # print(f"Visited: {visited}")
+                # print(f"Seller region: {mission.vehicle_assignments[seller]}")
 
-                candidateTrade = mission.vehicle_assignments[mission.vehicles[seller]] - visited
+                candidateTrade = mission.vehicle_assignments[seller] - visited
                 print(f"Current candidate trade: {candidateTrade}")
                 if candidateTrade - set(graph) == set():
                     print(f"All items in the candidate trade are in the graph")
@@ -190,10 +198,10 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
             account_balances[seller] = account_balances[seller] + graph.nodes[candidate]['weight']
             tradeFound = True
             pairsTimeOut[frozenset({buyer, seller})] = 1
-            return mission.vehicle_assignments[mission.vehicles[seller]] - {candidate}
+            return mission.vehicle_assignments[seller] - {candidate}
         # If not returned yet no trade found, time out pair for 3 iterations and return seller assignments
     pairsTimeOut[frozenset({buyer, seller})] = 3
-    return mission.vehicle_assignments[mission.vehicles[seller]]
+    return mission.vehicle_assignments[seller]
 
 # Pre-condition: A mission area
 # Post-condtion: Returns a dictionary mapping an integer representing region to a set of nodes that neighbor that region
@@ -216,36 +224,36 @@ def sum_weights(mission, subgraph):
     print("\tCalculating weight sum...")
     graph = mission.grid_graph.graph
     weightSum = 0
-    print(f"Vehicle start positions: {mission.vehicles}")
-    print(f"\tAll nodes in the subgrapgh: {subgraph}")
-    print(f"\tAll nodes in the graph: {graph.nodes.items()}")
+    # print(f"Vehicle start positions: {mission.vehicles}")
+    # print(f"\tAll nodes in the subgrapgh: {subgraph}")
+    # print(f"\tAll nodes in the graph: {graph.nodes.items()}")
     for node_key in subgraph:
         node_data = graph.nodes[node_key]
         weightSum += node_data['weight']
     print("\n\t" + str(weightSum))
     return weightSum
 
-def updateRegions(mission, regionNeighborNodes, seller, buyer, tradedNodes, region_map):
+def updateRegions(mission, regionNeighborNodes, seller, buyer, tradedNodes):
         graph = mission.grid_graph.graph
         # Update regions post trade
-        for node_key in mission.vehicle_assignments[mission.vehicles[seller]]:
-            graph.nodes[node_key]['region'] = mission.vehicles[seller]
-        for node_key in mission.vehicle_assignments[mission.vehicles[buyer]]:
-            graph.nodes[node_key]['region'] = mission.vehicles[buyer]
+        for node_key in mission.vehicle_assignments[seller]:
+            graph.nodes[node_key]['region'] = seller
+        for node_key in mission.vehicle_assignments[buyer]:
+            graph.nodes[node_key]['region'] = buyer
 
         # If a region gains neighboring that they were also neighbors with, they are no longer neighbors
-        regionNeighborNodes[mission.vehicles[buyer]] = regionNeighborNodes[mission.vehicles[buyer]] - regionNeighborNodes[mission.vehicles[buyer]].intersection(tradedNodes)
+        regionNeighborNodes[buyer] = regionNeighborNodes[buyer] - regionNeighborNodes[buyer].intersection(tradedNodes)
         
         for node_key in tradedNodes:
             for neighbor_key in graph[node_key]:
                 neighbor_data = graph.nodes[neighbor_key]
-                if region_map[neighbor_data['region']] != seller:
-                    regionNeighborNodes[mission.vehicles[seller]] -= {neighbor_key}
+                if neighbor_data['region'] != seller:
+                    regionNeighborNodes[seller] -= {neighbor_key}
         
         # Add new neighbors
-        buyerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[mission.vehicles[buyer]])
+        buyerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[buyer])
         updateNeighbors(mission, buyerRegionSubgraph, regionNeighborNodes)
-        sellerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[mission.vehicles[seller]])
+        sellerRegionSubgraph = graph.subgraph(mission.vehicle_assignments[seller])
         updateNeighbors(mission, sellerRegionSubgraph, regionNeighborNodes)
 
 def updateNeighbors(mission, regionSubgrapgh, regionNeighborNodes):
@@ -262,6 +270,9 @@ def isCutPoint(mission, candidate, sellerRegionSubgraph, seller):
     for e in sellerRegionSubgraph[candidate]:
         start = e
         break
+    if start is None:
+        print("No neighbors found for candidate, returning False")
+        return False
     stack = [start]
     visited = set()
     while stack:
@@ -271,7 +282,7 @@ def isCutPoint(mission, candidate, sellerRegionSubgraph, seller):
             if neighbor not in visited and neighbor != candidate:
                 stack.append(neighbor)
 
-    if mission.vehicle_assignments[mission.vehicles[seller]] - {candidate} == visited:
+    if mission.vehicle_assignments[seller] - {candidate} == visited:
         return False
     return True 
 

@@ -55,7 +55,7 @@ bals = cyclic_region_growth(mission_3)
 
 # mission_3.draw(show_neighbors=False, node_color="blue", edge_color="white")
 
-region_fine_tuning(mission_3, 100, bals)
+region_fine_tuning(mission_3, 1000, bals)
 print("Balances post reigon growth: " + str(bals))
 
 mission_3.redraw_grid_colormesh()
