@@ -211,7 +211,8 @@ class MissionArea:
         for i in range(2,max_value):
             vehicle_speed = self.grid_graph.graph.nodes[self.vehicles[i - 2]]['speed']
             vehicle_sensor_range = self.grid_graph.graph.nodes[self.vehicles[i - 2]]['sensorRange']
-            labels[i] = f"Speed: {vehicle_speed}, Sensor Radius: {vehicle_sensor_range}"
+            vehicle_pos = self.vehicles[i - 2]
+            labels[i] = f"{vehicle_pos} Speed: {vehicle_speed}, Sensor Radius: {vehicle_sensor_range}"
 
         cbar.ax.set_yticklabels(labels)
 

@@ -16,7 +16,7 @@ uxvs = []
 # uxvs.append(UxV(name="charlie", position=(600,75), speed=(10), sensorRange=(5), type="UUV", endurance=100))
 # uxvs.append(UxV(name="delta", position=(900, 55), speed=(20), sensorRange=(20), type="UUV", endurance=200))
 
-uxvs.append(UxV(name="alpha", position=(5,15), speed=(10), sensorRange=(20), type="UUV", endurance=100, color="blue", heading=0))
+uxvs.append(UxV(name="alpha", position=(5,15), speed=(200), sensorRange=(20), type="UUV", endurance=100, color="blue", heading=0))
 uxvs.append(UxV(name="bravo", position=(45,275), speed=(10), sensorRange=(15), type="UUV", endurance=100, color="green", heading=0))
 uxvs.append(UxV(name="charlie", position=(155,275), speed=(10), sensorRange=(5), type="UUV", endurance=100, color="orange", heading=0))
 uxvs.append(UxV(name="delta", position=(315, 345), speed=(10), sensorRange=(20), type="UUV", endurance=100, color="green", heading=0))
