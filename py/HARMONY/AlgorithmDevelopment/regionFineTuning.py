@@ -6,15 +6,11 @@ import heapq
 #                for the vehicles/regions
 # Post-condition: Updates mission area with new regions which should more closely reflect optimal vehicle assignments
 def region_fine_tuning(mission, iterations, account_balances : list[int]):
-    # Create a map from vehicle to index.
-    # Needed because of change of nodes.[node]['region'] from int to tuple
-    # region_map = {}
-    # for e, v in enumerate(mission.vehicles):
-    #     region_map[v] = e
-
+    
     graph = mission.grid_graph.graph
     i = iterations
     pairsTimeOut = dict() # frozen set of two regions to a counter for how many turns they are in time out (if untradeable)
+    last2trades = [] # List of pairs that have been traded in the last 2 iterations, and the contents of the trade
     regionNeighborNodes = find_neighbor_nodes(mission)
 
     while(i > 0):
@@ -71,7 +67,7 @@ def region_fine_tuning(mission, iterations, account_balances : list[int]):
        
         print("================================================")
         # Find tasks to trade and update vehicle assignments
-        keptNodes = find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances, pairsTimeOut)
+        keptNodes = find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances, pairsTimeOut, last2trades)
         tradedNodes = mission.vehicle_assignments[seller] - keptNodes
         mission.vehicle_assignments[buyer] =  mission.vehicle_assignments[buyer].union(tradedNodes)
         mission.vehicle_assignments[seller] = keptNodes
@@ -86,7 +82,7 @@ def region_fine_tuning(mission, iterations, account_balances : list[int]):
 # Post-condition: Returns the subtree that when kept by the seller region, leads to an ideal transaction,
 #                 otherwise if no trees are found that lead to an ideal transaction, no trade occurs and pair is marked
 #                 untradeable for some amount of iterations
-def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances, pairsTimeOut) :
+def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balances, pairsTimeOut, last2trades) :
     graph = mission.grid_graph.graph
     print("Entering finding kept nodes")
 
@@ -108,13 +104,22 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
         print("Now checking " + str(kthLargest) + "th largest cell as candidate")
         if not buyerNeighborsInSeller:
             # return empty and mark the pair as untradable if no neighboring nodes (meaning one might be empty or another error?)
-            print("Pairs are untradeable")
+            print("Error: No neighbors of the buyer are in the seller")
             pairsTimeOut[frozenset({buyer, seller})] = 1
+            print(f"Type of seller vehicle assignments is: {type(mission.vehicle_assignments[seller])}")
             return mission.vehicle_assignments[seller]
 
         # Candidate is kth largets node
         candidate = heapq.nlargest(kthLargest, buyerNeighborsInSeller, key=lambda node_key: graph.nodes[node_key]['weight'])[-1]
         print(f"{candidate} is selected as the candidate, with an area of {graph.nodes[candidate]['weight']}")
+
+        # If candidate does not have any neighbors, the trade cannot be made
+        if not sellerRegionSubgraph[candidate]:
+            print("Candidate has no neighbors, trading nothing. (Cannot trade last cell away)")
+            pairsTimeOut[frozenset({buyer, seller})] = 3
+            print(f"Type of seller vehicle assignments is: {type(mission.vehicle_assignments[seller])}")
+            return mission.vehicle_assignments[seller]
+
         if candidate in regionNeighborNodes[buyer]:
             print("candidate is in buyer's neighbor set")
         else:
@@ -127,9 +132,9 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
         if isCutPoint(mission, candidate, sellerRegionSubgraph, seller):
             print("Candidate is the cut point, searching q subtrees")
             print("========================================================")
-            bestTradeIndex = float('inf')
+            bestTradeIndex = max(abs(account_balances[buyer]), abs(account_balances[seller]))
             bestTradeSum = 0
-            bestTrade = {}
+            bestTrade = mission.vehicle_assignments[seller]
             # print(f"Seller region subgraph: {sellerRegionSubgraph.nodes.items()}")
 
             if set(sellerRegionSubgraph) - mission.vehicle_assignments[seller] == set() and mission.vehicle_assignments[seller] - set(sellerRegionSubgraph) == set():
@@ -177,30 +182,43 @@ def find_kept_nodes(mission, regionNeighborNodes, buyer, seller, account_balance
                     print("Seller's balance would have been: " + str(account_balances[seller] + tradeSum))
                     print("Trade sum: " + str(tradeSum))
 
-            if max(abs(account_balances[buyer]), abs(account_balances[seller])) < bestTradeIndex:
+            print("Checking if best trade is actually better than original state... ")
+            if not isValidTrade(last2trades, buyer, seller, bestTradeSum) or bestTrade == mission.vehicle_assignments[seller] :
                 # Increase K, don't return
                 kthLargest += 1
                 # Don't make the trade
                 print("No available trades are better, checking next best candidate cell")
                 print("=============================================================")
             else:
+                print("It is valid! :)")
                 account_balances[buyer] = account_balances[buyer] - bestTradeSum
                 account_balances[seller] = account_balances[seller] + bestTradeSum
                 print("Trading " + str(bestTradeSum) + " from the seller to the buyer")
                 print("=============================================================")
                 tradeFound=True
-                pairsTimeOut[frozenset({buyer, seller})] = 1
+                # pairsTimeOut[frozenset({buyer, seller})] = 1
+                updateTradeList(last2trades, buyer, seller, bestTradeSum)
+                print(f"Type of bestTrade is: {type(bestTrade)}")
                 return bestTrade
-        
         else:
-            print("Candidate weight: " + str(graph.nodes[candidate]['weight']))
-            account_balances[buyer] = account_balances[buyer] - graph.nodes[candidate]['weight']
-            account_balances[seller] = account_balances[seller] + graph.nodes[candidate]['weight']
-            tradeFound = True
-            pairsTimeOut[frozenset({buyer, seller})] = 1
-            return mission.vehicle_assignments[seller] - {candidate}
-        # If not returned yet no trade found, time out pair for 3 iterations and return seller assignments
+            if isValidTrade(last2trades, buyer, seller, graph.nodes[candidate]['weight']):
+                print("Candidate weight: " + str(graph.nodes[candidate]['weight']))
+                account_balances[buyer] = account_balances[buyer] - graph.nodes[candidate]['weight']
+                account_balances[seller] = account_balances[seller] + graph.nodes[candidate]['weight']
+                tradeFound = True
+                # pairsTimeOut[frozenset({buyer, seller})] = 1
+                updateTradeList(last2trades, buyer, seller, graph.nodes[candidate]['weight'])
+                print(f"Type of seller vehicle assignments - candidate is {type(mission.vehicle_assignments[seller] - {candidate})}")
+                return mission.vehicle_assignments[seller] - {candidate}
+            # otherwise increase k, don't return
+            kthLargest += 1
+            # Don't make the trade
+            print("No available trades are better, checking next best candidate cell")
+            print("=============================================================")
+
+    # If not returned yet no trade found, time out pair for 3 iterations and return seller assignments
     pairsTimeOut[frozenset({buyer, seller})] = 3
+    print(f"Type of seller assignments is {type(mission.vehicle_assignments[seller])}")
     return mission.vehicle_assignments[seller]
 
 # Pre-condition: A mission area
@@ -301,3 +319,35 @@ def dfs(visited, stack, candidate, regionSubgraph):
         for neighbor in regionSubgraph[node]:
             if neighbor not in visited and neighbor != candidate:
                 stack.append(neighbor)
+
+def updateTradeList(last2trades, buyer, seller, tradeValue):
+    # Update the last 3 trades with the current trade
+    print("Updating trade list...")
+    if len(last2trades) == 2:
+        last2trades.pop(0)
+    last2trades.append((buyer, seller, tradeValue))
+    print(f"Last 2 trades: {last2trades}")
+    return last2trades
+
+def isValidTrade(last2trades, buyer, seller, tradeValue):
+
+    # For trade to be invalid, last trades must include trade with the same buyer and seller, and the other trade must be the seller and buyer swapped
+    print(f"Last two trades: {last2trades}")
+    if len(last2trades) < 2:
+        print("Not enough trades to asses back and fourth trades. Thus, trade is valid")
+        return True
+    if last2trades[0][0] == buyer and last2trades[0][1] == seller:
+        # first trade is same, now other must be swapped
+        if last2trades[1][0] == seller and last2trades[1][1] == buyer:
+            print("Regions are trading back and fourth, trade is NOT valid")
+            return False
+    
+    if last2trades[1][0] == buyer and last2trades[1][1] == seller:
+        # first trade is same, now other must be swapped
+        if last2trades[0][0] == seller and last2trades[0][1] == buyer:
+            print("Regions are trading back and fourth, trade is NOT valid")
+            return False
+
+    print("Regions are NOT trading back and fourth, trade is valid")
+    return True
+    
